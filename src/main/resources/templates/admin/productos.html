@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin — Productos | Dream Zone</title>
+    <link rel="stylesheet" th:href="@{/css/admin.css}">
+</head>
+<body>
+
+<div class="admin-layout">
+
+    <!-- ══ SIDEBAR ══════════════════════════════════════ -->
+    <aside class="sidebar">
+        <div class="sidebar-logo">
+            <div class="logo-text">DZ<em>Admin</em></div>
+            <small>Panel de control</small>
+        </div>
+
+        <nav class="sidebar-menu">
+            <div class="menu-label">Catálogo</div>
+            <a th:href="@{/admin/productos}" class="menu-item active">
+                <span class="icon">◫</span> Productos
+            </a>
+
+            <!-- Aquí puedes añadir más módulos después -->
+            <div class="menu-label" style="margin-top:12px">Sistema</div>
+            <a href="#" class="menu-item">
+                <span class="icon">⚙</span> Configuración
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <a href="/">
+                <span>↩</span> Cerrar sesión
+            </a>
+        </div>
+    </aside>
+
+    <!-- ══ MAIN ══════════════════════════════════════════ -->
+    <div class="main-content">
+
+        <!-- Topbar -->
+        <header class="topbar">
+            <div class="topbar-left">
+                <h1>Productos</h1>
+                <div class="breadcrumb">Admin / <span>Productos</span></div>
+            </div>
+            <div class="topbar-right">
+                <!-- Buscador — hace GET con ?buscar=... -->
+                <form th:action="@{/admin/productos}" method="get" style="display:flex">
+                    <div class="search-box">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none"
+                             stroke="#6A8BA8" stroke-width="2">
+                            <circle cx="11" cy="11" r="8"/>
+                            <path d="m21 21-4.35-4.35"/>
+                        </svg>
+                        <input type="text" name="buscar"
+                               placeholder="Buscar producto..."
+                               th:value="${buscar}">
+                    </div>
+                </form>
+                <a th:href="@{/admin/productos/nuevo}" class="btn btn-primary">
+                    + Agregar Producto
+                </a>
+            </div>
+        </header>
+
+        <!-- Contenido -->
+        <main class="content">
+
+            <!-- Alerta de éxito -->
+            <div th:if="${mensaje}" class="alert alert-success">
+                ✓ <span th:text="${mensaje}"></span>
+            </div>
+            <div th:if="${error}" class="alert alert-error">
+                ✕ <span th:text="${error}"></span>
+            </div>
+
+            <!-- Tarjetas de estadísticas -->
+            <div class="stat-grid">
+                <div class="stat-card total">
+                    <div class="stat-label">Total</div>
+                    <div class="stat-value" th:text="${totalProductos}">0</div>
+                    <div class="stat-delta">productos en catálogo</div>
+                </div>
+                <div class="stat-card bajo">
+                    <div class="stat-label">Stock bajo</div>
+                    <div class="stat-value" th:text="${stockBajo}">0</div>
+                    <div class="stat-delta">requieren atención</div>
+                </div>
+                <div class="stat-card sin">
+                    <div class="stat-label">Sin stock</div>
+                    <div class="stat-value" th:text="${sinStock}">0</div>
+                    <div class="stat-delta">agotados</div>
+                </div>
+                <div class="stat-card activo">
+                    <div class="stat-label">Activos</div>
+                    <div class="stat-value" th:text="${activos}">0</div>
+                    <div class="stat-delta">disponibles</div>
+                </div>
+            </div>
+
+            <!-- Tabla de productos -->
+            <div class="panel">
+                <div class="panel-header">
+                    <h2>Catálogo de productos</h2>
+                    <span class="count" th:text="${productos.size()} + ' productos'">0 productos</span>
+                </div>
+
+                <table>
+                    <thead>
+                    <tr>
+                        <th>Producto</th>
+                        <th>Categoría</th>
+                        <th>Precio</th>
+                        <th>Stock</th>
+                        <th>Acciones</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <!-- Mensaje si no hay resultados -->
+                    <tr th:if="${productos.isEmpty()}">
+                        <td colspan="5" style="text-align:center; padding:32px; color:#3A5470;">
+                            No se encontraron productos.
+                        </td>
+                    </tr>
+
+                    <!-- Fila por cada producto -->
+                    <tr th:each="p : ${productos}">
+                        <td>
+                            <span class="td-name" th:text="${p.nombre}">Nombre</span>
+                            <span class="td-sku"  th:text="${p.sku}">SKU</span>
+                        </td>
+                        <td th:text="${p.categoria}">Categoría</td>
+                        <td>
+                                <span class="td-price"
+                                      th:text="'$' + ${#numbers.formatInteger(p.precio, 1, 'COMMA')}">
+                                    $0
+                                </span>
+                        </td>
+                        <td>
+                            <!-- Badge dinámico según estado -->
+                            <span th:if="${p.estadoStock == 'En stock'}"
+                                  class="badge badge-ok"  th:text="${p.estadoStock}"></span>
+                            <span th:if="${p.estadoStock == 'Stock bajo'}"
+                                  class="badge badge-low" th:text="${p.estadoStock}"></span>
+                            <span th:if="${p.estadoStock == 'Sin stock'}"
+                                  class="badge badge-out" th:text="${p.estadoStock}"></span>
+                        </td>
+                        <td>
+                            <div class="action-btns">
+                                <!-- Editar (enlace futuro) -->
+                                <a href="#" class="action-btn edit" title="Editar">✏</a>
+                                <!-- Eliminar -->
+                                <a th:href="@{/admin/productos/eliminar/{id}(id=${p.id})}"
+                                   class="action-btn delete"
+                                   title="Eliminar"
+                                   onclick="return confirm('¿Eliminar este producto?')">✕</a>
+                            </div>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </main>
+    </div>
+</div>
+
+</body>
+</html>
