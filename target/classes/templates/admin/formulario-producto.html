@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agregar Producto | Dream Zone Admin</title>
+    <link rel="stylesheet" th:href="@{/css/admin.css}">
+</head>
+<body>
+
+<div class="admin-layout">
+
+    <!-- ══ SIDEBAR ══════════════════════════════════════ -->
+    <aside class="sidebar">
+        <div class="sidebar-logo">
+            <div class="logo-text">DZ<em>Admin</em></div>
+            <small>Panel de control</small>
+        </div>
+        <nav class="sidebar-menu">
+            <div class="menu-label">Catálogo</div>
+            <a th:href="@{/admin/productos}" class="menu-item active">
+                <span class="icon">◫</span> Productos
+            </a>
+            <div class="menu-label" style="margin-top:12px">Sistema</div>
+            <a href="#" class="menu-item">
+                <span class="icon">⚙</span> Configuración
+            </a>
+        </nav>
+        <div class="sidebar-footer">
+            <a href="/"><span>↩</span> Cerrar sesión</a>
+        </div>
+    </aside>
+
+    <!-- ══ MAIN ══════════════════════════════════════════ -->
+    <div class="main-content">
+
+        <!-- Topbar -->
+        <header class="topbar">
+            <div class="topbar-left">
+                <h1 th:text="${titulo}">Agregar Producto</h1>
+                <div class="breadcrumb">
+                    Admin / <a th:href="@{/admin/productos}"
+                               style="color:var(--sky);text-decoration:none">Productos</a>
+                    / <span>Nuevo</span>
+                </div>
+            </div>
+            <div class="topbar-right">
+                <a th:href="@{/admin/productos}" class="btn btn-ghost">← Volver</a>
+            </div>
+        </header>
+
+        <!-- Contenido -->
+        <main class="content">
+
+            <!-- Formulario -->
+            <form th:action="${accion}"
+                  th:object="${producto}"
+                  method="post">
+
+                <div class="form-card">
+                    <div class="form-header">
+                        <h2>Información del producto</h2>
+                    </div>
+
+                    <div class="form-body">
+
+                        <!-- Nombre -->
+                        <div class="field full">
+                            <label for="nombre">Nombre del producto</label>
+                            <input type="text"
+                                   id="nombre"
+                                   th:field="*{nombre}"
+                                   placeholder="Ej: DZ Snapback Edición Limitada">
+                            <span class="error-msg"
+                                  th:if="${#fields.hasErrors('nombre')}"
+                                  th:errors="*{nombre}">
+                            </span>
+                        </div>
+
+                        <!-- Categoría -->
+                        <div class="field">
+                            <label for="categoria">Categoría</label>
+                            <select id="categoria" th:field="*{categoria}">
+                                <option value="">-- Selecciona --</option>
+                                <option value="Gorras">Gorras</option>
+                                <option value="Ropa">Ropa</option>
+                                <option value="Accesorios">Accesorios</option>
+                                <option value="Calzado">Calzado</option>
+                            </select>
+                            <span class="error-msg"
+                                  th:if="${#fields.hasErrors('categoria')}"
+                                  th:errors="*{categoria}">
+                            </span>
+                        </div>
+
+                        <!-- Precio -->
+                        <div class="field">
+                            <label for="precio">Precio (COP)</label>
+                            <input type="number"
+                                   id="precio"
+                                   th:field="*{precio}"
+                                   placeholder="85000"
+                                   min="0">
+                            <span class="error-msg"
+                                  th:if="${#fields.hasErrors('precio')}"
+                                  th:errors="*{precio}">
+                            </span>
+                        </div>
+
+                        <!-- Stock -->
+                        <div class="field">
+                            <label for="stock">Stock disponible</label>
+                            <input type="number"
+                                   id="stock"
+                                   th:field="*{stock}"
+                                   placeholder="50"
+                                   min="0">
+                            <span class="error-msg"
+                                  th:if="${#fields.hasErrors('stock')}"
+                                  th:errors="*{stock}">
+                            </span>
+                        </div>
+
+                        <!-- SKU -->
+                        <div class="field">
+                            <label for="sku">SKU <span style="color:var(--soft);font-weight:400">(opcional)</span></label>
+                            <input type="text"
+                                   id="sku"
+                                   th:field="*{sku}"
+                                   placeholder="SKU-006">
+                        </div>
+
+                        <!-- Descripción -->
+                        <div class="field full">
+                            <label for="descripcion">Descripción</label>
+                            <textarea id="descripcion"
+                                      th:field="*{descripcion}"
+                                      placeholder="Describe el producto: materiales, tallas disponibles, colores...">
+                            </textarea>
+                        </div>
+
+                    </div>
+
+                    <!-- Footer con botones -->
+                    <div class="form-footer">
+                        <a th:href="@{/admin/productos}" class="btn btn-ghost">Cancelar</a>
+                        <button type="submit" class="btn btn-primary">Guardar producto →</button>
+                    </div>
+
+                </div>
+
+            </form>
+
+        </main>
+    </div>
+</div>
+
+</body>
+</html>

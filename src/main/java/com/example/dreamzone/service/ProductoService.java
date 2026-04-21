@@ -65,6 +65,21 @@ public class ProductoService {
         return catalogo.removeIf(p -> p.getId().equals(id));
     }
 
+    // ── ACTUALIZAR ─────────────────────────────────────────────
+    public boolean actualizar(Producto editado) {
+        for (int i = 0; i < catalogo.size(); i++) {
+            if (catalogo.get(i).getId().equals(editado.getId())) {
+                // Preservar SKU si viene vacío
+                if (editado.getSku() == null || editado.getSku().isBlank()) {
+                    editado.setSku(catalogo.get(i).getSku());
+                }
+                catalogo.set(i, editado);
+                return true;
+            }
+        }
+        return false;
+    }
+
     // ── ESTADÍSTICAS para el dashboard ────────────────────────
     public long totalProductos()   { return catalogo.size(); }
 

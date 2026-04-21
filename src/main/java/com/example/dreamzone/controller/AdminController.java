@@ -8,6 +8,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import java.util.Optional;
 
 @Controller
 @RequestMapping("/admin")
@@ -85,12 +86,48 @@ public class AdminController {
         return "redirect:/admin/productos";
     }
 
+    // ── GET /admin/productos/ver/{id}  →  detalle ────────────
+    @GetMapping("/productos/ver/{id}")
+    public String verProducto(@PathVariable Long id, Model model,
+                              RedirectAttributes redirectAttrs) {
+        return productoService.buscarPorId(id)
+                .map(p -> { model.addAttribute("producto", p); return "admin/ver-producto"; })
+                .orElseGet(() -> {
+                    redirectAttrs.addFlashAttribute("error", "Producto no encontrado.");
+                    return "redirect:/admin/productos";
+                });
+    }
+
+    // ── GET /admin/productos/editar/{id}  →  formulario edición
+    @GetMapping("/productos/editar/{id}")
+    public String mostrarFormularioEditar(@PathVariable Long id, Model model,
+                                          RedirectAttributes redirectAttrs) {
+        return productoService.buscarPorId(id)
+                .map(p -> { model.addAttribute("producto", p); return "admin/editar-producto"; })
+                .orElseGet(() -> {
+                    redirectAttrs.addFlashAttribute("error", "Producto no encontrado.");
+                    return "redirect:/admin/productos";
+                });
+    }
+
+    // ── POST /admin/productos/actualizar  →  guarda edición ───
+    @PostMapping("/productos/actualizar")
+    public String actualizarProducto(@Valid @ModelAttribute("producto") Producto producto,
+                                     BindingResult result,
+                                     RedirectAttributes redirectAttrs) {
+        if (result.hasErrors()) {
+            return "admin/editar-producto";
+        }
+        productoService.actualizar(producto);
+        redirectAttrs.addFlashAttribute("mensaje", "¡Producto actualizado correctamente!");
+        return "redirect:/admin/productos";
+    }
+
     // ── GET /admin/productos/eliminar/{id}  →  elimina ────────
     @GetMapping("/productos/eliminar/{id}")
     public String eliminarProducto(@PathVariable Long id,
                                    RedirectAttributes redirectAttrs) {
-        boolean eliminado = productoService.eliminar(id);
-        if (eliminado) {
+        if (productoService.eliminar(id)) {
             redirectAttrs.addFlashAttribute("mensaje", "Producto eliminado correctamente.");
         } else {
             redirectAttrs.addFlashAttribute("error", "No se encontró el producto.");
