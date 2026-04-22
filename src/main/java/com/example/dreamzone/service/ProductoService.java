@@ -9,6 +9,11 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
+/**
+ * Servicio de Productos — trabaja en memoria para el MVP.
+ * Cuando integren BD, solo cambia este archivo; el controller
+ * y las vistas no necesitan modificaciones.
+ */
 @Service
 public class ProductoService {
 
@@ -48,6 +53,7 @@ public class ProductoService {
     // ── AGREGAR ────────────────────────────────────────────────
     public void agregar(Producto producto) {
         producto.setId(contadorId.getAndIncrement());
+        // Generar SKU automático si viene vacío
         if (producto.getSku() == null || producto.getSku().isBlank()) {
             producto.setSku("SKU-" + String.format("%03d", producto.getId()));
         }
@@ -63,6 +69,7 @@ public class ProductoService {
     public boolean actualizar(Producto editado) {
         for (int i = 0; i < catalogo.size(); i++) {
             if (catalogo.get(i).getId().equals(editado.getId())) {
+                // Preservar SKU si viene vacío
                 if (editado.getSku() == null || editado.getSku().isBlank()) {
                     editado.setSku(catalogo.get(i).getSku());
                 }
