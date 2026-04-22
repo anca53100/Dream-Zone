@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalle Producto | Dream Zone Admin</title>
+    <link rel="stylesheet" th:href="@{/css/admin.css}">
+    <style>
+        .detail-card {
+            background: var(--d3);
+            border-radius: 16px;
+            border: 1px solid var(--border2);
+            max-width: 680px;
+            overflow: hidden;
+        }
+        .detail-header {
+            background: linear-gradient(120deg, var(--ocean), var(--sky));
+            padding: 28px 28px 24px;
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 16px;
+        }
+        .detail-header h2 {
+            font-family: 'Syne', sans-serif;
+            font-size: 22px;
+            font-weight: 800;
+            color: white;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .detail-header .sku-tag {
+            font-size: 11px;
+            color: rgba(255,255,255,0.65);
+            margin-top: 4px;
+            font-family: 'DM Sans', sans-serif;
+        }
+        .detail-header .price-tag {
+            font-family: 'Syne', sans-serif;
+            font-size: 28px;
+            font-weight: 800;
+            color: var(--amber);
+            white-space: nowrap;
+        }
+        .detail-body {
+            padding: 24px 28px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        .detail-field { display: flex; flex-direction: column; gap: 4px; }
+        .detail-field.full { grid-column: span 2; }
+        .detail-field .dlabel {
+            font-family: 'Syne', sans-serif;
+            font-size: 9px;
+            font-weight: 700;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+        }
+        .detail-field .dvalue {
+            font-size: 14px;
+            color: var(--text);
+            font-weight: 500;
+            padding: 10px 14px;
+            background: var(--d2);
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+        .detail-field .dvalue.desc {
+            font-size: 13px;
+            line-height: 1.6;
+            color: #8daec8;
+            min-height: 60px;
+        }
+        .detail-footer {
+            padding: 16px 28px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            gap: 10px;
+        }
+    </style>
+</head>
+<body>
+<div class="admin-layout">
+
+    <aside class="sidebar">
+        <div class="sidebar-logo">
+            <div class="logo-text">DZ<em>Admin</em></div>
+            <small>Panel de control</small>
+        </div>
+        <nav class="sidebar-menu">
+            <div class="menu-label">Catálogo</div>
+            <a th:href="@{/admin/productos}" class="menu-item active">
+                <span class="icon">◫</span> Productos
+            </a>
+        </nav>
+        <div class="sidebar-footer">
+            <a href="/"><span>↩</span> Cerrar sesión</a>
+        </div>
+    </aside>
+
+    <div class="main-content">
+
+        <header class="topbar">
+            <div class="topbar-left">
+                <h1>Detalle del producto</h1>
+            </div>
+            <div class="topbar-right">
+                <a th:href="@{/admin/productos/editar/{id}(id=${producto.id})}" class="btn btn-primary">✏ Editar</a>
+                <a th:href="@{/admin/productos}" class="btn btn-ghost">← Volver</a>
+            </div>
+        </header>
+
+        <main class="content">
+            <div class="detail-card">
+                <div class="detail-header">
+                    <div>
+                        <h2 th:text="${producto.nombre}">Nombre</h2>
+                        <div class="sku-tag" th:text="${producto.sku}">SKU</div>
+                        <div style="margin-top:10px;">
+                            <span th:if="${producto.estadoStock == 'En stock'}"   class="badge badge-ok"  th:text="${producto.estadoStock}"></span>
+                            <span th:if="${producto.estadoStock == 'Stock bajo'}" class="badge badge-low" th:text="${producto.estadoStock}"></span>
+                            <span th:if="${producto.estadoStock == 'Sin stock'}"  class="badge badge-out" th:text="${producto.estadoStock}"></span>
+                        </div>
+                    </div>
+                    <div class="price-tag"
+                         th:text="'$' + ${#numbers.formatInteger(producto.precio, 1, 'COMMA')}">
+                    </div>
+                </div>
+                <div class="detail-body">
+                    <div class="detail-field">
+                        <div class="dlabel">Categoría</div>
+                        <div class="dvalue" th:text="${producto.categoria}">—</div>
+                    </div>
+                    <div class="detail-field">
+                        <div class="dlabel">Stock disponible</div>
+                        <div class="dvalue" th:text="${producto.stock} + ' unidades'">—</div>
+                    </div>
+                    <div class="detail-field">
+                        <div class="dlabel">Precio</div>
+                        <div class="dvalue" th:text="'$' + ${#numbers.formatInteger(producto.precio, 1, 'COMMA')} + ' COP'">—</div>
+                    </div>
+                    <div class="detail-field">
+                        <div class="dlabel">SKU</div>
+                        <div class="dvalue" th:text="${producto.sku}">—</div>
+                    </div>
+                    <div class="detail-field full">
+                        <div class="dlabel">Descripción</div>
+                        <div class="dvalue desc"
+                             th:text="${producto.descripcion != null and !producto.descripcion.isEmpty()} ? ${producto.descripcion} : 'Sin descripción.'">
+                        </div>
+                    </div>
+                </div>
+                <div class="detail-footer">
+                    <a th:href="@{/admin/productos/editar/{id}(id=${producto.id})}" class="btn btn-primary">✏ Editar producto</a>
+                    <a th:href="@{/admin/productos}" class="btn btn-ghost">← Volver al catálogo</a>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+</body>
+</html>
