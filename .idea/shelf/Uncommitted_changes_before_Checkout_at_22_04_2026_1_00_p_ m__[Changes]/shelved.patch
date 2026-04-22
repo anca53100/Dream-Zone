@@ -1,0 +1,203 @@
+Index: src/main/java/com/example/dreamzone/model/Producto.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.example.dreamzone.model;\r\n\r\nimport jakarta.validation.constraints.Min;\r\nimport jakarta.validation.constraints.NotBlank;\r\nimport jakarta.validation.constraints.NotNull;\r\n\r\npublic class Producto {\r\n\r\n    private Long id;\r\n\r\n    @NotBlank(message = \"El nombre es obligatorio\")\r\n    private String nombre;\r\n\r\n    @NotBlank(message = \"La categoría es obligatoria\")\r\n    private String categoria;\r\n\r\n    @NotNull(message = \"El precio es obligatorio\")\r\n    @Min(value = 0, message = \"El precio no puede ser negativo\")\r\n    private Double precio;\r\n\r\n    @NotNull(message = \"El stock es obligatorio\")\r\n    @Min(value = 0, message = \"El stock no puede ser negativo\")\r\n    private Integer stock;\r\n\r\n    private String sku;\r\n    private String descripcion;\r\n\r\n    // ── Constructores ──────────────────────────────────\r\n    public Producto() {}\r\n\r\n    public Producto(Long id, String nombre, String categoria,\r\n                    Double precio, Integer stock, String sku, String descripcion) {\r\n        this.id          = id;\r\n        this.nombre      = nombre;\r\n        this.categoria   = categoria;\r\n        this.precio      = precio;\r\n        this.stock       = stock;\r\n        this.sku         = sku;\r\n        this.descripcion = descripcion;\r\n    }\r\n\r\n    // Helper: estado de stock para la vista\r\n    public String getEstadoStock() {\r\n        if (stock == null || stock == 0) return \"Sin stock\";\r\n        if (stock <= 5)                  return \"Stock bajo\";\r\n        return \"En stock\";\r\n    }\r\n\r\n    // ── Getters y Setters ───────────────────────────────\r\n    public Long getId()                  { return id; }\r\n    public void setId(Long id)           { this.id = id; }\r\n\r\n    public String getNombre()            { return nombre; }\r\n    public void setNombre(String n)      { this.nombre = n; }\r\n\r\n    public String getCategoria()         { return categoria; }\r\n    public void setCategoria(String c)   { this.categoria = c; }\r\n\r\n    public Double getPrecio()            { return precio; }\r\n    public void setPrecio(Double p)      { this.precio = p; }\r\n\r\n    public Integer getStock()            { return stock; }\r\n    public void setStock(Integer s)      { this.stock = s; }\r\n\r\n    public String getSku()               { return sku; }\r\n    public void setSku(String sku)       { this.sku = sku; }\r\n\r\n    public String getDescripcion()       { return descripcion; }\r\n    public void setDescripcion(String d) { this.descripcion = d; }\r\n}
+===================================================================
+diff --git a/src/main/java/com/example/dreamzone/model/Producto.java b/src/main/java/com/example/dreamzone/model/Producto.java
+--- a/src/main/java/com/example/dreamzone/model/Producto.java	(revision d6d7dc07334165eadf8c16e03217ecc3abe1ec58)
++++ b/src/main/java/com/example/dreamzone/model/Producto.java	(date 1776880775456)
+@@ -14,6 +14,9 @@
+     @NotBlank(message = "La categoría es obligatoria")
+     private String categoria;
+ 
++    @NotBlank(message = "La subcategoría es obligatoria")
++    private String subcategoria;
++
+     @NotNull(message = "El precio es obligatorio")
+     @Min(value = 0, message = "El precio no puede ser negativo")
+     private Double precio;
+@@ -24,15 +27,17 @@
+ 
+     private String sku;
+     private String descripcion;
++    private String badge;
+ 
+     // ── Constructores ──────────────────────────────────
+     public Producto() {}
+ 
+-    public Producto(Long id, String nombre, String categoria,
++    public Producto(Long id, String nombre, String categoria, String subcategoria,
+                     Double precio, Integer stock, String sku, String descripcion) {
+         this.id          = id;
+         this.nombre      = nombre;
+         this.categoria   = categoria;
++        this.subcategoria = subcategoria;
+         this.precio      = precio;
+         this.stock       = stock;
+         this.sku         = sku;
+@@ -56,6 +61,9 @@
+     public String getCategoria()         { return categoria; }
+     public void setCategoria(String c)   { this.categoria = c; }
+ 
++    public String getSubcategoria()          { return subcategoria; }
++    public void setSubcategoria(String s)    { this.subcategoria = s; }
++
+     public Double getPrecio()            { return precio; }
+     public void setPrecio(Double p)      { this.precio = p; }
+ 
+@@ -67,4 +75,18 @@
+ 
+     public String getDescripcion()       { return descripcion; }
+     public void setDescripcion(String d) { this.descripcion = d; }
++
++    public String getBadge()             { return badge; }
++    public void setBadge(String badge)   { this.badge = badge; }
++
++    // Constructor para los productos del catálogo (sin sku/descripcion/stock)
++    public Producto(Long id, String nombre, String categoria, String subcategoria,
++                    Double precio, String badge) {
++        this.id           = id;
++        this.nombre       = nombre;
++        this.categoria    = categoria;
++        this.subcategoria = subcategoria;
++        this.precio       = precio;
++        this.badge        = badge;
++    }
+ }
+\ No newline at end of file
+Index: src/main/java/com/example/dreamzone/service/ProductoService.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.example.dreamzone.service;\r\n\r\nimport com.example.dreamzone.model.Producto;\r\nimport org.springframework.stereotype.Service;\r\n\r\nimport java.util.ArrayList;\r\nimport java.util.List;\r\nimport java.util.Optional;\r\nimport java.util.concurrent.atomic.AtomicLong;\r\n\r\n/**\r\n * Servicio de Productos — trabaja en memoria para el MVP.\r\n * Cuando integren BD, solo cambia este archivo; el controller\r\n * y las vistas no necesitan modificaciones.\r\n */\r\n@Service\r\npublic class ProductoService {\r\n\r\n    private final List<Producto> catalogo = new ArrayList<>();\r\n    private final AtomicLong contadorId   = new AtomicLong(1);\r\n\r\n    public ProductoService() {\r\n        // Datos de prueba\r\n        catalogo.add(new Producto(contadorId.getAndIncrement(),\r\n                \"DZ Snapback Negro\", \"Gorras\", 85000.0, 20, \"SKU-001\",\r\n                \"Gorra snapback negra con logo DZ bordado\"));\r\n        catalogo.add(new Producto(contadorId.getAndIncrement(),\r\n                \"Camiseta Logo DZ\", \"Ropa\", 65000.0, 15, \"SKU-002\",\r\n                \"Camiseta de algodón con logo Dream Zone\"));\r\n        catalogo.add(new Producto(contadorId.getAndIncrement(),\r\n                \"Hoodie DZ Azul\", \"Ropa\", 140000.0, 4, \"SKU-003\",\r\n                \"Hoodie azul con logo DZ estampado\"));\r\n        catalogo.add(new Producto(contadorId.getAndIncrement(),\r\n                \"Mochila DZ\", \"Accesorios\", 110000.0, 8, \"SKU-004\",\r\n                \"Mochila resistente con parche DZ\"));\r\n        catalogo.add(new Producto(contadorId.getAndIncrement(),\r\n                \"Guantes DZ\", \"Accesorios\", 45000.0, 0, \"SKU-005\",\r\n                \"Guantes táctiles con logo bordado\"));\r\n    }\r\n\r\n    // ── LISTAR ─────────────────────────────────────────────────\r\n    public List<Producto> listarTodos() {\r\n        return new ArrayList<>(catalogo);\r\n    }\r\n\r\n    // ── BUSCAR POR ID ──────────────────────────────────────────\r\n    public Optional<Producto> buscarPorId(Long id) {\r\n        return catalogo.stream()\r\n                .filter(p -> p.getId().equals(id))\r\n                .findFirst();\r\n    }\r\n\r\n    // ── AGREGAR ────────────────────────────────────────────────\r\n    public void agregar(Producto producto) {\r\n        producto.setId(contadorId.getAndIncrement());\r\n        // Generar SKU automático si viene vacío\r\n        if (producto.getSku() == null || producto.getSku().isBlank()) {\r\n            producto.setSku(\"SKU-\" + String.format(\"%03d\", producto.getId()));\r\n        }\r\n        catalogo.add(producto);\r\n    }\r\n\r\n    // ── ELIMINAR ───────────────────────────────────────────────\r\n    public boolean eliminar(Long id) {\r\n        return catalogo.removeIf(p -> p.getId().equals(id));\r\n    }\r\n\r\n    // ── ACTUALIZAR ─────────────────────────────────────────────\r\n    public boolean actualizar(Producto editado) {\r\n        for (int i = 0; i < catalogo.size(); i++) {\r\n            if (catalogo.get(i).getId().equals(editado.getId())) {\r\n                // Preservar SKU si viene vacío\r\n                if (editado.getSku() == null || editado.getSku().isBlank()) {\r\n                    editado.setSku(catalogo.get(i).getSku());\r\n                }\r\n                catalogo.set(i, editado);\r\n                return true;\r\n            }\r\n        }\r\n        return false;\r\n    }\r\n\r\n    // ── ESTADÍSTICAS para el dashboard ────────────────────────\r\n    public long totalProductos()   { return catalogo.size(); }\r\n\r\n    public long stockBajo() {\r\n        return catalogo.stream()\r\n                .filter(p -> p.getStock() != null && p.getStock() > 0 && p.getStock() <= 5)\r\n                .count();\r\n    }\r\n\r\n    public long sinStock() {\r\n        return catalogo.stream()\r\n                .filter(p -> p.getStock() == null || p.getStock() == 0)\r\n                .count();\r\n    }\r\n\r\n    public long activos() {\r\n        return catalogo.stream()\r\n                .filter(p -> p.getStock() != null && p.getStock() > 0)\r\n                .count();\r\n    }\r\n}
+===================================================================
+diff --git a/src/main/java/com/example/dreamzone/service/ProductoService.java b/src/main/java/com/example/dreamzone/service/ProductoService.java
+--- a/src/main/java/com/example/dreamzone/service/ProductoService.java	(revision d6d7dc07334165eadf8c16e03217ecc3abe1ec58)
++++ b/src/main/java/com/example/dreamzone/service/ProductoService.java	(date 1776880775478)
+@@ -7,35 +7,30 @@
+ import java.util.List;
+ import java.util.Optional;
+ import java.util.concurrent.atomic.AtomicLong;
++import java.util.stream.Collectors;
+ 
+-/**
+- * Servicio de Productos — trabaja en memoria para el MVP.
+- * Cuando integren BD, solo cambia este archivo; el controller
+- * y las vistas no necesitan modificaciones.
+- */
+ @Service
+ public class ProductoService {
+ 
+     private final List<Producto> catalogo = new ArrayList<>();
+-    private final AtomicLong contadorId   = new AtomicLong(1);
++    private final AtomicLong contadorId   = new AtomicLong(16);
+ 
+     public ProductoService() {
+-        // Datos de prueba
+-        catalogo.add(new Producto(contadorId.getAndIncrement(),
+-                "DZ Snapback Negro", "Gorras", 85000.0, 20, "SKU-001",
+-                "Gorra snapback negra con logo DZ bordado"));
+-        catalogo.add(new Producto(contadorId.getAndIncrement(),
+-                "Camiseta Logo DZ", "Ropa", 65000.0, 15, "SKU-002",
+-                "Camiseta de algodón con logo Dream Zone"));
+-        catalogo.add(new Producto(contadorId.getAndIncrement(),
+-                "Hoodie DZ Azul", "Ropa", 140000.0, 4, "SKU-003",
+-                "Hoodie azul con logo DZ estampado"));
+-        catalogo.add(new Producto(contadorId.getAndIncrement(),
+-                "Mochila DZ", "Accesorios", 110000.0, 8, "SKU-004",
+-                "Mochila resistente con parche DZ"));
+-        catalogo.add(new Producto(contadorId.getAndIncrement(),
+-                "Guantes DZ", "Accesorios", 45000.0, 0, "SKU-005",
+-                "Guantes táctiles con logo bordado"));
++        catalogo.add(new Producto(1L,  "Taza",       "Otros",      "Taza",      25000.0, "NEW"));
++        catalogo.add(new Producto(2L,  "Camiseta",   "Camisas",    "Camisa",    25000.0, "NEW"));
++        catalogo.add(new Producto(3L,  "Billetera",  "Accesorios", "Accesorio", 25000.0, "NEW"));
++        catalogo.add(new Producto(4L,  "Figura",     "Otros",      "Figura",    25000.0, "NEW"));
++        catalogo.add(new Producto(5L,  "Gorra",      "Accesorios", "Accesorio", 25000.0, "NEW"));
++        catalogo.add(new Producto(6L,  "Taza 2",     "Otros",      "Taza",      25000.0, null));
++        catalogo.add(new Producto(7L,  "Saco",       "Sacos",      "Saco",      25000.0, null));
++        catalogo.add(new Producto(8L,  "Pin",        "Accesorios", "Accesorio", 25000.0, null));
++        catalogo.add(new Producto(9L,  "Figura 2",   "Otros",      "Figura",    25000.0, null));
++        catalogo.add(new Producto(10L, "Aretes",     "Accesorios", "Accesorio", 25000.0, null));
++        catalogo.add(new Producto(11L, "Camisa",     "Camisas",    "Camisa",    25000.0, null));
++        catalogo.add(new Producto(12L, "Saco largo", "Sacos",      "Saco",      25000.0, null));
++        catalogo.add(new Producto(13L, "Collar",     "Accesorios", "Accesorio", 25000.0, null));
++        catalogo.add(new Producto(14L, "Figura 3",   "Otros",      "Figura",    25000.0, null));
++        catalogo.add(new Producto(15L, "Camisa 2",   "Camisas",    "Camisa",    25000.0, null));
+     }
+ 
+     // ── LISTAR ─────────────────────────────────────────────────
+@@ -53,7 +48,6 @@
+     // ── AGREGAR ────────────────────────────────────────────────
+     public void agregar(Producto producto) {
+         producto.setId(contadorId.getAndIncrement());
+-        // Generar SKU automático si viene vacío
+         if (producto.getSku() == null || producto.getSku().isBlank()) {
+             producto.setSku("SKU-" + String.format("%03d", producto.getId()));
+         }
+@@ -69,7 +63,6 @@
+     public boolean actualizar(Producto editado) {
+         for (int i = 0; i < catalogo.size(); i++) {
+             if (catalogo.get(i).getId().equals(editado.getId())) {
+-                // Preservar SKU si viene vacío
+                 if (editado.getSku() == null || editado.getSku().isBlank()) {
+                     editado.setSku(catalogo.get(i).getSku());
+                 }
+@@ -80,8 +73,8 @@
+         return false;
+     }
+ 
+-    // ── ESTADÍSTICAS para el dashboard ────────────────────────
+-    public long totalProductos()   { return catalogo.size(); }
++    // ── ESTADÍSTICAS ───────────────────────────────────────────
++    public long totalProductos() { return catalogo.size(); }
+ 
+     public long stockBajo() {
+         return catalogo.stream()
+@@ -100,4 +93,31 @@
+                 .filter(p -> p.getStock() != null && p.getStock() > 0)
+                 .count();
+     }
++
++    // ── MÉTODOS NUEVOS ─────────────────────────────────────────
++    public List<Producto> getTodos() {
++        return listarTodos();
++    }
++
++    public List<Producto> getDestacados() {
++        return catalogo.stream()
++                .filter(p -> p.getBadge() != null)
++                .collect(Collectors.toList());
++    }
++
++    public List<Producto> getPorCategoria(String categoria) {
++        if (categoria == null || categoria.equals("Todos")) return listarTodos();
++        return catalogo.stream()
++                .filter(p -> p.getCategoria().equalsIgnoreCase(categoria))
++                .collect(Collectors.toList());
++    }
++
++    public List<Producto> buscar(String query) {
++        String q = query.toLowerCase();
++        return catalogo.stream()
++                .filter(p -> p.getNombre().toLowerCase().contains(q)
++                        || p.getCategoria().toLowerCase().contains(q)
++                        || p.getSubcategoria().toLowerCase().contains(q))
++                .collect(Collectors.toList());
++    }
+ }
+\ No newline at end of file
+Index: src/main/resources/application.properties
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>spring.application.name=Dream Zone\r\n
+===================================================================
+diff --git a/src/main/resources/application.properties b/src/main/resources/application.properties
+--- a/src/main/resources/application.properties	(revision d6d7dc07334165eadf8c16e03217ecc3abe1ec58)
++++ b/src/main/resources/application.properties	(date 1776880775498)
+@@ -1,1 +1,4 @@
+-spring.application.name=Dream Zone
++spring.application.name=DreamZone
++server.port=8080
++spring.thymeleaf.cache=false
++spring.thymeleaf.encoding=UTF-8
+\ No newline at end of file
