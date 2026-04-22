@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.stream.Collectors;
 
 /**
  * Servicio de Productos — trabaja en memoria para el MVP.
@@ -17,25 +18,24 @@ import java.util.concurrent.atomic.AtomicLong;
 public class ProductoService {
 
     private final List<Producto> catalogo = new ArrayList<>();
-    private final AtomicLong contadorId   = new AtomicLong(1);
+    private final AtomicLong contadorId   = new AtomicLong(16);
 
     public ProductoService() {
-        // Datos de prueba
-        catalogo.add(new Producto(contadorId.getAndIncrement(),
-                "DZ Snapback Negro", "Gorras", 85000.0, 20, "SKU-001",
-                "Gorra snapback negra con logo DZ bordado"));
-        catalogo.add(new Producto(contadorId.getAndIncrement(),
-                "Camiseta Logo DZ", "Ropa", 65000.0, 15, "SKU-002",
-                "Camiseta de algodón con logo Dream Zone"));
-        catalogo.add(new Producto(contadorId.getAndIncrement(),
-                "Hoodie DZ Azul", "Ropa", 140000.0, 4, "SKU-003",
-                "Hoodie azul con logo DZ estampado"));
-        catalogo.add(new Producto(contadorId.getAndIncrement(),
-                "Mochila DZ", "Accesorios", 110000.0, 8, "SKU-004",
-                "Mochila resistente con parche DZ"));
-        catalogo.add(new Producto(contadorId.getAndIncrement(),
-                "Guantes DZ", "Accesorios", 45000.0, 0, "SKU-005",
-                "Guantes táctiles con logo bordado"));
+        catalogo.add(new Producto(1L,  "Taza",       "Otros",      "Taza",      25000.0, "NEW"));
+        catalogo.add(new Producto(2L,  "Camiseta",   "Camisas",    "Camisa",    25000.0, "NEW"));
+        catalogo.add(new Producto(3L,  "Billetera",  "Accesorios", "Accesorio", 25000.0, "NEW"));
+        catalogo.add(new Producto(4L,  "Figura",     "Otros",      "Figura",    25000.0, "NEW"));
+        catalogo.add(new Producto(5L,  "Gorra",      "Accesorios", "Accesorio", 25000.0, "NEW"));
+        catalogo.add(new Producto(6L,  "Taza 2",     "Otros",      "Taza",      25000.0, null));
+        catalogo.add(new Producto(7L,  "Saco",       "Sacos",      "Saco",      25000.0, null));
+        catalogo.add(new Producto(8L,  "Pin",        "Accesorios", "Accesorio", 25000.0, null));
+        catalogo.add(new Producto(9L,  "Figura 2",   "Otros",      "Figura",    25000.0, null));
+        catalogo.add(new Producto(10L, "Aretes",     "Accesorios", "Accesorio", 25000.0, null));
+        catalogo.add(new Producto(11L, "Camisa",     "Camisas",    "Camisa",    25000.0, null));
+        catalogo.add(new Producto(12L, "Saco largo", "Sacos",      "Saco",      25000.0, null));
+        catalogo.add(new Producto(13L, "Collar",     "Accesorios", "Accesorio", 25000.0, null));
+        catalogo.add(new Producto(14L, "Figura 3",   "Otros",      "Figura",    25000.0, null));
+        catalogo.add(new Producto(15L, "Camisa 2",   "Camisas",    "Camisa",    25000.0, null));
     }
 
     // ── LISTAR ─────────────────────────────────────────────────
@@ -80,8 +80,8 @@ public class ProductoService {
         return false;
     }
 
-    // ── ESTADÍSTICAS para el dashboard ────────────────────────
-    public long totalProductos()   { return catalogo.size(); }
+    // ── ESTADÍSTICAS ───────────────────────────────────────────
+    public long totalProductos() { return catalogo.size(); }
 
     public long stockBajo() {
         return catalogo.stream()
@@ -99,5 +99,32 @@ public class ProductoService {
         return catalogo.stream()
                 .filter(p -> p.getStock() != null && p.getStock() > 0)
                 .count();
+    }
+
+    // ── MÉTODOS NUEVOS ─────────────────────────────────────────
+    public List<Producto> getTodos() {
+        return listarTodos();
+    }
+
+    public List<Producto> getDestacados() {
+        return catalogo.stream()
+                .filter(p -> p.getBadge() != null)
+                .collect(Collectors.toList());
+    }
+
+    public List<Producto> getPorCategoria(String categoria) {
+        if (categoria == null || categoria.equals("Todos")) return listarTodos();
+        return catalogo.stream()
+                .filter(p -> p.getCategoria().equalsIgnoreCase(categoria))
+                .collect(Collectors.toList());
+    }
+
+    public List<Producto> buscar(String query) {
+        String q = query.toLowerCase();
+        return catalogo.stream()
+                .filter(p -> p.getNombre().toLowerCase().contains(q)
+                        || p.getCategoria().toLowerCase().contains(q)
+                        || p.getSubcategoria().toLowerCase().contains(q))
+                .collect(Collectors.toList());
     }
 }
