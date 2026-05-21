@@ -4,6 +4,7 @@ import com.example.dreamzone.model.Producto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import com.example.dreamzone.repository.ProductoRepository;
 
@@ -43,5 +44,14 @@ public class ProductoService {
 
     public List<Producto> buscar(String nombre) {
         return productoRepository.findByNombreContainingIgnoreCase(nombre);
+    }
+
+    // ProductoService.java — agregar
+    public Map<String, Long> contarPorCategoria() {
+        return obtenerTodos().stream()
+                .collect(java.util.stream.Collectors.groupingBy(
+                        p -> p.getCategoria() != null ? p.getCategoria() : "Sin categoría",
+                        java.util.stream.Collectors.counting()
+                ));
     }
 }

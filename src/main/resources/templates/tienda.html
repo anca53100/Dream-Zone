@@ -361,7 +361,6 @@
         @media (max-width: 540px) {
             .products-grid { grid-template-columns: 1fr; }
             .main-content { padding: 20px 16px; }
-            .inicio{ padding: 20px 16px; }
         }
     </style>
 </head>
@@ -438,36 +437,7 @@
 </header>
 
 <div class ="inicio">
-    <!-- Header -->
-    <div class="tienda-header">
-        <h1 class="tienda-title">Tienda</h1>
-        <p class="tienda-sub">Explora nuestro catálogo completo</p>
-    </div>
-    <!-- Toolbar -->
-    <div class="toolbar">
-        <div class="toolbar-left">
-            <span class="results-count">Mostrando <strong>1–12</strong> de <strong>257</strong> resultados</span>
-            <div class="filter-tag" id="tag-nuevo" style="display:none">
-                Nuevo <span class="filter-tag-x" onclick="removeTag('nuevo')">×</span>
-            </div>
-        </div>
-        <div class="toolbar-right">
-            <select class="sort-select" onchange="sortProducts(this.value)">
-                <option value="reciente">Más recientes</option>
-                <option value="precio-asc">Precio: menor a mayor</option>
-                <option value="precio-desc">Precio: mayor a menor</option>
-                <option value="nombre">Nombre A–Z</option>
-            </select>
-            <div class="view-toggle">
-                <button class="view-btn active" id="gridBtn" onclick="setView('grid')" title="Cuadrícula">
-                    <svg fill="currentColor" viewBox="0 0 24 24"><path d="M3 3h7v7H3V3zm0 11h7v7H3v-7zm11-11h7v7h-7V3zm0 11h7v7h-7v-7z"/></svg>
-                </button>
-                <button class="view-btn" id="listBtn" onclick="setView('list')" title="Lista">
-                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
-                </button>
-            </div>
-        </div>
-    </div>
+
 </div>
 <!-- ─── PAGE WRAPPER ─── -->
 <div class="page-wrapper">
@@ -494,7 +464,6 @@
                 <label class="filter-option"><input type="checkbox" onchange="filterProducts()"/><div class="filter-checkbox"></div><span class="filter-label">Accesorios</span><span class="filter-count">98</span></label>
             </div>
         </div>
-
         <!-- Precio -->
         <div class="filter-group">
             <div class="filter-group-title" onclick="toggleGroup(this)">
@@ -538,6 +507,36 @@
 
     <!-- MAIN CONTENT -->
     <main class="main-content">
+        <!-- Header -->
+        <div class="tienda-header">
+            <h1 class="tienda-title">Tienda</h1>
+            <p class="tienda-sub">Explora nuestro catálogo completo</p>
+        </div>
+        <!-- Toolbar -->
+        <div class="toolbar">
+            <div class="toolbar-left">
+                <span class="results-count">Mostrando <strong>1–12</strong> de <strong>257</strong> resultados</span>
+                <div class="filter-tag" id="tag-nuevo" style="display:none">
+                    Nuevo <span class="filter-tag-x" onclick="removeTag('nuevo')">×</span>
+                </div>
+            </div>
+            <div class="toolbar-right">
+                <select class="sort-select" onchange="sortProducts(this.value)">
+                    <option value="reciente">Más recientes</option>
+                    <option value="precio-asc">Precio: menor a mayor</option>
+                    <option value="precio-desc">Precio: mayor a menor</option>
+                    <option value="nombre">Nombre A–Z</option>
+                </select>
+                <div class="view-toggle">
+                    <button class="view-btn active" id="gridBtn" onclick="setView('grid')" title="Cuadrícula">
+                        <svg fill="currentColor" viewBox="0 0 24 24"><path d="M3 3h7v7H3V3zm0 11h7v7H3v-7zm11-11h7v7h-7V3zm0 11h7v7h-7v-7z"/></svg>
+                    </button>
+                    <button class="view-btn" id="listBtn" onclick="setView('list')" title="Lista">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+                    </button>
+                </div>
+            </div>
+        </div>
         <!-- Products -->
         <div class="products-grid" id="productsGrid">
 
