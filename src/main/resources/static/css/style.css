@@ -111,3 +111,305 @@ html,body{height:100%;font-family:'Barlow',sans-serif;}
 .toast.show{transform:translateX(0);}
 .toast.red{border-left-color:#e53935;}
 .toast.green{border-left-color:#22c55e;}
+/* ============================================================
+   AUTH.CSS — DreamZone Login / Register
+   Fuentes: Bebas Neue (logo), Rajdhani (body)
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@400;500;600&display=swap');
+
+/* ── Reset base ── */
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+.auth-body {
+    min-height: 100vh;
+    background-color: #07091a;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 20px 0;
+    font-family: 'Rajdhani', sans-serif;
+}
+
+/* ── Wrapper 2 columnas ── */
+.auth-wrapper {
+    display: flex;
+    width: 860px;
+    max-width: 98vw;
+    min-height: auto;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 0 60px rgba(0, 100, 220, 0.2);
+}
+
+/* ── Panel izquierdo decorativo ── */
+.auth-banner {
+    flex: 1;
+    background-color: #07091a;
+}
+
+/* ── Panel derecho formulario ── */
+.auth-card {
+    width: 360px;
+    flex-shrink: 0;
+    background-color: #0e0f1e;
+    padding: 30px 36px;
+    display: flex;
+    flex-direction: column;
+}
+
+/* ── Logo ── */
+.auth-logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2.6rem;
+    color: #0088dd;
+    letter-spacing: 6px;
+    text-align: center;
+    line-height: 0.95;
+    margin-bottom: 20px;
+}
+
+/* ── Títulos ── */
+.auth-title {
+    .auth-title {
+        font-family: 'Playfair Display', serif;
+    }
+    color: #ffffff;
+    font-size: 1.3rem;
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 4px;
+    letter-spacing: 0.3px;
+}
+
+.auth-subtitle {
+    font-family: 'Rajdhani', sans-serif;
+    color: #6677aa;
+    font-size: 0.82rem;
+    text-align: center;
+    margin-bottom: 24px;
+}
+
+/* ── Alertas ── */
+.auth-alert {
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-size: 0.82rem;
+    margin-bottom: 16px;
+    font-family: 'Rajdhani', sans-serif;
+}
+
+.auth-alert-error {
+    background-color: rgba(220, 50, 50, 0.12);
+    border: 1px solid rgba(220, 50, 50, 0.35);
+    color: #ff6b6b;
+}
+
+.auth-alert-success {
+    background-color: rgba(50, 200, 100, 0.12);
+    border: 1px solid rgba(50, 200, 100, 0.35);
+    color: #4cde7c;
+}
+
+/* ── Campos ── */
+.auth-field {
+    margin-bottom: 14px;
+}
+
+.auth-field label {
+    display: block;
+    color: #8899bb;
+    font-size: 0.8rem;
+    font-weight: 500;
+    font-family: 'Rajdhani', sans-serif;
+    margin-bottom: 6px;
+}
+
+.auth-input {
+    width: 100%;
+    background-color: #171828;
+    border: 1px solid #252540;
+    border-radius: 8px;
+    color: #ccd6f0;
+    padding: 10px 14px;
+    font-size: 0.88rem;
+    font-family: 'Rajdhani', sans-serif;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.auth-input:focus {
+    border-color: #0088dd;
+    box-shadow: 0 0 0 3px rgba(0, 136, 221, 0.12);
+}
+
+.auth-input::placeholder {
+    color: #3a3a5c;
+}
+
+/* ── Password wrapper ── */
+.input-password-wrapper {
+    position: relative;
+}
+
+.input-password-wrapper .auth-input {
+    padding-right: 42px;
+}
+
+.toggle-password {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1rem;
+    color: #445566;
+    padding: 0;
+    line-height: 1;
+}
+
+.auth-link-small {
+    display: block;
+    text-align: right;
+    color: #2288cc;
+    font-size: 0.78rem;
+    font-family: 'Rajdhani', sans-serif;
+    text-decoration: none;
+    margin-top: 6px;
+}
+
+.auth-link-small:hover {
+    text-decoration: underline;
+}
+
+/* ── Botón principal ── */
+.btn-auth-primary {
+    width: 100%;
+    padding: 11px;
+    background: #1a6fff;
+    color: #ffffff;
+    font-size: 0.95rem;
+    font-weight: 600;
+    font-family: 'Rajdhani', sans-serif;
+    letter-spacing: 0.5px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-top: 8px;
+    transition: background 0.2s, transform 0.1s;
+}
+
+.btn-auth-primary:hover {
+    background: #1460e8;
+    transform: translateY(-1px);
+}
+
+.btn-auth-primary:active {
+    transform: translateY(0);
+}
+
+/* ── Divisor ── */
+.auth-divider {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 20px 0 16px;
+    color: #334455;
+    font-size: 0.78rem;
+    font-family: 'Rajdhani', sans-serif;
+}
+
+.auth-divider::before,
+.auth-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background-color: #1e1e38;
+}
+
+/* ── Botones sociales ── */
+.auth-social {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 22px;
+}
+
+.btn-social {
+    width: 48px;
+    height: 48px;
+    border-radius: 10px;
+    border: 1px solid #1e1e38;
+    background-color: #171828;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: border-color 0.2s, background-color 0.2s;
+}
+
+.btn-social:hover {
+    border-color: #0088dd;
+    background-color: #1a1e30;
+}
+
+/* ── Pie ── */
+.auth-footer-text {
+    text-align: center;
+    color: #445566;
+    font-size: 0.82rem;
+    font-family: 'Rajdhani', sans-serif;
+    margin-top: auto;
+}
+
+.auth-link {
+    color: #2288cc;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.auth-link:hover {
+    text-decoration: underline;
+}
+
+/* ── Responsive ── */
+@media (max-width: 680px) {
+    .auth-banner {
+        display: none;
+    }
+
+    .auth-wrapper {
+        width: 100%;
+        min-height: 100vh;
+        border-radius: 0;
+    }
+
+    .auth-card {
+        width: 100%;
+        padding: 36px 24px;
+    }
+}
+/* ── Checkbox términos ── */
+.auth-check {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 14px;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.82rem;
+    color: #8899bb;
+}
+
+.auth-checkbox {
+    width: 16px;
+    height: 16px;
+    accent-color: #1a6fff;
+    cursor: pointer;
+    flex-shrink: 0;
+}

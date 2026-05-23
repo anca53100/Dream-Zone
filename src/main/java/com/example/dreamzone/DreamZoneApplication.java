@@ -25,7 +25,7 @@ public class DreamZoneApplication {
             p.setEstado("Activo");
             p.setEsNuevo(true);
             repo.save(p);
-            System.out.println("✅ MongoDB conectado — productos: " + repo.count());
+            System.out.println(" MongoDB conectado — productos: " + repo.count());
         };
     }
 }

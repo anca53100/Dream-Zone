@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recuperar contraseña - Dream Zone</title>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@400;500;600&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body class="auth-body">
+
+<div class="auth-wrapper">
+
+    <!-- Panel izquierdo vacío -->
+    <div class="auth-banner"></div>
+
+    <!-- Panel derecho: formulario -->
+    <div class="auth-card">
+
+        <div class="auth-logo">
+            DREAM<br>ZONE
+        </div>
+
+        <h2 class="auth-title">Recuperar contraseña</h2>
+        <p class="auth-subtitle">Te enviaremos un enlace a tu correo</p>
+
+        <!-- Mensaje de error -->
+        <div th:if="${error}" class="auth-alert auth-alert-error">
+            <span th:text="${error}"></span>
+        </div>
+
+        <!-- Mensaje de éxito -->
+        <div th:if="${exito}" class="auth-alert auth-alert-success">
+            <span th:text="${exito}"></span>
+        </div>
+
+        <form th:action="@{/auth/recuperar}" method="post">
+
+            <div class="auth-field">
+                <label for="email">Correo electrónico</label>
+                <input type="email"
+                       id="email"
+                       name="email"
+                       placeholder="tu@email.com"
+                       required
+                       class="auth-input">
+            </div>
+
+            <button type="submit" class="btn-auth-primary">Enviar enlace</button>
+
+        </form>
+
+        <p class="auth-footer-text" style="margin-top: 16px;">
+            <a th:href="@{/auth/login}" class="auth-link">← Volver al login</a>
+        </p>
+
+    </div>
+</div>
+
+</body>
+</html>
