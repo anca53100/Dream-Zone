@@ -1,164 +1,622 @@
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Detalle Producto | Dream Zone Admin</title>
-    <link rel="stylesheet" th:href="@{/css/admin.css}">
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Ver Producto — DreamZone Admin</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}"/>
     <style>
-        .detail-card {
-            background: var(--d3);
-            border-radius: 16px;
-            border: 1px solid var(--border2);
-            max-width: 680px;
-            overflow: hidden;
-        }
-        .detail-header {
-            background: linear-gradient(120deg, var(--ocean), var(--sky));
-            padding: 28px 28px 24px;
-            display: flex;
-            align-items: flex-start;
-            justify-content: space-between;
-            gap: 16px;
-        }
-        .detail-header h2 {
-            font-family: 'Syne', sans-serif;
-            font-size: 22px;
-            font-weight: 800;
-            color: white;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        .detail-header .sku-tag {
-            font-size: 11px;
-            color: rgba(255,255,255,0.65);
-            margin-top: 4px;
-            font-family: 'DM Sans', sans-serif;
-        }
-        .detail-header .price-tag {
-            font-family: 'Syne', sans-serif;
-            font-size: 28px;
-            font-weight: 800;
-            color: var(--amber);
-            white-space: nowrap;
-        }
-        .detail-body {
-            padding: 24px 28px;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-        }
-        .detail-field { display: flex; flex-direction: column; gap: 4px; }
-        .detail-field.full { grid-column: span 2; }
-        .detail-field .dlabel {
-            font-family: 'Syne', sans-serif;
-            font-size: 9px;
-            font-weight: 700;
-            color: var(--muted);
-            text-transform: uppercase;
-            letter-spacing: 1.2px;
-        }
-        .detail-field .dvalue {
-            font-size: 14px;
-            color: var(--text);
-            font-weight: 500;
-            padding: 10px 14px;
-            background: var(--d2);
-            border-radius: 8px;
-            border: 1px solid var(--border);
-        }
-        .detail-field .dvalue.desc {
-            font-size: 13px;
-            line-height: 1.6;
-            color: #8daec8;
-            min-height: 60px;
-        }
-        .detail-footer {
-            padding: 16px 28px;
-            border-top: 1px solid var(--border);
-            display: flex;
-            gap: 10px;
+        /* ── Breadcrumb ── */
+        .breadcrumb { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-secondary); margin-bottom: 20px; }
+        .breadcrumb a { color: var(--text-secondary); text-decoration: none; transition: var(--transition); }
+        .breadcrumb a:hover { color: var(--neon-blue); }
+        .breadcrumb-sep { color: var(--text-muted); }
+        .breadcrumb-current { color: var(--text-primary); font-weight: 600; }
+
+        /* ── Product layout ── */
+        .product-layout { display: grid; grid-template-columns: 420px 1fr; gap: 24px; align-items: start; }
+
+        /* ── Gallery ── */
+        .gallery-wrap { position: sticky; top: 80px; }
+        .gallery-main { position: relative; background: var(--dark-surface); border: 1px solid var(--dark-border); border-radius: var(--radius-lg); overflow: hidden; aspect-ratio: 1; display: flex; align-items: center; justify-content: center; margin-bottom: 12px; }
+        .gallery-main img { width: 100%; height: 100%; object-fit: contain; transition: transform .4s ease; }
+        .gallery-main:hover img { transform: scale(1.04); }
+        .gallery-badge { position: absolute; top: 14px; left: 14px; display: flex; flex-direction: column; gap: 6px; }
+        .badge { display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; }
+        .badge-new    { background: rgba(0,212,255,.15); border: 1px solid rgba(0,212,255,.4); color: var(--neon-blue); }
+        .badge-oferta { background: rgba(248,113,113,.15); border: 1px solid rgba(248,113,113,.4); color: var(--neon-red); }
+        .badge-stock-ok { background: rgba(52,211,153,.15); border: 1px solid rgba(52,211,153,.4); color: var(--neon-green); }
+        .badge-stock-low { background: rgba(251,191,36,.15); border: 1px solid rgba(251,191,36,.4); color: var(--neon-yellow); }
+        .badge-stock-out { background: rgba(248,113,113,.15); border: 1px solid rgba(248,113,113,.4); color: var(--neon-red); }
+
+        .gallery-zoom { position: absolute; top: 14px; right: 14px; width: 34px; height: 34px; border-radius: 50%; background: rgba(0,0,0,.5); border: 1px solid var(--dark-border); display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-secondary); transition: var(--transition); }
+        .gallery-zoom:hover { border-color: var(--neon-blue); color: var(--neon-blue); }
+
+        .gallery-thumbs { display: flex; gap: 10px; }
+        .thumb { width: 68px; height: 68px; border-radius: var(--radius-sm); background: var(--dark-surface); border: 2px solid var(--dark-border); overflow: hidden; cursor: pointer; transition: var(--transition); flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 22px; }
+        .thumb:hover, .thumb.active { border-color: var(--neon-blue); }
+        .thumb img { width: 100%; height: 100%; object-fit: cover; }
+
+        /* ── Info panel ── */
+        .product-info { display: flex; flex-direction: column; gap: 20px; }
+
+        .product-meta-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+        .product-id { font-size: 12px; color: var(--text-muted); font-family: var(--font-display); }
+
+        .product-name { font-family: var(--font-display); font-size: 28px; font-weight: 900; line-height: 1.15; color: var(--text-primary); }
+        .product-name span { color: var(--neon-blue); }
+
+        .product-brand-cat { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-secondary); }
+        .dot-sep { width: 4px; height: 4px; border-radius: 50%; background: var(--text-muted); }
+
+        /* Stars */
+        .rating-row { display: flex; align-items: center; gap: 10px; }
+        .stars { display: flex; gap: 2px; }
+        .star { font-size: 14px; }
+        .star.on { color: var(--neon-yellow); }
+        .star.off { color: var(--dark-border); }
+        .rating-count { font-size: 13px; color: var(--text-secondary); }
+
+        /* Price */
+        .price-row { display: flex; align-items: baseline; gap: 14px; }
+        .price-main { font-family: var(--font-display); font-size: 36px; font-weight: 900; color: var(--neon-blue); }
+        .price-old  { font-size: 18px; color: var(--text-muted); text-decoration: line-through; }
+        .price-discount { font-size: 13px; font-weight: 700; background: rgba(248,113,113,.15); border: 1px solid rgba(248,113,113,.3); color: var(--neon-red); padding: 2px 8px; border-radius: 20px; }
+
+        /* Divider */
+        .divider { height: 1px; background: var(--dark-border); }
+
+        /* Specs grid */
+        .specs-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .spec-item { display: flex; flex-direction: column; gap: 3px; padding: 12px 14px; background: var(--dark-surface); border: 1px solid var(--dark-border); border-radius: var(--radius-md); }
+        .spec-label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: .6px; }
+        .spec-value { font-size: 14px; font-weight: 600; color: var(--text-primary); }
+
+        /* Description */
+        .desc-text { font-size: 14px; color: var(--text-secondary); line-height: 1.7; }
+
+        /* Stock indicator */
+        .stock-indicator { display: flex; align-items: center; gap: 14px; padding: 14px 18px; border-radius: var(--radius-md); background: var(--dark-surface); border: 1px solid var(--dark-border); }
+        .stock-number { font-family: var(--font-display); font-size: 28px; font-weight: 900; }
+        .stock-number.ok  { color: var(--neon-green); }
+        .stock-number.low { color: var(--neon-yellow); }
+        .stock-number.out { color: var(--neon-red); }
+        .stock-bar-wrap { flex: 1; }
+        .stock-bar-label { font-size: 12px; color: var(--text-secondary); margin-bottom: 6px; display: flex; justify-content: space-between; }
+        .stock-bar-track { height: 6px; background: var(--dark-border); border-radius: 4px; overflow: hidden; }
+        .stock-bar-fill  { height: 100%; border-radius: 4px; transition: width 1s ease; }
+        .stock-bar-fill.ok  { background: linear-gradient(90deg,#34d399,#059669); }
+        .stock-bar-fill.low { background: linear-gradient(90deg,#fbbf24,#d97706); }
+        .stock-bar-fill.out { background: linear-gradient(90deg,#f87171,#dc2626); }
+
+        /* Action buttons */
+        .action-row { display: flex; gap: 10px; flex-wrap: wrap; }
+        .btn-icon { display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; border-radius: var(--radius-md); font-size: 14px; font-weight: 600; cursor: pointer; border: none; text-decoration: none; transition: var(--transition); }
+        .btn-edit   { background: linear-gradient(135deg,#00d4ff,#7c3aed); color: #fff; flex: 1; justify-content: center; }
+        .btn-edit:hover { opacity: .88; transform: translateY(-1px); }
+        .btn-stock  { background: rgba(251,191,36,.12); border: 1px solid rgba(251,191,36,.35); color: var(--neon-yellow); }
+        .btn-stock:hover { background: rgba(251,191,36,.2); }
+        .btn-delete { background: rgba(248,113,113,.1); border: 1px solid rgba(248,113,113,.3); color: var(--neon-red); }
+        .btn-delete:hover { background: rgba(248,113,113,.2); }
+
+        /* Status toggle */
+        .toggle-row { display: flex; align-items: center; justify-content: space-between; padding: 13px 16px; background: var(--dark-surface); border: 1px solid var(--dark-border); border-radius: var(--radius-md); }
+        .toggle-info { font-size: 14px; font-weight: 600; }
+        .toggle-sub  { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+        .toggle { position: relative; width: 44px; height: 24px; cursor: pointer; }
+        .toggle input { opacity: 0; width: 0; height: 0; }
+        .toggle-slider { position: absolute; inset: 0; border-radius: 12px; background: var(--dark-border); transition: .3s; }
+        .toggle-slider:before { content: ''; position: absolute; width: 18px; height: 18px; left: 3px; bottom: 3px; border-radius: 50%; background: var(--text-muted); transition: .3s; }
+        .toggle input:checked + .toggle-slider { background: var(--neon-blue); }
+        .toggle input:checked + .toggle-slider:before { transform: translateX(20px); background: #fff; }
+
+        /* Side column */
+        .side-cards { display: flex; flex-direction: column; gap: 16px; }
+
+        /* Related products */
+        .related-item { display: flex; align-items: center; gap: 12px; padding: 11px 0; border-bottom: 1px solid var(--dark-border); }
+        .related-item:last-child { border-bottom: none; }
+        .related-img { width: 44px; height: 44px; border-radius: var(--radius-sm); background: var(--dark-surface); border: 1px solid var(--dark-border); display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+        .related-name { font-size: 13px; font-weight: 600; }
+        .related-price { font-size: 12px; color: var(--neon-blue); font-weight: 700; margin-top: 2px; }
+        .related-stock-pill { font-size: 11px; padding: 2px 7px; border-radius: 10px; font-weight: 700; }
+
+        /* History list */
+        .history-item { display: flex; align-items: flex-start; gap: 12px; padding: 11px 0; border-bottom: 1px solid var(--dark-border); }
+        .history-item:last-child { border-bottom: none; }
+        .history-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; margin-top: 5px; }
+        .history-text { font-size: 13px; line-height: 1.4; color: var(--text-secondary); }
+        .history-text strong { color: var(--text-primary); }
+        .history-time { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+
+        /* Responsive */
+        @media (max-width: 960px) {
+            .product-layout { grid-template-columns: 1fr; }
+            .gallery-wrap { position: static; }
         }
     </style>
 </head>
 <body>
-<div class="admin-layout">
 
-    <aside class="sidebar">
-        <div class="sidebar-logo">
-            <div class="logo-text">DZ<em>Admin</em></div>
-            <small>Panel de control</small>
+<!-- ─── SIDEBAR ─── -->
+<aside class="sidebar" id="sidebar">
+    <div class="logo">
+        <div class="logo-text">DREAM<br/>ZONE</div>
+        <div class="logo-sub">PANEL ADMIN</div>
+    </div>
+
+    <nav class="nav-section">
+        <a href="/admin" class="nav-item">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1V5zm10 0a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zM4 15a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1v-4zm10 0a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z"/></svg>
+            Panel de control
+        </a>
+    </nav>
+
+    <nav class="nav-section">
+        <div class="nav-label">Inventario</div>
+        <a href="/admin/productos" class="nav-item active">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+            Productos
+        </a>
+        <a href="/admin/categorias" class="nav-item">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/></svg>
+            Categorías
+        </a>
+        <a href="/admin/stock" class="nav-item">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+            Stock
+            <span class="nav-badge red">3</span>
+        </a>
+        <a href="/admin/imagenes" class="nav-item">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+            Imágenes
+        </a>
+    </nav>
+
+    <nav class="nav-section">
+        <div class="nav-label">Gestión</div>
+        <a href="/admin/usuarios" class="nav-item">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+            Usuarios
+        </a>
+    </nav>
+
+    <div class="sidebar-bottom">
+        <a href="/" class="nav-item">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+            Ver tienda
+        </a>
+        <a href="/auth/logout" class="nav-item">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+            Cerrar sesión
+        </a>
+    </div>
+</aside>
+
+<!-- ─── TOPBAR ─── -->
+<header class="topbar">
+    <button class="hamburger" onclick="document.getElementById('sidebar').classList.toggle('open')">
+        <svg width="22" height="22" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+    </button>
+    <div class="search-bar">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+        <input type="text" placeholder="Buscar en el panel..."/>
+    </div>
+    <div class="topbar-actions">
+        <div class="icon-btn">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+            <span class="cart-count">3</span>
         </div>
-        <nav class="sidebar-menu">
-            <div class="menu-label">Catálogo</div>
-            <a th:href="@{/admin/productos}" class="menu-item active">
-                <span class="icon">◫</span> Productos
+        <div class="avatar">AD</div>
+    </div>
+</header>
+
+<!-- ─── MAIN ─── -->
+<main class="main">
+
+    <!-- Breadcrumb -->
+    <div class="breadcrumb animate">
+        <a href="/admin">Panel</a>
+        <span class="breadcrumb-sep">›</span>
+        <a href="/admin/productos">Productos</a>
+        <span class="breadcrumb-sep">›</span>
+        <span class="breadcrumb-current" th:text="${producto.nombre}">Figura Satoru Gojo</span>
+    </div>
+
+    <!-- Page header -->
+    <div class="flex items-center justify-between mb-24 animate">
+        <div>
+            <h1 class="page-title">Detalle de <span style="color:var(--neon-blue)">producto</span></h1>
+            <p class="page-subtitle" th:text="'ID: #' + ${producto.id ?: 'PRD-0042'}">ID: #PRD-0042</p>
+        </div>
+        <div class="flex" style="gap:10px">
+            <a th:href="@{/admin/productos/editar/{id}(id=${producto.id})}"
+               href="/admin/productos/42/editar" class="btn btn-primary btn-sm">
+                Editar producto
             </a>
-        </nav>
-        <div class="sidebar-footer">
-            <a href="/"><span>↩</span> Cerrar sesión</a>
         </div>
-    </aside>
+    </div>
 
-    <div class="main-content">
+    <!-- Main product layout -->
+    <div class="product-layout mb-24">
 
-        <header class="topbar">
-            <div class="topbar-left">
-                <h1>Detalle del producto</h1>
+        <!-- LEFT: Gallery -->
+        <div class="gallery-wrap animate delay-1">
+            <div class="gallery-main">
+                <!-- Thymeleaf: th:src="@{${producto.imagenPrincipal}}" -->
+                <img id="mainImg" src="https://placehold.co/420x420/0d1117/00d4ff?text=🗿" alt="Figura Satoru Gojo"/>
+
+                <div class="gallery-badge">
+                    <!-- Render badges condicionalmente con Thymeleaf -->
+                    <span class="badge badge-new" th:if="${producto.esNuevo}">✦ Nuevo</span>
+                    <span class="badge badge-oferta" th:if="${producto.tieneDescuento}">🔥 Oferta</span>
+                    <!-- Demo estático -->
+                    <span class="badge badge-new">✦ Nuevo</span>
+                </div>
+
+                <button class="gallery-zoom" onclick="openLightbox()" title="Ampliar imagen">
+                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"/></svg>
+                </button>
             </div>
-            <div class="topbar-right">
-                <a th:href="@{/admin/productos/editar/{id}(id=${producto.id})}" class="btn btn-primary">✏ Editar</a>
-                <a th:href="@{/admin/productos}" class="btn btn-ghost">← Volver</a>
-            </div>
-        </header>
 
-        <main class="content">
-            <div class="detail-card">
-                <div class="detail-header">
+            <!-- Thumbnails -->
+            <div class="gallery-thumbs">
+                <!-- th:each="img : ${producto.imagenes}" -->
+                <div class="thumb active" onclick="switchImg(this, 'https://placehold.co/420x420/0d1117/00d4ff?text=🗿')">🗿</div>
+                <div class="thumb" onclick="switchImg(this, 'https://placehold.co/420x420/0d1117/7c3aed?text=Vista+2')">📐</div>
+                <div class="thumb" onclick="switchImg(this, 'https://placehold.co/420x420/0d1117/34d399?text=Vista+3')">🔍</div>
+                <div class="thumb" onclick="switchImg(this, 'https://placehold.co/420x420/0d1117/fbbf24?text=Vista+4')">✨</div>
+                <!-- Botón agregar imagen -->
+                <a href="/admin/imagenes" class="thumb" style="border-style:dashed;color:var(--text-muted);font-size:20px;" title="Gestionar imágenes">+</a>
+            </div>
+        </div>
+
+        <!-- RIGHT: Product info -->
+        <div class="product-info">
+
+            <!-- Meta / badges row -->
+            <div class="animate delay-1">
+                <div class="product-meta-row mb-8">
+                    <!-- Estado activo/inactivo -->
+                    <span class="badge badge-stock-ok" th:if="${producto.activo}">● Activo</span>
+                    <span class="badge badge-stock-out" th:unless="${producto.activo}">● Inactivo</span>
+                    <!-- Demo -->
+                    <span class="badge badge-stock-ok">● Activo</span>
+                    <span class="product-id" th:text="'REF: ' + ${producto.referencia ?: 'JJK-GJO-24'}">REF: JJK-GJO-24</span>
+                </div>
+
+                <h1 class="product-name mb-8">
+                    Figura <span th:text="${producto.nombre ?: 'Satoru Gojo'}">Satoru Gojo</span>
+                </h1>
+
+                <div class="product-brand-cat mb-12">
+                    <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/></svg>
+                    <span th:text="${producto.categoria ?: 'Figuras'}">Figuras</span>
+                    <span class="dot-sep"></span>
+                    <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+                    <span th:text="${producto.marca ?: 'Banpresto'}">Banpresto</span>
+                </div>
+
+                <!-- Rating (si aplica en tu MVP, si no puedes eliminar esta sección) -->
+                <div class="rating-row mb-4">
+                    <div class="stars">
+                        <span class="star on">★</span><span class="star on">★</span>
+                        <span class="star on">★</span><span class="star on">★</span>
+                        <span class="star off">★</span>
+                    </div>
+                    <span class="rating-count">4.0 · 24 reseñas</span>
+                </div>
+            </div>
+
+            <div class="divider"></div>
+
+            <!-- Precio -->
+            <div class="animate delay-2">
+                <div class="price-row">
+                    <span class="price-main"
+                          th:text="'$' + ${#numbers.formatDecimal(#objects.nullSafe(producto.precio, 899.00), 1, 2)}">
+                        $899.00
+                    </span>
+                    <!-- Precio tachado si hay descuento: th:if="${producto.precioAnterior != null}" -->
+                    <span class="price-old">$1.200.00</span>
+                    <span class="price-discount">-25%</span>
+                </div>
+            </div>
+
+            <div class="divider"></div>
+
+            <!-- Stock indicator -->
+            <div class="animate delay-2">
+                <div class="flex items-center justify-between mb-8">
+                    <span class="section-title" style="font-size:14px">Estado de <span>stock</span></span>
+                    <a href="/admin/stock" class="text-blue text-sm">Actualizar →</a>
+                </div>
+                <div class="stock-indicator">
+                    <!-- Thymeleaf: cambiar clase según nivel de stock -->
+                    <span class="stock-number ok" th:text="${producto.stock ?: 15}" id="stockNum">15</span>
+                    <div class="stock-bar-wrap">
+                        <div class="stock-bar-label">
+                            <span>Disponible</span>
+                            <!-- th:text="${producto.stock + ' de ' + producto.stockMax}" -->
+                            <span>15 de 50 uds.</span>
+                        </div>
+                        <div class="stock-bar-track">
+                            <!-- data-w = (stock / stockMax) * 100 -->
+                            <div class="stock-bar-fill ok" style="width:0%" id="stockBar" data-w="30"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="divider"></div>
+
+            <!-- Specs grid -->
+            <div class="animate delay-3">
+                <h3 class="section-title mb-12">Especificaciones</h3>
+                <div class="specs-grid">
+                    <div class="spec-item">
+                        <span class="spec-label">Categoría</span>
+                        <span class="spec-value" th:text="${producto.categoria ?: 'Figuras'}">Figuras</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">Marca</span>
+                        <span class="spec-value" th:text="${producto.marca ?: 'Banpresto'}">Banpresto</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">Material</span>
+                        <span class="spec-value" th:text="${producto.material ?: 'PVC'}">PVC</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">Altura</span>
+                        <span class="spec-value" th:text="${producto.altura ?: '24 cm'}">24 cm</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">Serie</span>
+                        <span class="spec-value" th:text="${producto.serie ?: 'Jujutsu Kaisen'}">Jujutsu Kaisen</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">Fecha registro</span>
+                        <!-- th:text="${#temporals.format(producto.fechaCreacion, 'dd/MM/yyyy')}" -->
+                        <span class="spec-value">12/05/2025</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Descripción -->
+            <div class="animate delay-3">
+                <h3 class="section-title mb-8">Descripción</h3>
+                <p class="desc-text" th:text="${producto.descripcion}">
+                    Figura coleccionable de Satoru Gojo de la serie Jujutsu Kaisen. Detalles increíbles y pintura de alta calidad. Incluye base de exhibición. Ideal para coleccionistas y fanáticos del anime. Edición limitada de importación japonesa.
+                </p>
+            </div>
+
+            <!-- Toggle activo/inactivo -->
+            <div class="animate delay-4">
+                <div class="toggle-row">
                     <div>
-                        <h2 th:text="${producto.nombre}">Nombre</h2>
-                        <div class="sku-tag" th:text="${producto.sku}">SKU</div>
-                        <div style="margin-top:10px;">
-                            <span th:if="${producto.estadoStock == 'En stock'}"   class="badge badge-ok"  th:text="${producto.estadoStock}"></span>
-                            <span th:if="${producto.estadoStock == 'Stock bajo'}" class="badge badge-low" th:text="${producto.estadoStock}"></span>
-                            <span th:if="${producto.estadoStock == 'Sin stock'}"  class="badge badge-out" th:text="${producto.estadoStock}"></span>
-                        </div>
+                        <div class="toggle-info">Producto visible en tienda</div>
+                        <div class="toggle-sub">Los clientes pueden ver y comprar este producto</div>
                     </div>
-                    <div class="price-tag"
-                         th:text="'$' + ${#numbers.formatInteger(producto.precio, 1, 'COMMA')}">
-                    </div>
-                </div>
-                <div class="detail-body">
-                    <div class="detail-field">
-                        <div class="dlabel">Categoría</div>
-                        <div class="dvalue" th:text="${producto.categoria}">—</div>
-                    </div>
-                    <div class="detail-field">
-                        <div class="dlabel">Stock disponible</div>
-                        <div class="dvalue" th:text="${producto.stock} + ' unidades'">—</div>
-                    </div>
-                    <div class="detail-field">
-                        <div class="dlabel">Precio</div>
-                        <div class="dvalue" th:text="'$' + ${#numbers.formatInteger(producto.precio, 1, 'COMMA')} + ' COP'">—</div>
-                    </div>
-                    <div class="detail-field">
-                        <div class="dlabel">SKU</div>
-                        <div class="dvalue" th:text="${producto.sku}">—</div>
-                    </div>
-                    <div class="detail-field full">
-                        <div class="dlabel">Descripción</div>
-                        <div class="dvalue desc"
-                             th:text="${producto.descripcion != null and !producto.descripcion.isEmpty()} ? ${producto.descripcion} : 'Sin descripción.'">
-                        </div>
-                    </div>
-                </div>
-                <div class="detail-footer">
-                    <a th:href="@{/admin/productos/editar/{id}(id=${producto.id})}" class="btn btn-primary">✏ Editar producto</a>
-                    <a th:href="@{/admin/productos}" class="btn btn-ghost">← Volver al catálogo</a>
+                    <label class="toggle">
+                        <!-- th:checked="${producto.activo}" -->
+                        <input type="checkbox" checked onchange="toggleEstado(this)"/>
+                        <span class="toggle-slider"></span>
+                    </label>
                 </div>
             </div>
-        </main>
+
+            <!-- Action buttons -->
+            <div class="action-row animate delay-4">
+                <a th:href="@{/admin/productos/{id}/editar(id=${producto.id})}"
+                   href="/admin/productos/42/editar" class="btn-icon btn-edit">
+                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                    Editar información
+                </a>
+                <a href="/admin/stock" class="btn-icon btn-stock">
+                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+                    Stock
+                </a>
+                <button class="btn-icon btn-delete" onclick="confirmDelete()">
+                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                    Eliminar
+                </button>
+            </div>
+
+        </div>
+        <!-- /product-info -->
+    </div>
+
+    <!-- Bottom row: productos relacionados + historial -->
+    <div class="grid-3 mb-24">
+
+        <!-- Productos relacionados (misma categoría) -->
+        <div class="card animate delay-1">
+            <div class="flex items-center justify-between mb-16">
+                <h3 class="section-title">Misma <span>categoría</span></h3>
+                <a href="/admin/productos" class="text-blue text-sm">Ver todos →</a>
+            </div>
+            <!-- th:each="rel : ${relacionados}" -->
+            <div class="related-item">
+                <div class="related-img">🗿</div>
+                <div style="flex:1">
+                    <div class="related-name">Figura Itadori Yuji</div>
+                    <div class="related-price">$749.00</div>
+                </div>
+                <span class="related-stock-pill badge badge-stock-ok">22 uds.</span>
+            </div>
+            <div class="related-item">
+                <div class="related-img">⚔️</div>
+                <div style="flex:1">
+                    <div class="related-name">Figura Megumi Fushiguro</div>
+                    <div class="related-price">$699.00</div>
+                </div>
+                <span class="related-stock-pill badge badge-stock-ok">18 uds.</span>
+            </div>
+            <div class="related-item">
+                <div class="related-img">🌀</div>
+                <div style="flex:1">
+                    <div class="related-name">Figura Ryomen Sukuna</div>
+                    <div class="related-price">$950.00</div>
+                </div>
+                <span class="related-stock-pill badge badge-stock-low">5 uds.</span>
+            </div>
+            <div class="related-item">
+                <div class="related-img">👁️</div>
+                <div style="flex:1">
+                    <div class="related-name">Figura Nobara Kugisaki</div>
+                    <div class="related-price">$680.00</div>
+                </div>
+                <span class="related-stock-pill badge badge-stock-ok">11 uds.</span>
+            </div>
+        </div>
+
+        <!-- Historial de cambios -->
+        <div class="card animate delay-2">
+            <h3 class="section-title mb-16">Historial de <span>cambios</span></h3>
+            <div>
+                <div class="history-item">
+                    <div class="history-dot" style="background:var(--neon-green)"></div>
+                    <div>
+                        <div class="history-text">Producto <strong>creado</strong> en el sistema</div>
+                        <div class="history-time">12/05/2025 — 10:24 a.m.</div>
+                    </div>
+                </div>
+                <div class="history-item">
+                    <div class="history-dot" style="background:var(--neon-blue)"></div>
+                    <div>
+                        <div class="history-text">Stock actualizado: <strong>10 → 15 uds.</strong></div>
+                        <div class="history-time">18/05/2025 — 03:10 p.m.</div>
+                    </div>
+                </div>
+                <div class="history-item">
+                    <div class="history-dot" style="background:var(--neon-purple)"></div>
+                    <div>
+                        <div class="history-text">Precio modificado: <strong>$950 → $899</strong></div>
+                        <div class="history-time">20/05/2025 — 11:45 a.m.</div>
+                    </div>
+                </div>
+                <div class="history-item">
+                    <div class="history-dot" style="background:var(--neon-yellow)"></div>
+                    <div>
+                        <div class="history-text">Imágenes actualizadas <strong>(+3 fotos)</strong></div>
+                        <div class="history-time">21/05/2025 — 09:00 a.m.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Info rápida / acciones secundarias -->
+        <div class="card animate delay-3">
+            <h3 class="section-title mb-16">Acciones <span>rápidas</span></h3>
+            <div style="display:flex;flex-direction:column;gap:10px">
+                <a th:href="@{/productos/{id}(id=${producto.id})}"
+                   href="/productos/42" target="_blank"
+                   class="btn-icon btn-stock" style="justify-content:center">
+                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                    Ver en tienda
+                </a>
+                <a href="/admin/imagenes" class="btn-icon"
+                   style="justify-content:center;background:rgba(124,58,237,.12);border:1px solid rgba(124,58,237,.35);color:var(--neon-purple)">
+                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                    Gestionar imágenes
+                </a>
+                <a href="/admin/productos/nuevo" class="btn-icon"
+                   style="justify-content:center;background:rgba(52,211,153,.1);border:1px solid rgba(52,211,153,.3);color:var(--neon-green)">
+                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                    Duplicar producto
+                </a>
+            </div>
+
+            <!-- Mini stats -->
+            <div class="divider" style="margin:16px 0"></div>
+            <h3 class="section-title mb-12" style="font-size:13px">Resumen rápido</h3>
+            <div style="display:flex;flex-direction:column;gap:8px">
+                <div class="flex items-center justify-between">
+                    <span style="font-size:13px;color:var(--text-secondary)">Imágenes</span>
+                    <span style="font-size:13px;font-weight:700;color:var(--neon-blue)">4 fotos</span>
+                </div>
+                <div class="flex items-center justify-between">
+                    <span style="font-size:13px;color:var(--text-secondary)">Vistas en tienda</span>
+                    <span style="font-size:13px;font-weight:700;color:var(--neon-blue)">1,240</span>
+                </div>
+                <div class="flex items-center justify-between">
+                    <span style="font-size:13px;color:var(--text-secondary)">En favoritos</span>
+                    <span style="font-size:13px;font-weight:700;color:var(--neon-purple)">87 usuarios</span>
+                </div>
+                <div class="flex items-center justify-between">
+                    <span style="font-size:13px;color:var(--text-secondary)">Último movimiento</span>
+                    <span style="font-size:13px;font-weight:700;color:var(--text-primary)">Hoy</span>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</main>
+
+<!-- ─── Lightbox simple ─── -->
+<div id="lightbox" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:9999;align-items:center;justify-content:center;cursor:zoom-out" onclick="this.style.display='none'">
+    <img id="lightboxImg" src="" style="max-width:90vw;max-height:90vh;object-fit:contain;border-radius:8px"/>
+</div>
+
+<!-- ─── Modal confirmar eliminar ─── -->
+<div id="deleteModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:9999;align-items:center;justify-content:center">
+    <div style="background:var(--dark-card,#161b22);border:1px solid rgba(248,113,113,.3);border-radius:16px;padding:32px;max-width:400px;width:90%;text-align:center">
+        <div style="font-size:48px;margin-bottom:16px">⚠️</div>
+        <h2 style="font-size:20px;font-weight:800;margin-bottom:10px;color:var(--text-primary,#fff)">¿Eliminar producto?</h2>
+        <p style="font-size:14px;color:var(--text-secondary,#8b949e);margin-bottom:24px">Esta acción no se puede deshacer. El producto será eliminado permanentemente del catálogo.</p>
+        <div style="display:flex;gap:12px;justify-content:center">
+            <button onclick="document.getElementById('deleteModal').style.display='none'"
+                    style="padding:10px 24px;border-radius:8px;background:var(--dark-surface,#21262d);border:1px solid var(--dark-border,#30363d);color:var(--text-primary,#fff);cursor:pointer;font-size:14px;font-weight:600">
+                Cancelar
+            </button>
+            <!-- th:action="@{/admin/productos/{id}/eliminar(id=${producto.id})}" method="post" -->
+            <a href="/admin/productos/42/eliminar"
+               style="padding:10px 24px;border-radius:8px;background:rgba(248,113,113,.15);border:1px solid rgba(248,113,113,.4);color:#f87171;cursor:pointer;font-size:14px;font-weight:700;text-decoration:none">
+                Sí, eliminar
+            </a>
+        </div>
     </div>
 </div>
+
+<script>
+    // Animar stock bar
+    setTimeout(() => {
+        const bar = document.getElementById('stockBar');
+        if (bar) bar.style.width = bar.dataset.w + '%';
+    }, 500);
+
+    // Cambiar imagen principal
+    function switchImg(thumb, src) {
+        document.querySelectorAll('.thumb').forEach(t => t.classList.remove('active'));
+        thumb.classList.add('active');
+        const main = document.getElementById('mainImg');
+        if (main) { main.style.opacity = 0; setTimeout(() => { main.src = src; main.style.opacity = 1; }, 150); }
+    }
+
+    // Lightbox
+    function openLightbox() {
+        const lb = document.getElementById('lightbox');
+        const img = document.getElementById('lightboxImg');
+        img.src = document.getElementById('mainImg').src;
+        lb.style.display = 'flex';
+    }
+
+    // Confirmar eliminar
+    function confirmDelete() {
+        document.getElementById('deleteModal').style.display = 'flex';
+    }
+
+    // Toggle estado (aquí harías un POST/fetch al backend)
+    function toggleEstado(cb) {
+        // POST /admin/productos/{id}/toggle-estado
+        console.log('Estado cambiado:', cb.checked ? 'activo' : 'inactivo');
+    }
+
+    // Smooth img transition
+    const mainImg = document.getElementById('mainImg');
+    if (mainImg) mainImg.style.transition = 'opacity .15s ease';
+</script>
+
 </body>
 </html>
