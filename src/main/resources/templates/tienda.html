@@ -430,7 +430,7 @@
         </a>
         <a href="/carrito" class="icon-btn">
             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
-            <span class="cart-count">3</span>
+            <span class="cart-count" id="cartBadge" style="display:none">0</span>
         </a>
         <div class="avatar">DZ</div>
     </div>
@@ -540,13 +540,12 @@
         <!-- Products -->
         <div class="products-grid" id="productsGrid">
 
-            <!-- Card 1 -->
-            <div class="product-card" data-name="figura satoru gojo" data-cat="figuras" data-precio="899" data-stock="15" style="animation-delay:0.05s">
+            <div class="product-card" data-id="gojo-figure" data-name="figura satoru gojo" data-cat="figuras" data-precio="899" data-stock="15" style="animation-delay:0.05s">
                 <div class="product-img">
                     <div class="product-img-inner"></div>
                     <span class="product-badge badge-new">NUEVO</span>
                     <div class="product-actions">
-                        <button class="add-cart-btn">Agregar</button>
+                        <button class="add-cart-btn" onclick="addToCart(this)">Agregar</button>
                         <button class="fav-btn">♡</button>
                     </div>
                 </div>
@@ -554,21 +553,18 @@
                     <div class="product-series">Jujutsu Kaisen</div>
                     <div class="product-name">Figura Satoru Gojo</div>
                     <div class="product-meta">
-                        <div class="product-price">
-                            <span class="price-current">$899</span>
-                        </div>
+                        <div class="product-price"><span class="price-current">$899</span></div>
                         <span class="product-stock stock-ok">● En stock</span>
                     </div>
                 </div>
             </div>
 
-            <!-- Card 2 -->
-            <div class="product-card" data-name="funko pop nezuko" data-cat="funko" data-precio="299" data-stock="28" style="animation-delay:0.1s">
+            <div class="product-card" data-id="nezuko-funko" data-name="funko pop nezuko" data-cat="funko" data-precio="299" data-stock="28" style="animation-delay:0.1s">
                 <div class="product-img">
                     <div class="product-img-inner"></div>
                     <span class="product-badge badge-new">NUEVO</span>
                     <div class="product-actions">
-                        <button class="add-cart-btn">Agregar</button>
+                        <button class="add-cart-btn" onclick="addToCart(this)">Agregar</button>
                         <button class="fav-btn">♡</button>
                     </div>
                 </div>
@@ -576,20 +572,17 @@
                     <div class="product-series">Demon Slayer</div>
                     <div class="product-name">Funko Pop! Nezuko</div>
                     <div class="product-meta">
-                        <div class="product-price">
-                            <span class="price-current">$299</span>
-                        </div>
+                        <div class="product-price"><span class="price-current">$299</span></div>
                         <span class="product-stock stock-ok">● En stock</span>
                     </div>
                 </div>
             </div>
 
-            <!-- Card 3 -->
-            <div class="product-card" data-name="sudadera one piece" data-cat="ropa" data-precio="600" data-stock="8" style="animation-delay:0.15s">
+            <div class="product-card" data-id="op-sudadera" data-name="sudadera one piece" data-cat="ropa" data-precio="600" data-stock="8" style="animation-delay:0.15s">
                 <div class="product-img">
                     <div class="product-img-inner"></div>
                     <div class="product-actions">
-                        <button class="add-cart-btn">Agregar</button>
+                        <button class="add-cart-btn" onclick="addToCart(this)">Agregar</button>
                         <button class="fav-btn">♡</button>
                     </div>
                 </div>
@@ -606,12 +599,11 @@
                 </div>
             </div>
 
-            <!-- Card 4 -->
-            <div class="product-card" data-name="manga attack on titan" data-cat="mangas" data-precio="179" data-stock="32" style="animation-delay:0.2s">
+            <div class="product-card" data-id="aot-manga-34" data-name="manga attack on titan" data-cat="mangas" data-precio="179" data-stock="32" style="animation-delay:0.2s">
                 <div class="product-img">
                     <div class="product-img-inner"></div>
                     <div class="product-actions">
-                        <button class="add-cart-btn">Agregar</button>
+                        <button class="add-cart-btn" onclick="addToCart(this)">Agregar</button>
                         <button class="fav-btn">♡</button>
                     </div>
                 </div>
@@ -619,21 +611,18 @@
                     <div class="product-series">Attack on Titan</div>
                     <div class="product-name">Manga Attack on Titan Vol. 34</div>
                     <div class="product-meta">
-                        <div class="product-price">
-                            <span class="price-current">$179</span>
-                        </div>
+                        <div class="product-price"><span class="price-current">$179</span></div>
                         <span class="product-stock stock-ok">● En stock</span>
                     </div>
                 </div>
             </div>
 
-            <!-- Card 5 -->
-            <div class="product-card" data-name="figura izuku midoriya" data-cat="figuras" data-precio="799" data-stock="5" style="animation-delay:0.25s">
+            <div class="product-card" data-id="midoriya-figure" data-name="figura izuku midoriya" data-cat="figuras" data-precio="799" data-stock="5" style="animation-delay:0.25s">
                 <div class="product-img">
                     <div class="product-img-inner"></div>
                     <span class="product-badge badge-new">NUEVO</span>
                     <div class="product-actions">
-                        <button class="add-cart-btn">Agregar</button>
+                        <button class="add-cart-btn" onclick="addToCart(this)">Agregar</button>
                         <button class="fav-btn">♡</button>
                     </div>
                 </div>
@@ -641,20 +630,17 @@
                     <div class="product-series">My Hero Academia</div>
                     <div class="product-name">Figura Izuku Midoriya</div>
                     <div class="product-meta">
-                        <div class="product-price">
-                            <span class="price-current">$799</span>
-                        </div>
+                        <div class="product-price"><span class="price-current">$799</span></div>
                         <span class="product-stock stock-low">● 5 disponibles</span>
                     </div>
                 </div>
             </div>
 
-            <!-- Card 6 -->
-            <div class="product-card" data-name="poster dragon ball super" data-cat="posters" data-precio="199" data-stock="40" style="animation-delay:0.3s">
+            <div class="product-card" data-id="db-poster" data-name="poster dragon ball super" data-cat="posters" data-precio="199" data-stock="40" style="animation-delay:0.3s">
                 <div class="product-img">
                     <div class="product-img-inner"></div>
                     <div class="product-actions">
-                        <button class="add-cart-btn">Agregar</button>
+                        <button class="add-cart-btn" onclick="addToCart(this)">Agregar</button>
                         <button class="fav-btn">♡</button>
                     </div>
                 </div>
@@ -662,20 +648,17 @@
                     <div class="product-series">Dragon Ball Super</div>
                     <div class="product-name">Póster Dragon Ball Super</div>
                     <div class="product-meta">
-                        <div class="product-price">
-                            <span class="price-current">$199</span>
-                        </div>
+                        <div class="product-price"><span class="price-current">$199</span></div>
                         <span class="product-stock stock-ok">● En stock</span>
                     </div>
                 </div>
             </div>
 
-            <!-- Card 7 -->
-            <div class="product-card" data-name="llavero akatsuki" data-cat="accesorios" data-precio="85" data-stock="60" style="animation-delay:0.35s">
+            <div class="product-card" data-id="akatsuki-key" data-name="llavero akatsuki" data-cat="accesorios" data-precio="85" data-stock="60" style="animation-delay:0.35s">
                 <div class="product-img">
                     <div class="product-img-inner"></div>
                     <div class="product-actions">
-                        <button class="add-cart-btn">Agregar</button>
+                        <button class="add-cart-btn" onclick="addToCart(this)">Agregar</button>
                         <button class="fav-btn">♡</button>
                     </div>
                 </div>
@@ -683,20 +666,17 @@
                     <div class="product-series">Naruto Shippuden</div>
                     <div class="product-name">Llavero Akatsuki</div>
                     <div class="product-meta">
-                        <div class="product-price">
-                            <span class="price-current">$85</span>
-                        </div>
+                        <div class="product-price"><span class="price-current">$85</span></div>
                         <span class="product-stock stock-ok">● En stock</span>
                     </div>
                 </div>
             </div>
 
-            <!-- Card 9 -->
-            <div class="product-card" data-name="funko pop goku ultra instinct" data-cat="funko" data-precio="349" data-stock="20" style="animation-delay:0.45s">
+            <div class="product-card" data-id="goku-ui-funko" data-name="funko pop goku ultra instinct" data-cat="funko" data-precio="349" data-stock="20" style="animation-delay:0.45s">
                 <div class="product-img">
                     <div class="product-img-inner"></div>
                     <div class="product-actions">
-                        <button class="add-cart-btn">Agregar</button>
+                        <button class="add-cart-btn" onclick="addToCart(this)">Agregar</button>
                         <button class="fav-btn">♡</button>
                     </div>
                 </div>
@@ -704,21 +684,18 @@
                     <div class="product-series">Dragon Ball Super</div>
                     <div class="product-name">Funko Pop! Goku Ultra Instinct</div>
                     <div class="product-meta">
-                        <div class="product-price">
-                            <span class="price-current">$349</span>
-                        </div>
+                        <div class="product-price"><span class="price-current">$349</span></div>
                         <span class="product-stock stock-ok">● En stock</span>
                     </div>
                 </div>
             </div>
 
-            <!-- Card 10 -->
-            <div class="product-card" data-name="figura luffy gear 5" data-cat="figuras" data-precio="1299" data-stock="7" style="animation-delay:0.5s">
+            <div class="product-card" data-id="luffy-g5-figure" data-name="figura luffy gear 5" data-cat="figuras" data-precio="1299" data-stock="7" style="animation-delay:0.5s">
                 <div class="product-img">
                     <div class="product-img-inner"></div>
                     <span class="product-badge badge-new">NUEVO</span>
                     <div class="product-actions">
-                        <button class="add-cart-btn">Agregar</button>
+                        <button class="add-cart-btn" onclick="addToCart(this)">Agregar</button>
                         <button class="fav-btn">♡</button>
                     </div>
                 </div>
@@ -726,20 +703,17 @@
                     <div class="product-series">One Piece</div>
                     <div class="product-name">Figura Luffy Gear 5</div>
                     <div class="product-meta">
-                        <div class="product-price">
-                            <span class="price-current">$1,299</span>
-                        </div>
+                        <div class="product-price"><span class="price-current">$1,299</span></div>
                         <span class="product-stock stock-low">● 7 disponibles</span>
                     </div>
                 </div>
             </div>
 
-            <!-- Card 11 -->
-            <div class="product-card" data-name="manga naruto box set" data-cat="mangas" data-precio="2499" data-stock="3" style="animation-delay:0.55s">
+            <div class="product-card" data-id="naruto-boxset" data-name="manga naruto box set" data-cat="mangas" data-precio="2499" data-stock="3" style="animation-delay:0.55s">
                 <div class="product-img">
                     <div class="product-img-inner"></div>
                     <div class="product-actions">
-                        <button class="add-cart-btn">Agregar</button>
+                        <button class="add-cart-btn" onclick="addToCart(this)">Agregar</button>
                         <button class="fav-btn">♡</button>
                     </div>
                 </div>
@@ -756,13 +730,12 @@
                 </div>
             </div>
 
-            <!-- Card 12 -->
-            <div class="product-card" data-name="figura rem re zero" data-cat="figuras" data-precio="1899" data-stock="4" style="animation-delay:0.6s">
+            <div class="product-card" data-id="rem-figure" data-name="figura rem re zero" data-cat="figuras" data-precio="1899" data-stock="4" style="animation-delay:0.6s">
                 <div class="product-img">
                     <div class="product-img-inner"></div>
                     <span class="product-badge badge-new">NUEVO</span>
                     <div class="product-actions">
-                        <button class="add-cart-btn">Agregar</button>
+                        <button class="add-cart-btn" onclick="addToCart(this)">Agregar</button>
                         <button class="fav-btn">♡</button>
                     </div>
                 </div>
@@ -770,9 +743,7 @@
                     <div class="product-series">Re:Zero</div>
                     <div class="product-name">Figura Rem Re:Zero</div>
                     <div class="product-meta">
-                        <div class="product-price">
-                            <span class="price-current">$1,899</span>
-                        </div>
+                        <div class="product-price"><span class="price-current">$1,899</span></div>
                         <span class="product-stock stock-low">● 4 disponibles</span>
                     </div>
                 </div>
@@ -876,11 +847,70 @@
         return false;
     }
 
-    // Check URL params
     const params = new URLSearchParams(window.location.search);
     if (params.get('filter') === 'nuevo') document.getElementById('tag-nuevo').style.display = 'flex';
 
+    const DZ_CART = 'dz_cart';
+    function getCart() { try { return JSON.parse(localStorage.getItem(DZ_CART)) || []; } catch(e) { return []; } }
+    function saveCart(cart) { localStorage.setItem(DZ_CART, JSON.stringify(cart)); updateBadge(); }
+    function updateBadge() {
+        const n = getCart().reduce((s, i) => s + i.qty, 0);
+        const b = document.getElementById('cartBadge');
+        if (b) { b.textContent = n; b.style.display = n > 0 ? 'flex' : 'none'; }
+    }
+    function addToCart(btn) {
+        const card = btn.closest('.product-card');
+        const id    = card.dataset.id;
+        const name  = card.querySelector('.product-name').textContent.trim();
+        const series = card.querySelector('.product-series').textContent.trim();
+        const price = parseInt(card.dataset.precio);
+        const cat   = card.dataset.cat || '';
+        const cart  = getCart();
+        const found = cart.find(i => i.id === id);
+        if (found) { found.qty++; } else { cart.push({ id, name, series, price, cat, qty: 1 }); }
+        saveCart(cart);
+        btn.textContent = '✓ Agregado';
+        btn.style.background = '#34d399';
+        btn.style.color = '#030712';
+        btn.disabled = true;
+        setTimeout(() => {
+            btn.textContent = 'Agregar';
+            btn.style.background = '';
+            btn.style.color = '';
+            btn.disabled = false;
+        }, 1500);
+        showToast(name);
+    }
+    function showToast(name) {
+        const t = document.getElementById('dz-toast');
+        document.getElementById('dz-toast-text').textContent = name;
+        t.classList.add('dz-toast-on');
+        clearTimeout(window._dzTimer);
+        window._dzTimer = setTimeout(() => t.classList.remove('dz-toast-on'), 2800);
+    }
+    updateBadge();
+
 </script>
 
+
+<div id="dz-toast">
+    <span style="font-size:20px;flex-shrink:0">🛒</span>
+    <div style="flex:1;min-width:0">
+        <div style="font-size:10px;color:#9ca3af;letter-spacing:1px;text-transform:uppercase;margin-bottom:2px">Agregado al carrito</div>
+        <div id="dz-toast-text" style="font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></div>
+    </div>
+    <a href="/carrito" style="flex-shrink:0;background:#7c3aed;color:white;border-radius:6px;padding:6px 12px;font-size:12px;font-weight:700;text-decoration:none;white-space:nowrap;transition:background 0.15s">Ver carrito</a>
+</div>
+<style>
+#dz-toast {
+    position:fixed;bottom:24px;right:24px;z-index:9999;
+    background:#0d1117;border:1px solid rgba(0,212,255,0.4);border-radius:12px;
+    padding:14px 16px;display:flex;align-items:center;gap:12px;min-width:270px;max-width:340px;
+    transform:translateY(90px);opacity:0;transition:all 0.35s cubic-bezier(0.34,1.56,0.64,1);
+    pointer-events:none;font-family:'Rajdhani',sans-serif;
+    box-shadow:0 8px 32px rgba(0,0,0,0.5);
+}
+#dz-toast.dz-toast-on { transform:translateY(0);opacity:1;pointer-events:auto; }
+</style>
 </body>
 </html>
