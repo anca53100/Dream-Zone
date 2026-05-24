@@ -44,6 +44,13 @@
         .quick-action-icon  { font-size: 24px; }
         .quick-action-label { font-size: 12px; font-weight: 600; color: var(--text-secondary); }
         .quick-action:hover .quick-action-label { color: var(--text-primary); }
+
+        .top-product-img img{
+            width:100%;
+            height:100%;
+            object-fit:cover;
+            border-radius:6px;
+        }
     </style>
 </head>
 <body>
@@ -68,29 +75,7 @@
             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
             Productos
         </a>
-        <a href="/admin/categorias" class="nav-item">
-            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/></svg>
-            Categorías
-        </a>
-        <a href="/admin/stock" class="nav-item">
-            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
-            Stock
-            <span class="nav-badge red">3</span>
-        </a>
-        <a href="/admin/imagenes" class="nav-item">
-            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-            Imágenes
-        </a>
     </nav>
-
-    <nav class="nav-section">
-        <div class="nav-label">Gestión</div>
-        <a href="/admin/usuarios" class="nav-item">
-            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
-            Usuarios
-        </a>
-    </nav>
-
     <div class="sidebar-bottom">
         <a href="/" class="nav-item">
             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
@@ -108,10 +93,6 @@
     <button class="hamburger" onclick="document.getElementById('sidebar').classList.toggle('open')">
         <svg width="22" height="22" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
     </button>
-    <div class="search-bar">
-        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-        <input type="text" placeholder="Buscar en el panel..."/>
-    </div>
     <div class="topbar-actions">
         <div class="icon-btn">
             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
@@ -149,7 +130,9 @@
         <div class="stat-card green animate delay-2">
             <div>
                 <div class="stat-label">PRODUCTOS ACTIVOS</div>
-                <div class="stat-value text-green">245</div>
+                <div class="stat-value text-green"
+                     th:text="${productosActivos}">
+                </div>
                 <div class="stat-change up">↑ En catálogo</div>
             </div>
             <div class="stat-icon green"></div>
@@ -157,7 +140,9 @@
         <div class="stat-card yellow animate delay-3">
             <div>
                 <div class="stat-label">CATEGORÍAS</div>
-                <div class="stat-value text-yellow">6</div>
+                <div class="stat-value text-yellow"
+                     th:text="${totalCategorias}">
+                </div>
                 <div class="stat-change up">Figuras, Mangas…</div>
             </div>
             <div class="stat-icon yellow"></div>
@@ -165,7 +150,9 @@
         <div class="stat-card red animate delay-4">
             <div>
                 <div class="stat-label">STOCK BAJO</div>
-                <div class="stat-value text-red">3</div>
+                <div class="stat-value text-red"
+                     th:text="${stockBajo}">
+                </div>
                 <div class="stat-change down">Requiere atención</div>
             </div>
             <div class="stat-icon red"></div>
@@ -187,7 +174,7 @@
                     <div class="chart-bar-track">
                         <div class="chart-bar-fill"
                              style="width:0%;background:linear-gradient(90deg,#00d4ff,#7c3aed)"
-                             th:data-w="${entry.value * 10}"></div>
+                             th:data-w="${entry.value * 100 / totalProductos}"></div>
                     </div>
                     <span class="chart-bar-val text-blue" th:text="${entry.value}">0</span>
                 </div>
@@ -201,22 +188,6 @@
                 <a href="/admin/productos/nuevo" class="quick-action">
                     <span class="quick-action-icon">➕</span>
                     <span class="quick-action-label">Nuevo producto</span>
-                </a>
-                <a href="/admin/categorias" class="quick-action">
-                    <span class="quick-action-icon">🏷️</span>
-                    <span class="quick-action-label">Categorías</span>
-                </a>
-                <a href="/admin/stock" class="quick-action">
-                    <span class="quick-action-icon">📊</span>
-                    <span class="quick-action-label">Ver stock</span>
-                </a>
-                <a href="/admin/imagenes" class="quick-action">
-                    <span class="quick-action-icon">🖼️</span>
-                    <span class="quick-action-label">Imágenes</span>
-                </a>
-                <a href="/admin/usuarios" class="quick-action">
-                    <span class="quick-action-icon">👤</span>
-                    <span class="quick-action-label">Usuarios</span>
                 </a>
                 <a href="/admin/productos" class="quick-action">
                     <span class="quick-action-icon">📦</span>
@@ -236,35 +207,50 @@
                 <a href="/admin/productos" class="text-blue text-sm">Ver todos →</a>
             </div>
             <div>
-                <div class="top-product-item">
-                    <span class="top-rank first">#1</span>
-                    <div class="top-product-img">🔑</div>
-                    <div style="flex:1"><div class="top-product-name">Llavero Akatsuki</div><div class="top-product-cat">Accesorios</div></div>
-                    <span class="top-product-stock">60 uds.</span>
-                </div>
-                <div class="top-product-item">
-                    <span class="top-rank second">#2</span>
-                    <div class="top-product-img">🎭</div>
-                    <div style="flex:1"><div class="top-product-name">Funko Pop! Nezuko</div><div class="top-product-cat">Funko Pop!</div></div>
-                    <span class="top-product-stock">28 uds.</span>
-                </div>
-                <div class="top-product-item">
-                    <span class="top-rank third">#3</span>
-                    <div class="top-product-img">📚</div>
-                    <div style="flex:1"><div class="top-product-name">Manga AoT Vol.34</div><div class="top-product-cat">Mangas</div></div>
-                    <span class="top-product-stock">32 uds.</span>
-                </div>
-                <div class="top-product-item">
-                    <span class="top-rank">#4</span>
-                    <div class="top-product-img">🗿</div>
-                    <div style="flex:1"><div class="top-product-name">Figura Satoru Gojo</div><div class="top-product-cat">Figuras</div></div>
-                    <span class="top-product-stock">15 uds.</span>
-                </div>
-                <div class="top-product-item">
-                    <span class="top-rank">#5</span>
-                    <div class="top-product-img">⚡</div>
-                    <div style="flex:1"><div class="top-product-name">Funko Goku Ultra</div><div class="top-product-cat">Funko Pop!</div></div>
-                    <span class="top-product-stock">20 uds.</span>
+
+                <div class="top-product-item"
+                     th:each="producto, iter : ${topStock}">
+
+                    <!-- Ranking -->
+                    <span class="top-rank"
+                          th:classappend="
+                            ${iter.index == 0} ? 'first' :
+                            (${iter.index == 1} ? 'second' :
+                            (${iter.index == 2} ? 'third' : ''))"
+                                      th:text="'#' + ${iter.count}">
+                        #1
+                    </span>
+
+                    <!-- Imagen -->
+                    <div class="top-product-img">
+                        <img th:if="${producto.imagen != null and !producto.imagen.isEmpty()}"
+                             th:src="${producto.imagen}"
+                             alt="Producto"
+                             style="width:100%;height:100%;object-fit:cover;border-radius:6px"/>
+
+                        <span th:if="${producto.imagen == null or producto.imagen.isEmpty()}">
+                            📦
+                        </span>
+                    </div>
+
+                    <!-- Info -->
+                    <div style="flex:1">
+                        <div class="top-product-name"
+                             th:text="${producto.nombre}">
+                            Producto
+                        </div>
+
+                        <div class="top-product-cat"
+                             th:text="${producto.categoria}">
+                            Categoría
+                        </div>
+                    </div>
+
+                    <!-- Stock -->
+                    <span class="top-product-stock"
+                          th:text="${producto.stock} + ' uds.'">
+                        0 uds.
+                    </span>
                 </div>
             </div>
         </div>
@@ -272,68 +258,57 @@
         <!-- Stock bajo -->
         <div class="card animate delay-2">
             <div class="flex items-center justify-between mb-16">
-                <h3 class="section-title">Stock <span style="color:var(--neon-red)">bajo</span></h3>
-                <a href="/admin/stock" class="text-blue text-sm">Gestionar →</a>
+                <h3 class="section-title">
+                    Stock <span style="color:var(--neon-red)">bajo</span>
+                </h3>
             </div>
-            <div class="stock-alert critical">
-                <span>🔴</span>
-                <span class="stock-alert-name">Gorra Pikachu</span>
-                <span class="stock-alert-count" style="color:var(--neon-red)">0 uds.</span>
+
+            <div th:if="${#lists.isEmpty(stockCritico)}">
+                <p class="text-secondary">No hay productos con stock bajo.</p>
             </div>
-            <div class="stock-alert">
-                <span>⚠️</span>
-                <span class="stock-alert-name">Box Set Naruto</span>
-                <span class="stock-alert-count">3 uds.</span>
-            </div>
-            <div class="stock-alert">
-                <span>⚠️</span>
-                <span class="stock-alert-name">Figura Rem Re:Zero</span>
-                <span class="stock-alert-count">4 uds.</span>
-            </div>
-            <div class="stock-alert">
-                <span>⚠️</span>
-                <span class="stock-alert-name">Figura Luffy Gear 5</span>
-                <span class="stock-alert-count">7 uds.</span>
+
+            <div th:each="producto : ${stockCritico}"
+                 class="stock-alert"
+                 th:classappend="${producto.stock == 0} ? 'critical'">
+
+                <span th:text="${producto.stock == 0} ? '🔴' : '⚠️'"></span>
+
+                <span class="stock-alert-name"
+                      th:text="${producto.nombre}">
+                    Producto
+                </span>
+
+                <span class="stock-alert-count"
+                      th:text="${producto.stock} + ' uds.'">
+                    0 uds.
+                </span>
             </div>
         </div>
 
         <!-- Actividad reciente -->
         <div class="card animate delay-3">
-            <h3 class="section-title mb-16">Actividad <span>reciente</span></h3>
+
+            <h3 class="section-title mb-16">
+                Actividad <span>reciente</span>
+            </h3>
             <div class="activity-list">
-                <div class="activity-item">
-                    <div class="activity-dot" style="background:var(--neon-green)"></div>
-                    <div>
-                        <div class="activity-text">Producto <strong>Figura Gojo</strong> agregado</div>
-                        <div class="activity-time">Hace 10 minutos</div>
+                <div class="activity-item"
+                     th:each="producto : ${actividadReciente}">
+                    <div class="activity-dot"
+                         style="background:var(--neon-green)">
                     </div>
-                </div>
-                <div class="activity-item">
-                    <div class="activity-dot" style="background:var(--neon-blue)"></div>
                     <div>
-                        <div class="activity-text">Stock de <strong>Funko Nezuko</strong> actualizado</div>
-                        <div class="activity-time">Hace 35 minutos</div>
-                    </div>
-                </div>
-                <div class="activity-item">
-                    <div class="activity-dot" style="background:var(--neon-yellow)"></div>
-                    <div>
-                        <div class="activity-text">Stock bajo: <strong>Rem Re:Zero</strong></div>
-                        <div class="activity-time">Hace 1 hora</div>
-                    </div>
-                </div>
-                <div class="activity-item">
-                    <div class="activity-dot" style="background:var(--neon-red)"></div>
-                    <div>
-                        <div class="activity-text">Producto <strong>Gorra Pikachu</strong> agotado</div>
-                        <div class="activity-time">Hace 2 horas</div>
-                    </div>
-                </div>
-                <div class="activity-item">
-                    <div class="activity-dot" style="background:var(--neon-purple)"></div>
-                    <div>
-                        <div class="activity-text">Categoría <strong>Accesorios</strong> creada</div>
-                        <div class="activity-time">Hace 3 horas</div>
+                        <div class="activity-text">
+                            Producto
+                            <strong th:text="${producto.nombre}">
+                                Producto
+                            </strong>
+                            agregado o actualizado
+                        </div>
+                        <div class="activity-time">
+                            ID:
+                            <span th:text="${producto.id}"></span>
+                        </div>
                     </div>
                 </div>
             </div>

@@ -17,7 +17,16 @@
         .product-layout { display: grid; grid-template-columns: 420px 1fr; gap: 24px; align-items: start; }
 
         /* ── Gallery ── */
-        .gallery-wrap { position: sticky; top: 80px; }
+        .gallery-wrap {
+            position: sticky;
+            top: 80px;
+            align-self: start;
+            z-index: 1;
+        }
+        .product-info {
+            position: relative;
+            z-index: 2;
+        }
         .gallery-main { position: relative; background: var(--dark-surface); border: 1px solid var(--dark-border); border-radius: var(--radius-lg); overflow: hidden; aspect-ratio: 1; display: flex; align-items: center; justify-content: center; margin-bottom: 12px; }
         .gallery-main img { width: 100%; height: 100%; object-fit: contain; transition: transform .4s ease; }
         .gallery-main:hover img { transform: scale(1.04); }
@@ -158,29 +167,7 @@
             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
             Productos
         </a>
-        <a href="/admin/categorias" class="nav-item">
-            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/></svg>
-            Categorías
-        </a>
-        <a href="/admin/stock" class="nav-item">
-            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
-            Stock
-            <span class="nav-badge red">3</span>
-        </a>
-        <a href="/admin/imagenes" class="nav-item">
-            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-            Imágenes
-        </a>
     </nav>
-
-    <nav class="nav-section">
-        <div class="nav-label">Gestión</div>
-        <a href="/admin/usuarios" class="nav-item">
-            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
-            Usuarios
-        </a>
-    </nav>
-
     <div class="sidebar-bottom">
         <a href="/" class="nav-item">
             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
@@ -227,13 +214,7 @@
     <div class="flex items-center justify-between mb-24 animate">
         <div>
             <h1 class="page-title">Detalle de <span style="color:var(--neon-blue)">producto</span></h1>
-            <p class="page-subtitle" th:text="'ID: #' + ${producto.id ?: 'PRD-0042'}">ID: #PRD-0042</p>
-        </div>
-        <div class="flex" style="gap:10px">
-            <a th:href="@{/admin/productos/editar/{id}(id=${producto.id})}"
-               href="/admin/productos/42/editar" class="btn btn-primary btn-sm">
-                Editar producto
-            </a>
+            <p class="page-subtitle" th:text="'ID: #' + (${producto.id} != null ? producto.id : 'PRD-0042')">ID: #PRD-0042</p>
         </div>
     </div>
 
@@ -244,82 +225,49 @@
         <div class="gallery-wrap animate delay-1">
             <div class="gallery-main">
                 <!-- Thymeleaf: th:src="@{${producto.imagenPrincipal}}" -->
-                <img id="mainImg" src="https://placehold.co/420x420/0d1117/00d4ff?text=🗿" alt="Figura Satoru Gojo"/>
-
-                <div class="gallery-badge">
-                    <!-- Render badges condicionalmente con Thymeleaf -->
-                    <span class="badge badge-new" th:if="${producto.esNuevo}">✦ Nuevo</span>
-                    <span class="badge badge-oferta" th:if="${producto.tieneDescuento}">🔥 Oferta</span>
-                    <!-- Demo estático -->
-                    <span class="badge badge-new">✦ Nuevo</span>
-                </div>
-
+                <img id="mainImg"
+                     th:src="${producto.imagen != null and !#strings.isEmpty(producto.imagen)}
+                      ? ${producto.imagen}
+                      : 'https://placehold.co/420x420'"
+                     alt="Producto"/>
                 <button class="gallery-zoom" onclick="openLightbox()" title="Ampliar imagen">
                     <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"/></svg>
                 </button>
-            </div>
-
-            <!-- Thumbnails -->
-            <div class="gallery-thumbs">
-                <!-- th:each="img : ${producto.imagenes}" -->
-                <div class="thumb active" onclick="switchImg(this, 'https://placehold.co/420x420/0d1117/00d4ff?text=🗿')">🗿</div>
-                <div class="thumb" onclick="switchImg(this, 'https://placehold.co/420x420/0d1117/7c3aed?text=Vista+2')">📐</div>
-                <div class="thumb" onclick="switchImg(this, 'https://placehold.co/420x420/0d1117/34d399?text=Vista+3')">🔍</div>
-                <div class="thumb" onclick="switchImg(this, 'https://placehold.co/420x420/0d1117/fbbf24?text=Vista+4')">✨</div>
-                <!-- Botón agregar imagen -->
-                <a href="/admin/imagenes" class="thumb" style="border-style:dashed;color:var(--text-muted);font-size:20px;" title="Gestionar imágenes">+</a>
             </div>
         </div>
 
         <!-- RIGHT: Product info -->
         <div class="product-info">
-
             <!-- Meta / badges row -->
             <div class="animate delay-1">
                 <div class="product-meta-row mb-8">
                     <!-- Estado activo/inactivo -->
-                    <span class="badge badge-stock-ok" th:if="${producto.activo}">● Activo</span>
-                    <span class="badge badge-stock-out" th:unless="${producto.activo}">● Inactivo</span>
-                    <!-- Demo -->
-                    <span class="badge badge-stock-ok">● Activo</span>
-                    <span class="product-id" th:text="'REF: ' + ${producto.referencia ?: 'JJK-GJO-24'}">REF: JJK-GJO-24</span>
+                    <span class="badge badge-stock-ok"
+                          th:if="${producto.estado == 'Activo'}">
+                        ● Activo
+                    </span>
+                    <span class="badge badge-stock-out"
+                          th:unless="${producto.estado == 'Activo'}">
+                        ● Inactivo
+                    </span>
+                    <span class="product-id" th:text="${'REF: ' + (producto.id != null ? producto.id : 'JJK-GJO-24')}"></span>
                 </div>
 
                 <h1 class="product-name mb-8">
-                    Figura <span th:text="${producto.nombre ?: 'Satoru Gojo'}">Satoru Gojo</span>
+                    <span th:text="${producto.nombre}"></span>
                 </h1>
 
                 <div class="product-brand-cat mb-12">
-                    <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/></svg>
-                    <span th:text="${producto.categoria ?: 'Figuras'}">Figuras</span>
-                    <span class="dot-sep"></span>
-                    <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
-                    <span th:text="${producto.marca ?: 'Banpresto'}">Banpresto</span>
-                </div>
-
-                <!-- Rating (si aplica en tu MVP, si no puedes eliminar esta sección) -->
-                <div class="rating-row mb-4">
-                    <div class="stars">
-                        <span class="star on">★</span><span class="star on">★</span>
-                        <span class="star on">★</span><span class="star on">★</span>
-                        <span class="star off">★</span>
-                    </div>
-                    <span class="rating-count">4.0 · 24 reseñas</span>
+                    <span th:text="${producto.categoria != null ? producto.categoria : 'Figuras'}">Figuras</span>
                 </div>
             </div>
-
             <div class="divider"></div>
-
             <!-- Precio -->
             <div class="animate delay-2">
                 <div class="price-row">
                     <span class="price-main"
-                          th:text="'$' + ${#numbers.formatDecimal(#objects.nullSafe(producto.precio, 899.00), 1, 2)}">
-                        $899.00
+                          th:text="${'COP $ ' + #numbers.formatInteger(producto.precio, 0, 'POINT')}">
                     </span>
-                    <!-- Precio tachado si hay descuento: th:if="${producto.precioAnterior != null}" -->
-                    <span class="price-old">$1.200.00</span>
-                    <span class="price-discount">-25%</span>
                 </div>
             </div>
 
@@ -329,16 +277,13 @@
             <div class="animate delay-2">
                 <div class="flex items-center justify-between mb-8">
                     <span class="section-title" style="font-size:14px">Estado de <span>stock</span></span>
-                    <a href="/admin/stock" class="text-blue text-sm">Actualizar →</a>
                 </div>
                 <div class="stock-indicator">
                     <!-- Thymeleaf: cambiar clase según nivel de stock -->
-                    <span class="stock-number ok" th:text="${producto.stock ?: 15}" id="stockNum">15</span>
+                    <span class="stock-number ok" th:text="${producto.stock}" id="stockNum"></span>
                     <div class="stock-bar-wrap">
                         <div class="stock-bar-label">
                             <span>Disponible</span>
-                            <!-- th:text="${producto.stock + ' de ' + producto.stockMax}" -->
-                            <span>15 de 50 uds.</span>
                         </div>
                         <div class="stock-bar-track">
                             <!-- data-w = (stock / stockMax) * 100 -->
@@ -359,25 +304,16 @@
                         <span class="spec-value" th:text="${producto.categoria ?: 'Figuras'}">Figuras</span>
                     </div>
                     <div class="spec-item">
-                        <span class="spec-label">Marca</span>
-                        <span class="spec-value" th:text="${producto.marca ?: 'Banpresto'}">Banpresto</span>
-                    </div>
-                    <div class="spec-item">
                         <span class="spec-label">Material</span>
-                        <span class="spec-value" th:text="${producto.material ?: 'PVC'}">PVC</span>
+                        <span class="spec-value" th:text="${producto.material != null ? producto.material : 'PVC'}">Algodon</span>
                     </div>
                     <div class="spec-item">
-                        <span class="spec-label">Altura</span>
-                        <span class="spec-value" th:text="${producto.altura ?: '24 cm'}">24 cm</span>
+                        <span class="spec-label">Talla</span>
+                        <span class="spec-value" th:text="${producto.talla}">XL</span>
                     </div>
                     <div class="spec-item">
                         <span class="spec-label">Serie</span>
                         <span class="spec-value" th:text="${producto.serie ?: 'Jujutsu Kaisen'}">Jujutsu Kaisen</span>
-                    </div>
-                    <div class="spec-item">
-                        <span class="spec-label">Fecha registro</span>
-                        <!-- th:text="${#temporals.format(producto.fechaCreacion, 'dd/MM/yyyy')}" -->
-                        <span class="spec-value">12/05/2025</span>
                     </div>
                 </div>
             </div>
@@ -407,14 +343,10 @@
 
             <!-- Action buttons -->
             <div class="action-row animate delay-4">
-                <a th:href="@{/admin/productos/{id}/editar(id=${producto.id})}"
+                <a th:href="@{/admin/productos/editar/{id}(id=${producto.id})}"
                    href="/admin/productos/42/editar" class="btn-icon btn-edit">
                     <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
                     Editar información
-                </a>
-                <a href="/admin/stock" class="btn-icon btn-stock">
-                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
-                    Stock
                 </a>
                 <button class="btn-icon btn-delete" onclick="confirmDelete()">
                     <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
@@ -425,133 +357,6 @@
         </div>
         <!-- /product-info -->
     </div>
-
-    <!-- Bottom row: productos relacionados + historial -->
-    <div class="grid-3 mb-24">
-
-        <!-- Productos relacionados (misma categoría) -->
-        <div class="card animate delay-1">
-            <div class="flex items-center justify-between mb-16">
-                <h3 class="section-title">Misma <span>categoría</span></h3>
-                <a href="/admin/productos" class="text-blue text-sm">Ver todos →</a>
-            </div>
-            <!-- th:each="rel : ${relacionados}" -->
-            <div class="related-item">
-                <div class="related-img">🗿</div>
-                <div style="flex:1">
-                    <div class="related-name">Figura Itadori Yuji</div>
-                    <div class="related-price">$749.00</div>
-                </div>
-                <span class="related-stock-pill badge badge-stock-ok">22 uds.</span>
-            </div>
-            <div class="related-item">
-                <div class="related-img">⚔️</div>
-                <div style="flex:1">
-                    <div class="related-name">Figura Megumi Fushiguro</div>
-                    <div class="related-price">$699.00</div>
-                </div>
-                <span class="related-stock-pill badge badge-stock-ok">18 uds.</span>
-            </div>
-            <div class="related-item">
-                <div class="related-img">🌀</div>
-                <div style="flex:1">
-                    <div class="related-name">Figura Ryomen Sukuna</div>
-                    <div class="related-price">$950.00</div>
-                </div>
-                <span class="related-stock-pill badge badge-stock-low">5 uds.</span>
-            </div>
-            <div class="related-item">
-                <div class="related-img">👁️</div>
-                <div style="flex:1">
-                    <div class="related-name">Figura Nobara Kugisaki</div>
-                    <div class="related-price">$680.00</div>
-                </div>
-                <span class="related-stock-pill badge badge-stock-ok">11 uds.</span>
-            </div>
-        </div>
-
-        <!-- Historial de cambios -->
-        <div class="card animate delay-2">
-            <h3 class="section-title mb-16">Historial de <span>cambios</span></h3>
-            <div>
-                <div class="history-item">
-                    <div class="history-dot" style="background:var(--neon-green)"></div>
-                    <div>
-                        <div class="history-text">Producto <strong>creado</strong> en el sistema</div>
-                        <div class="history-time">12/05/2025 — 10:24 a.m.</div>
-                    </div>
-                </div>
-                <div class="history-item">
-                    <div class="history-dot" style="background:var(--neon-blue)"></div>
-                    <div>
-                        <div class="history-text">Stock actualizado: <strong>10 → 15 uds.</strong></div>
-                        <div class="history-time">18/05/2025 — 03:10 p.m.</div>
-                    </div>
-                </div>
-                <div class="history-item">
-                    <div class="history-dot" style="background:var(--neon-purple)"></div>
-                    <div>
-                        <div class="history-text">Precio modificado: <strong>$950 → $899</strong></div>
-                        <div class="history-time">20/05/2025 — 11:45 a.m.</div>
-                    </div>
-                </div>
-                <div class="history-item">
-                    <div class="history-dot" style="background:var(--neon-yellow)"></div>
-                    <div>
-                        <div class="history-text">Imágenes actualizadas <strong>(+3 fotos)</strong></div>
-                        <div class="history-time">21/05/2025 — 09:00 a.m.</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Info rápida / acciones secundarias -->
-        <div class="card animate delay-3">
-            <h3 class="section-title mb-16">Acciones <span>rápidas</span></h3>
-            <div style="display:flex;flex-direction:column;gap:10px">
-                <a th:href="@{/productos/{id}(id=${producto.id})}"
-                   href="/productos/42" target="_blank"
-                   class="btn-icon btn-stock" style="justify-content:center">
-                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
-                    Ver en tienda
-                </a>
-                <a href="/admin/imagenes" class="btn-icon"
-                   style="justify-content:center;background:rgba(124,58,237,.12);border:1px solid rgba(124,58,237,.35);color:var(--neon-purple)">
-                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                    Gestionar imágenes
-                </a>
-                <a href="/admin/productos/nuevo" class="btn-icon"
-                   style="justify-content:center;background:rgba(52,211,153,.1);border:1px solid rgba(52,211,153,.3);color:var(--neon-green)">
-                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
-                    Duplicar producto
-                </a>
-            </div>
-
-            <!-- Mini stats -->
-            <div class="divider" style="margin:16px 0"></div>
-            <h3 class="section-title mb-12" style="font-size:13px">Resumen rápido</h3>
-            <div style="display:flex;flex-direction:column;gap:8px">
-                <div class="flex items-center justify-between">
-                    <span style="font-size:13px;color:var(--text-secondary)">Imágenes</span>
-                    <span style="font-size:13px;font-weight:700;color:var(--neon-blue)">4 fotos</span>
-                </div>
-                <div class="flex items-center justify-between">
-                    <span style="font-size:13px;color:var(--text-secondary)">Vistas en tienda</span>
-                    <span style="font-size:13px;font-weight:700;color:var(--neon-blue)">1,240</span>
-                </div>
-                <div class="flex items-center justify-between">
-                    <span style="font-size:13px;color:var(--text-secondary)">En favoritos</span>
-                    <span style="font-size:13px;font-weight:700;color:var(--neon-purple)">87 usuarios</span>
-                </div>
-                <div class="flex items-center justify-between">
-                    <span style="font-size:13px;color:var(--text-secondary)">Último movimiento</span>
-                    <span style="font-size:13px;font-weight:700;color:var(--text-primary)">Hoy</span>
-                </div>
-            </div>
-        </div>
-
-    </div>
-
 </main>
 
 <!-- ─── Lightbox simple ─── -->
