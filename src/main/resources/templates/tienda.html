@@ -97,7 +97,7 @@
         .icon-btn svg { width: 18px; height: 18px; }
         .cart-count {
             position: absolute; top: -4px; right: -4px;
-            width: 16px; height: 16px; background: var(--neon-purple);
+            width: 18px; height: 18px; background: var(--neon-purple);
             border-radius: 50%; font-size: 10px; font-weight: 700;
             display: flex; align-items: center; justify-content: center; color: white;
         }
@@ -113,8 +113,6 @@
             margin-left: 220px; margin-top: 64px;
             display: flex; min-height: calc(100vh - 64px);
         }
-
-        .inicio { flex: 1; padding: 28px 32px; overflow-y: auto; }
 
         /* ─── FILTER SIDEBAR ─── */
         .filter-sidebar {
@@ -152,12 +150,8 @@
             justify-content: center; transition: all 0.15s; background: var(--dark-surface);
         }
         .filter-option input { display: none; }
-        .filter-option input:checked + .filter-checkbox {
-            background: var(--neon-blue); border-color: var(--neon-blue);
-        }
-        .filter-option input:checked + .filter-checkbox::after {
-            content: '✓'; font-size: 10px; color: var(--dark-bg); font-weight: 900;
-        }
+        .filter-option input:checked + .filter-checkbox { background: var(--neon-blue); border-color: var(--neon-blue); }
+        .filter-option input:checked + .filter-checkbox::after { content: '✓'; font-size: 10px; color: var(--dark-bg); font-weight: 900; }
         .filter-label { font-size: 14px; color: var(--text-secondary); flex: 1; }
         .filter-count { font-size: 11px; color: var(--text-secondary); }
 
@@ -186,7 +180,6 @@
         /* ─── MAIN CONTENT ─── */
         .main-content { flex: 1; padding: 28px 32px; overflow-y: auto; }
 
-        /* Breadcrumb */
         .breadcrumb {
             display: flex; align-items: center; gap: 8px;
             font-size: 13px; color: var(--text-secondary); margin-bottom: 20px;
@@ -194,18 +187,12 @@
         .breadcrumb a { color: var(--text-secondary); text-decoration: none; transition: color 0.15s; }
         .breadcrumb a:hover { color: var(--neon-blue); }
         .breadcrumb-sep { color: var(--dark-border); }
-        .breadcrumb-current { color: var(--text-primary); }
 
-        /* Tienda header */
         .tienda-header { margin-bottom: 24px; }
         .tienda-title { font-family: 'Orbitron', monospace; font-size: 22px; font-weight: 900; margin-bottom: 4px; }
         .tienda-sub { font-size: 14px; color: var(--text-secondary); }
 
-        /* Toolbar */
-        .toolbar {
-            display: flex; align-items: center; gap: 12px;
-            margin-bottom: 24px; flex-wrap: wrap;
-        }
+        .toolbar { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; flex-wrap: wrap; }
         .toolbar-left { display: flex; align-items: center; gap: 8px; flex: 1; flex-wrap: wrap; }
         .toolbar-right { display: flex; align-items: center; gap: 8px; }
 
@@ -239,10 +226,7 @@
         .results-count strong { color: var(--text-primary); }
 
         /* ─── PRODUCT GRID ─── */
-        .products-grid {
-            display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;
-            margin-bottom: 32px;
-        }
+        .products-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 32px; }
         .products-grid.list-view { grid-template-columns: 1fr; }
 
         .product-card {
@@ -253,7 +237,7 @@
         }
         @keyframes fade-in {
             from { opacity: 0; transform: translateY(12px); }
-            to { opacity: 1; transform: translateY(0); }
+            to   { opacity: 1; transform: translateY(0); }
         }
         .product-card:hover {
             border-color: rgba(0, 212, 255, 0.4); transform: translateY(-4px);
@@ -266,6 +250,10 @@
             display: flex; align-items: center; justify-content: center;
             position: relative; overflow: hidden;
         }
+        .product-img img {
+            position: absolute; top: 0; left: 0;
+            width: 100%; height: 100%; object-fit: cover;
+        }
         .product-img-inner {
             width: 65%; height: 65%; border-radius: 8px;
             background: linear-gradient(135deg, var(--dark-border), rgba(31,41,55,0.5));
@@ -275,13 +263,17 @@
             position: absolute; top: 10px; left: 10px;
             padding: 3px 8px; border-radius: 4px;
             font-size: 10px; font-weight: 700; letter-spacing: 1px;
+            z-index: 2;
         }
         .badge-new { background: var(--neon-blue); color: var(--dark-bg); }
+        .badge-oferta { background: #f59e0b; color: var(--dark-bg); }
+
         .product-actions {
             position: absolute; bottom: 0; left: 0; right: 0; padding: 12px;
             display: flex; gap: 8px; opacity: 0; transform: translateY(8px);
             transition: all 0.2s;
             background: linear-gradient(to top, rgba(3,7,18,0.97), transparent);
+            z-index: 2;
         }
         .add-cart-btn {
             flex: 1; background: var(--neon-blue); color: var(--dark-bg);
@@ -307,47 +299,25 @@
         .price-current { font-size: 18px; font-weight: 700; color: var(--neon-blue); font-family: 'Orbitron', monospace; }
         .price-old { font-size: 12px; color: var(--text-secondary); text-decoration: line-through; }
         .product-stock { font-size: 11px; }
-        .stock-ok { color: #34d399; }
+        .stock-ok  { color: #34d399; }
         .stock-low { color: #fbbf24; }
         .stock-out { color: #f87171; }
 
         /* LIST VIEW */
         .products-grid.list-view .product-card { display: flex; flex-direction: row; }
-        .products-grid.list-view .product-img { width: 140px; flex-shrink: 0; aspect-ratio: auto; }
+        .products-grid.list-view .product-img  { width: 140px; flex-shrink: 0; aspect-ratio: auto; }
         .products-grid.list-view .product-info { flex: 1; padding: 20px; display: flex; flex-direction: column; justify-content: center; }
         .products-grid.list-view .product-name { font-size: 16px; }
         .products-grid.list-view .product-actions { position: static; opacity: 1; transform: none; background: none; padding: 0; margin-top: 12px; width: fit-content; }
 
-        /* ─── PAGINATION ─── */
-        .pagination {
-            display: flex; align-items: center; justify-content: center; gap: 6px;
-            margin-top: 8px; padding-bottom: 32px;
-        }
-        .page-btn {
-            width: 36px; height: 36px; border-radius: 8px; border: 1px solid var(--dark-border);
-            background: var(--dark-card); color: var(--text-secondary);
-            display: flex; align-items: center; justify-content: center;
-            cursor: pointer; font-family: 'Rajdhani', sans-serif; font-size: 14px;
-            font-weight: 600; transition: all 0.15s; text-decoration: none;
-        }
-        .page-btn:hover { border-color: var(--neon-blue); color: var(--neon-blue); }
-        .page-btn.active { background: var(--neon-blue); border-color: var(--neon-blue); color: var(--dark-bg); font-weight: 700; }
-        .page-btn.disabled { opacity: 0.3; cursor: not-allowed; pointer-events: none; }
-        .page-dots { color: var(--text-secondary); font-size: 14px; padding: 0 4px; }
-
         /* ─── EMPTY STATE ─── */
-        .empty-state {
-            text-align: center; padding: 80px 32px;
-            display: none;
-        }
-        .empty-icon { font-size: 64px; margin-bottom: 16px; opacity: 0.5; }
+        .empty-state { text-align: center; padding: 80px 32px; }
+        .empty-icon  { font-size: 64px; margin-bottom: 16px; opacity: 0.5; }
         .empty-title { font-family: 'Orbitron', monospace; font-size: 18px; margin-bottom: 8px; }
-        .empty-sub { color: var(--text-secondary); font-size: 15px; }
+        .empty-sub   { color: var(--text-secondary); font-size: 15px; }
 
         /* ─── MOBILE ─── */
-        @media (max-width: 1100px) {
-            .products-grid { grid-template-columns: repeat(2, 1fr); }
-        }
+        @media (max-width: 1100px) { .products-grid { grid-template-columns: repeat(2, 1fr); } }
         @media (max-width: 900px) {
             .nav-sidebar { transform: translateX(-100%); transition: transform 0.3s; }
             .nav-sidebar.open { transform: translateX(0); }
@@ -382,22 +352,18 @@
             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
             Tienda
         </a>
-        <a href="/tienda" class="nav-item">
-            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg>
-            Categorías
-        </a>
         <a href="/tienda?filter=nuevo" class="nav-item">
             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
             Novedades
-            <span class="nav-badge">12</span>
+            <span class="nav-badge">NW</span>
         </a>
         <a href="/tienda?filter=oferta" class="nav-item">
             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/></svg>
             Ofertas
         </a>
-        <a href="/favoritos" class="nav-item">
-            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
-            Favoritos
+        <a href="/carrito" class="nav-item">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+            Carrito
         </a>
     </nav>
     <nav class="nav-section">
@@ -425,20 +391,17 @@
         <input type="text" placeholder="Buscar productos, categorías..." id="searchInput" oninput="filterProducts()"/>
     </div>
     <div class="topbar-actions">
-        <a href="/favoritos" class="icon-btn">
-            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
-        </a>
         <a href="/carrito" class="icon-btn">
             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
-            <span class="cart-count" id="cartBadge" style="display:none">0</span>
+            <!-- Badge: count desde servidor, actualizado por JS tras addToCart -->
+            <span class="cart-count" id="cartBadge"
+                  th:text="${totalItems}"
+                  th:style="${totalItems > 0} ? '' : 'display:none'">0</span>
         </a>
         <div class="avatar">DZ</div>
     </div>
 </header>
 
-<div class ="inicio">
-
-</div>
 <!-- ─── PAGE WRAPPER ─── -->
 <div class="page-wrapper">
 
@@ -446,7 +409,7 @@
     <aside class="filter-sidebar" id="filterSidebar">
         <div class="filter-header">
             <span class="filter-title">FILTROS</span>
-            <a href="#" class="filter-reset" onclick="resetFilters()">Limpiar todo</a>
+            <a href="#" class="filter-reset" onclick="resetFilters(); return false;">Limpiar todo</a>
         </div>
 
         <!-- Categorías -->
@@ -456,40 +419,26 @@
                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
             </div>
             <div class="filter-options">
-                <label class="filter-option"><input type="checkbox" onchange="filterProducts()"/><div class="filter-checkbox"></div><span class="filter-label">Figuras</span><span class="filter-count">124</span></label>
-                <label class="filter-option"><input type="checkbox" onchange="filterProducts()"/><div class="filter-checkbox"></div><span class="filter-label">Mangas</span><span class="filter-count">93</span></label>
-                <label class="filter-option"><input type="checkbox" onchange="filterProducts()"/><div class="filter-checkbox"></div><span class="filter-label">Ropa</span><span class="filter-count">76</span></label>
-                <label class="filter-option"><input type="checkbox" onchange="filterProducts()"/><div class="filter-checkbox"></div><span class="filter-label">Funko Pop!</span><span class="filter-count">102</span></label>
-                <label class="filter-option"><input type="checkbox" onchange="filterProducts()"/><div class="filter-checkbox"></div><span class="filter-label">Pósters</span><span class="filter-count">63</span></label>
-                <label class="filter-option"><input type="checkbox" onchange="filterProducts()"/><div class="filter-checkbox"></div><span class="filter-label">Accesorios</span><span class="filter-count">98</span></label>
+                <label class="filter-option"><input type="checkbox" value="figuras"    onchange="filterProducts()"/><div class="filter-checkbox"></div><span class="filter-label">Figuras</span></label>
+                <label class="filter-option"><input type="checkbox" value="mangas"     onchange="filterProducts()"/><div class="filter-checkbox"></div><span class="filter-label">Mangas</span></label>
+                <label class="filter-option"><input type="checkbox" value="ropa"       onchange="filterProducts()"/><div class="filter-checkbox"></div><span class="filter-label">Ropa</span></label>
+                <label class="filter-option"><input type="checkbox" value="funko"      onchange="filterProducts()"/><div class="filter-checkbox"></div><span class="filter-label">Funko Pop!</span></label>
+                <label class="filter-option"><input type="checkbox" value="posters"    onchange="filterProducts()"/><div class="filter-checkbox"></div><span class="filter-label">Pósters</span></label>
+                <label class="filter-option"><input type="checkbox" value="accesorios" onchange="filterProducts()"/><div class="filter-checkbox"></div><span class="filter-label">Accesorios</span></label>
             </div>
         </div>
+
         <!-- Precio -->
         <div class="filter-group">
             <div class="filter-group-title" onclick="toggleGroup(this)">
                 Rango de precio
                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
             </div>
-            <input type="range" class="range-slider" min="0" max="5000" value="3000" oninput="updatePriceRange(this)"/>
+            <input type="range" class="range-slider" min="0" max="5000" value="5000" id="priceRange" oninput="updatePriceRange(this)"/>
             <div class="price-inputs">
-                <input type="number" class="price-input" value="0" placeholder="Mín" id="priceMin"/>
+                <input type="number" class="price-input" value="0"    placeholder="Mín" id="priceMin"/>
                 <span class="price-sep">—</span>
-                <input type="number" class="price-input" value="3000" placeholder="Máx" id="priceMax"/>
-            </div>
-        </div>
-
-        <!-- Marca -->
-        <div class="filter-group">
-            <div class="filter-group-title" onclick="toggleGroup(this)">
-                Marca
-                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-            </div>
-            <div class="filter-options">
-                <label class="filter-option"><input type="checkbox" onchange="filterProducts()"/><div class="filter-checkbox"></div><span class="filter-label">Banpresto</span></label>
-                <label class="filter-option"><input type="checkbox" onchange="filterProducts()"/><div class="filter-checkbox"></div><span class="filter-label">Good Smile Company</span></label>
-                <label class="filter-option"><input type="checkbox" onchange="filterProducts()"/><div class="filter-checkbox"></div><span class="filter-label">Funko</span></label>
-                <label class="filter-option"><input type="checkbox" onchange="filterProducts()"/><div class="filter-checkbox"></div><span class="filter-label">Bandai</span></label>
-                <label class="filter-option"><input type="checkbox" onchange="filterProducts()"/><div class="filter-checkbox"></div><span class="filter-label">Kotobukiya</span></label>
+                <input type="number" class="price-input" value="5000" placeholder="Máx" id="priceMax"/>
             </div>
         </div>
 
@@ -500,24 +449,36 @@
                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
             </div>
             <div class="filter-options">
-                <label class="filter-option"><input type="checkbox" checked onchange="filterProducts()"/><div class="filter-checkbox"></div><span class="filter-label">En stock</span><span class="filter-count">248</span></label>
+                <label class="filter-option">
+                    <input type="checkbox" id="soloStock" onchange="filterProducts()"/>
+                    <div class="filter-checkbox"></div>
+                    <span class="filter-label">Solo en stock</span>
+                </label>
             </div>
         </div>
     </aside>
 
     <!-- MAIN CONTENT -->
     <main class="main-content">
-        <!-- Header -->
         <div class="tienda-header">
             <h1 class="tienda-title">Tienda</h1>
             <p class="tienda-sub">Explora nuestro catálogo completo</p>
         </div>
+
         <!-- Toolbar -->
         <div class="toolbar">
             <div class="toolbar-left">
-                <span class="results-count">Mostrando <strong>1–12</strong> de <strong>257</strong> resultados</span>
-                <div class="filter-tag" id="tag-nuevo" style="display:none">
-                    Nuevo <span class="filter-tag-x" onclick="removeTag('nuevo')">×</span>
+                <span class="results-count">
+                    <strong th:text="${productos.size()}">0</strong> producto(s)
+                    <th:block th:if="${filter != null}">
+                        — filtro: <strong th:text="${filter}"></strong>
+                    </th:block>
+                </span>
+                <div class="filter-tag" id="tag-nuevo" th:style="${'nuevo'.equals(filter)} ? '' : 'display:none'">
+                    Nuevo <span class="filter-tag-x" onclick="window.location.href='/tienda'">×</span>
+                </div>
+                <div class="filter-tag" id="tag-oferta" th:style="${'oferta'.equals(filter)} ? '' : 'display:none'">
+                    Oferta <span class="filter-tag-x" onclick="window.location.href='/tienda'">×</span>
                 </div>
             </div>
             <div class="toolbar-right">
@@ -537,369 +498,98 @@
                 </div>
             </div>
         </div>
-        <!-- Products -->
-        <div class="products-grid" id="productsGrid">
 
-            <div class="product-card" data-id="gojo-figure" data-name="figura satoru gojo" data-cat="figuras" data-precio="899" data-stock="15" style="animation-delay:0.05s">
+        <!-- Products Grid — renderizado por Thymeleaf desde MongoDB -->
+        <div class="products-grid" id="productsGrid" th:if="${!productos.isEmpty()}">
+
+            <div class="product-card"
+                 th:each="p, pStat : ${productos}"
+                 th:attr="data-id=${p.id},
+                          data-name=${#strings.toLowerCase(p.nombre ?: '')},
+                          data-cat=${#strings.toLowerCase(p.categoria ?: '')},
+                          data-precio=${p.precio.intValue()},
+                          data-stock=${p.stock}"
+                 th:style="${'animation-delay:' + (pStat.index * 0.05) + 's'}">
+
                 <div class="product-img">
-                    <div class="product-img-inner"></div>
-                    <span class="product-badge badge-new">NUEVO</span>
+                    <!-- Imagen real si existe (la ruta ya incluye /images/productos/) -->
+                    <img th:if="${p.imagenes != null and !p.imagenes.isEmpty()}"
+                         th:src="${p.imagenes[0]}"
+                         th:alt="${p.nombre}"/>
+                    <!-- Placeholder emoji por categoría -->
+                    <div class="product-img-inner"
+                         th:unless="${p.imagenes != null and !p.imagenes.isEmpty()}"
+                         th:text="${p.categoria != null ?
+                             (p.categoria.equalsIgnoreCase('figuras')    ? '🗿' :
+                              p.categoria.equalsIgnoreCase('mangas')     ? '📚' :
+                              p.categoria.equalsIgnoreCase('ropa')       ? '👕' :
+                              p.categoria.equalsIgnoreCase('funko')      ? '🎭' :
+                              p.categoria.equalsIgnoreCase('posters')    ? '🖼' :
+                              p.categoria.equalsIgnoreCase('accesorios') ? '🎒' : '📦')
+                             : '📦'}">📦</div>
+
+                    <!-- Badges -->
+                    <span class="product-badge badge-new"   th:if="${p.esNuevo}">NUEVO</span>
+                    <span class="product-badge badge-oferta" th:if="${p.esOferta and !p.esNuevo}">OFERTA</span>
+
                     <div class="product-actions">
-                        <button class="add-cart-btn" onclick="addToCart(this)">Agregar</button>
+                        <button class="add-cart-btn"
+                                th:disabled="${p.stock <= 0}"
+                                th:text="${p.stock > 0 ? 'Agregar' : 'Sin stock'}"
+                                onclick="addToCart(this)">Agregar</button>
                         <button class="fav-btn">♡</button>
                     </div>
                 </div>
-                <div class="product-info">
-                    <div class="product-series">Jujutsu Kaisen</div>
-                    <div class="product-name">Figura Satoru Gojo</div>
-                    <div class="product-meta">
-                        <div class="product-price"><span class="price-current">$899</span></div>
-                        <span class="product-stock stock-ok">● En stock</span>
-                    </div>
-                </div>
-            </div>
 
-            <div class="product-card" data-id="nezuko-funko" data-name="funko pop nezuko" data-cat="funko" data-precio="299" data-stock="28" style="animation-delay:0.1s">
-                <div class="product-img">
-                    <div class="product-img-inner"></div>
-                    <span class="product-badge badge-new">NUEVO</span>
-                    <div class="product-actions">
-                        <button class="add-cart-btn" onclick="addToCart(this)">Agregar</button>
-                        <button class="fav-btn">♡</button>
-                    </div>
-                </div>
                 <div class="product-info">
-                    <div class="product-series">Demon Slayer</div>
-                    <div class="product-name">Funko Pop! Nezuko</div>
-                    <div class="product-meta">
-                        <div class="product-price"><span class="price-current">$299</span></div>
-                        <span class="product-stock stock-ok">● En stock</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="product-card" data-id="op-sudadera" data-name="sudadera one piece" data-cat="ropa" data-precio="600" data-stock="8" style="animation-delay:0.15s">
-                <div class="product-img">
-                    <div class="product-img-inner"></div>
-                    <div class="product-actions">
-                        <button class="add-cart-btn" onclick="addToCart(this)">Agregar</button>
-                        <button class="fav-btn">♡</button>
-                    </div>
-                </div>
-                <div class="product-info">
-                    <div class="product-series">One Piece</div>
-                    <div class="product-name">Sudadera One Piece Straw Hat</div>
+                    <div class="product-series" th:text="${p.serie ?: ''}"></div>
+                    <div class="product-name"   th:text="${p.nombre}"></div>
                     <div class="product-meta">
                         <div class="product-price">
-                            <span class="price-current">$600</span>
-                            <span class="price-old">$849</span>
+                            <span class="price-current"
+                                  th:text="${'$' + #numbers.formatDecimal(p.precio, 1, 'COMMA', 0, 'POINT')}">$0</span>
+                            <span class="price-old"
+                                  th:if="${p.esOferta and p.precioAnterior > 0}"
+                                  th:text="${'$' + #numbers.formatDecimal(p.precioAnterior, 1, 'COMMA', 0, 'POINT')}"></span>
                         </div>
-                        <span class="product-stock stock-low">● Pocas unidades</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="product-card" data-id="aot-manga-34" data-name="manga attack on titan" data-cat="mangas" data-precio="179" data-stock="32" style="animation-delay:0.2s">
-                <div class="product-img">
-                    <div class="product-img-inner"></div>
-                    <div class="product-actions">
-                        <button class="add-cart-btn" onclick="addToCart(this)">Agregar</button>
-                        <button class="fav-btn">♡</button>
-                    </div>
-                </div>
-                <div class="product-info">
-                    <div class="product-series">Attack on Titan</div>
-                    <div class="product-name">Manga Attack on Titan Vol. 34</div>
-                    <div class="product-meta">
-                        <div class="product-price"><span class="price-current">$179</span></div>
-                        <span class="product-stock stock-ok">● En stock</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="product-card" data-id="midoriya-figure" data-name="figura izuku midoriya" data-cat="figuras" data-precio="799" data-stock="5" style="animation-delay:0.25s">
-                <div class="product-img">
-                    <div class="product-img-inner"></div>
-                    <span class="product-badge badge-new">NUEVO</span>
-                    <div class="product-actions">
-                        <button class="add-cart-btn" onclick="addToCart(this)">Agregar</button>
-                        <button class="fav-btn">♡</button>
-                    </div>
-                </div>
-                <div class="product-info">
-                    <div class="product-series">My Hero Academia</div>
-                    <div class="product-name">Figura Izuku Midoriya</div>
-                    <div class="product-meta">
-                        <div class="product-price"><span class="price-current">$799</span></div>
-                        <span class="product-stock stock-low">● 5 disponibles</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="product-card" data-id="db-poster" data-name="poster dragon ball super" data-cat="posters" data-precio="199" data-stock="40" style="animation-delay:0.3s">
-                <div class="product-img">
-                    <div class="product-img-inner"></div>
-                    <div class="product-actions">
-                        <button class="add-cart-btn" onclick="addToCart(this)">Agregar</button>
-                        <button class="fav-btn">♡</button>
-                    </div>
-                </div>
-                <div class="product-info">
-                    <div class="product-series">Dragon Ball Super</div>
-                    <div class="product-name">Póster Dragon Ball Super</div>
-                    <div class="product-meta">
-                        <div class="product-price"><span class="price-current">$199</span></div>
-                        <span class="product-stock stock-ok">● En stock</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="product-card" data-id="akatsuki-key" data-name="llavero akatsuki" data-cat="accesorios" data-precio="85" data-stock="60" style="animation-delay:0.35s">
-                <div class="product-img">
-                    <div class="product-img-inner"></div>
-                    <div class="product-actions">
-                        <button class="add-cart-btn" onclick="addToCart(this)">Agregar</button>
-                        <button class="fav-btn">♡</button>
-                    </div>
-                </div>
-                <div class="product-info">
-                    <div class="product-series">Naruto Shippuden</div>
-                    <div class="product-name">Llavero Akatsuki</div>
-                    <div class="product-meta">
-                        <div class="product-price"><span class="price-current">$85</span></div>
-                        <span class="product-stock stock-ok">● En stock</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="product-card" data-id="goku-ui-funko" data-name="funko pop goku ultra instinct" data-cat="funko" data-precio="349" data-stock="20" style="animation-delay:0.45s">
-                <div class="product-img">
-                    <div class="product-img-inner"></div>
-                    <div class="product-actions">
-                        <button class="add-cart-btn" onclick="addToCart(this)">Agregar</button>
-                        <button class="fav-btn">♡</button>
-                    </div>
-                </div>
-                <div class="product-info">
-                    <div class="product-series">Dragon Ball Super</div>
-                    <div class="product-name">Funko Pop! Goku Ultra Instinct</div>
-                    <div class="product-meta">
-                        <div class="product-price"><span class="price-current">$349</span></div>
-                        <span class="product-stock stock-ok">● En stock</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="product-card" data-id="luffy-g5-figure" data-name="figura luffy gear 5" data-cat="figuras" data-precio="1299" data-stock="7" style="animation-delay:0.5s">
-                <div class="product-img">
-                    <div class="product-img-inner"></div>
-                    <span class="product-badge badge-new">NUEVO</span>
-                    <div class="product-actions">
-                        <button class="add-cart-btn" onclick="addToCart(this)">Agregar</button>
-                        <button class="fav-btn">♡</button>
-                    </div>
-                </div>
-                <div class="product-info">
-                    <div class="product-series">One Piece</div>
-                    <div class="product-name">Figura Luffy Gear 5</div>
-                    <div class="product-meta">
-                        <div class="product-price"><span class="price-current">$1,299</span></div>
-                        <span class="product-stock stock-low">● 7 disponibles</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="product-card" data-id="naruto-boxset" data-name="manga naruto box set" data-cat="mangas" data-precio="2499" data-stock="3" style="animation-delay:0.55s">
-                <div class="product-img">
-                    <div class="product-img-inner"></div>
-                    <div class="product-actions">
-                        <button class="add-cart-btn" onclick="addToCart(this)">Agregar</button>
-                        <button class="fav-btn">♡</button>
-                    </div>
-                </div>
-                <div class="product-info">
-                    <div class="product-series">Naruto</div>
-                    <div class="product-name">Manga Naruto Box Set Completo</div>
-                    <div class="product-meta">
-                        <div class="product-price">
-                            <span class="price-current">$2,499</span>
-                            <span class="price-old">$3,200</span>
-                        </div>
-                        <span class="product-stock stock-low">● Últimas unidades</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="product-card" data-id="rem-figure" data-name="figura rem re zero" data-cat="figuras" data-precio="1899" data-stock="4" style="animation-delay:0.6s">
-                <div class="product-img">
-                    <div class="product-img-inner"></div>
-                    <span class="product-badge badge-new">NUEVO</span>
-                    <div class="product-actions">
-                        <button class="add-cart-btn" onclick="addToCart(this)">Agregar</button>
-                        <button class="fav-btn">♡</button>
-                    </div>
-                </div>
-                <div class="product-info">
-                    <div class="product-series">Re:Zero</div>
-                    <div class="product-name">Figura Rem Re:Zero</div>
-                    <div class="product-meta">
-                        <div class="product-price"><span class="price-current">$1,899</span></div>
-                        <span class="product-stock stock-low">● 4 disponibles</span>
+                        <span class="product-stock"
+                              th:classappend="${p.stock > 10 ? 'stock-ok' : (p.stock > 0 ? 'stock-low' : 'stock-out')}"
+                              th:text="${p.stock > 10 ? '● En stock' :
+                                        (p.stock > 0  ? '● ' + p.stock + ' uds.' : '● Sin stock')}">
+                            ● En stock
+                        </span>
                     </div>
                 </div>
             </div>
 
         </div>
 
-        <!-- Empty state -->
-        <div class="empty-state" id="emptyState">
-            <div class="empty-icon"></div>
+        <!-- Empty state (sin productos en MongoDB o sin resultados de filtro) -->
+        <div class="empty-state" id="emptyState"
+             th:if="${productos.isEmpty()}" style="display:block">
+            <div class="empty-icon">🔍</div>
             <div class="empty-title">Sin resultados</div>
-            <div class="empty-sub">Intenta con otros filtros o términos de búsqueda</div>
+            <div class="empty-sub">No hay productos disponibles en este momento. Vuelve pronto.</div>
+        </div>
+        <!-- Vacío generado por filtro JS (oculto por defecto cuando hay productos) -->
+        <div class="empty-state" id="emptyStateJs"
+             th:if="${!productos.isEmpty()}" style="display:none">
+            <div class="empty-icon">🔍</div>
+            <div class="empty-title">Sin resultados</div>
+            <div class="empty-sub">Intenta con otros filtros o términos de búsqueda.</div>
         </div>
 
-        <!-- Pagination -->
-        <div class="pagination">
-            <a href="#" class="page-btn disabled">‹</a>
-            <a href="#" class="page-btn active">1</a>
-            <a href="#" class="page-btn">2</a>
-            <a href="#" class="page-btn">3</a>
-            <a href="#" class="page-btn">4</a>
-            <span class="page-dots">…</span>
-            <a href="#" class="page-btn">20</a>
-            <a href="#" class="page-btn">›</a>
-        </div>
     </main>
 </div>
 
-<script>
-    // Sidebar toggle
-    function toggleNav() {
-        document.getElementById('navSidebar').classList.toggle('open');
-    }
-
-    // View toggle
-    function setView(mode) {
-        const grid = document.getElementById('productsGrid');
-        const gridBtn = document.getElementById('gridBtn');
-        const listBtn = document.getElementById('listBtn');
-        if (mode === 'list') {
-            grid.classList.add('list-view');
-            listBtn.classList.add('active');
-            gridBtn.classList.remove('active');
-        } else {
-            grid.classList.remove('list-view');
-            gridBtn.classList.add('active');
-            listBtn.classList.remove('active');
-        }
-    }
-
-    // Filter group toggle
-    function toggleGroup(el) {
-        el.classList.toggle('collapsed');
-        const options = el.nextElementSibling;
-        if (options) options.style.display = el.classList.contains('collapsed') ? 'none' : 'flex';
-    }
-
-    // Price range
-    function updatePriceRange(slider) {
-        document.getElementById('priceMax').value = slider.value;
-        filterProducts();
-    }
-
-    // Filter products
-    function filterProducts() {
-        const search = document.getElementById('searchInput').value.toLowerCase();
-        const cards = document.querySelectorAll('.product-card');
-        let visible = 0;
-        cards.forEach(card => {
-            const name = card.dataset.name || '';
-            const matches = name.includes(search);
-            card.style.display = matches ? '' : 'none';
-            if (matches) visible++;
-        });
-        document.getElementById('emptyState').style.display = visible === 0 ? 'block' : 'none';
-    }
-
-    // Sort
-    function sortProducts(val) {
-        const grid = document.getElementById('productsGrid');
-        const cards = Array.from(grid.querySelectorAll('.product-card'));
-        cards.sort((a, b) => {
-            if (val === 'precio-asc') return parseInt(a.dataset.precio) - parseInt(b.dataset.precio);
-            if (val === 'precio-desc') return parseInt(b.dataset.precio) - parseInt(a.dataset.precio);
-            if (val === 'nombre') return (a.dataset.name || '').localeCompare(b.dataset.name || '');
-            return 0;
-        });
-        cards.forEach(c => grid.appendChild(c));
-    }
-
-    // Remove filter tag
-    function removeTag(tag) {
-        document.getElementById('tag-' + tag).style.display = 'none';
-    }
-
-    // Reset filters
-    function resetFilters() {
-        document.querySelectorAll('.filter-option input').forEach(cb => cb.checked = false);
-        document.getElementById('searchInput').value = '';
-        filterProducts();
-        return false;
-    }
-
-    const params = new URLSearchParams(window.location.search);
-    if (params.get('filter') === 'nuevo') document.getElementById('tag-nuevo').style.display = 'flex';
-
-    const DZ_CART = 'dz_cart';
-    function getCart() { try { return JSON.parse(localStorage.getItem(DZ_CART)) || []; } catch(e) { return []; } }
-    function saveCart(cart) { localStorage.setItem(DZ_CART, JSON.stringify(cart)); updateBadge(); }
-    function updateBadge() {
-        const n = getCart().reduce((s, i) => s + i.qty, 0);
-        const b = document.getElementById('cartBadge');
-        if (b) { b.textContent = n; b.style.display = n > 0 ? 'flex' : 'none'; }
-    }
-    function addToCart(btn) {
-        const card = btn.closest('.product-card');
-        const id    = card.dataset.id;
-        const name  = card.querySelector('.product-name').textContent.trim();
-        const series = card.querySelector('.product-series').textContent.trim();
-        const price = parseInt(card.dataset.precio);
-        const cat   = card.dataset.cat || '';
-        const cart  = getCart();
-        const found = cart.find(i => i.id === id);
-        if (found) { found.qty++; } else { cart.push({ id, name, series, price, cat, qty: 1 }); }
-        saveCart(cart);
-        btn.textContent = '✓ Agregado';
-        btn.style.background = '#34d399';
-        btn.style.color = '#030712';
-        btn.disabled = true;
-        setTimeout(() => {
-            btn.textContent = 'Agregar';
-            btn.style.background = '';
-            btn.style.color = '';
-            btn.disabled = false;
-        }, 1500);
-        showToast(name);
-    }
-    function showToast(name) {
-        const t = document.getElementById('dz-toast');
-        document.getElementById('dz-toast-text').textContent = name;
-        t.classList.add('dz-toast-on');
-        clearTimeout(window._dzTimer);
-        window._dzTimer = setTimeout(() => t.classList.remove('dz-toast-on'), 2800);
-    }
-    updateBadge();
-
-</script>
-
-
+<!-- ─── Toast de carrito ─── -->
 <div id="dz-toast">
     <span style="font-size:20px;flex-shrink:0">🛒</span>
     <div style="flex:1;min-width:0">
         <div style="font-size:10px;color:#9ca3af;letter-spacing:1px;text-transform:uppercase;margin-bottom:2px">Agregado al carrito</div>
         <div id="dz-toast-text" style="font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></div>
     </div>
-    <a href="/carrito" style="flex-shrink:0;background:#7c3aed;color:white;border-radius:6px;padding:6px 12px;font-size:12px;font-weight:700;text-decoration:none;white-space:nowrap;transition:background 0.15s">Ver carrito</a>
+    <a href="/carrito" style="flex-shrink:0;background:#7c3aed;color:white;border-radius:6px;padding:6px 12px;font-size:12px;font-weight:700;text-decoration:none;white-space:nowrap">Ver carrito</a>
 </div>
 <style>
 #dz-toast {
@@ -912,5 +602,159 @@
 }
 #dz-toast.dz-toast-on { transform:translateY(0);opacity:1;pointer-events:auto; }
 </style>
+
+<script>
+    // ─── Sidebar / view ───────────────────────────────────────────────────────
+    function toggleNav() {
+        document.getElementById('navSidebar').classList.toggle('open');
+    }
+    function setView(mode) {
+        const grid = document.getElementById('productsGrid');
+        if (!grid) return;
+        document.getElementById('gridBtn').classList.toggle('active', mode === 'grid');
+        document.getElementById('listBtn').classList.toggle('active', mode === 'list');
+        grid.classList.toggle('list-view', mode === 'list');
+    }
+    function toggleGroup(el) {
+        el.classList.toggle('collapsed');
+        const opts = el.nextElementSibling;
+        if (opts) opts.style.display = el.classList.contains('collapsed') ? 'none' : 'flex';
+    }
+    function updatePriceRange(slider) {
+        document.getElementById('priceMax').value = slider.value;
+        filterProducts();
+    }
+
+    // ─── Filtrar productos (DOM) ──────────────────────────────────────────────
+    function filterProducts() {
+        const search = (document.getElementById('searchInput').value || '').toLowerCase();
+        const maxPrecio = parseFloat(document.getElementById('priceMax').value || 99999);
+        const minPrecio = parseFloat(document.getElementById('priceMin').value || 0);
+        const soloStock = document.getElementById('soloStock').checked;
+
+        // Categorías seleccionadas
+        const cats = [];
+        document.querySelectorAll('.filter-option input[type="checkbox"]:not(#soloStock)').forEach(cb => {
+            if (cb.checked && cb.value) cats.push(cb.value.toLowerCase());
+        });
+
+        const cards = document.querySelectorAll('.product-card');
+        let visible = 0;
+        cards.forEach(card => {
+            const name   = (card.dataset.name  || '').toLowerCase();
+            const cat    = (card.dataset.cat   || '').toLowerCase();
+            const precio = parseFloat(card.dataset.precio || 0);
+            const stock  = parseInt(card.dataset.stock   || 0);
+
+            const matchSearch = !search  || name.includes(search);
+            const matchCat    = cats.length === 0 || cats.includes(cat);
+            const matchPrecio = precio >= minPrecio && precio <= maxPrecio;
+            const matchStock  = !soloStock || stock > 0;
+
+            const show = matchSearch && matchCat && matchPrecio && matchStock;
+            card.style.display = show ? '' : 'none';
+            if (show) visible++;
+        });
+
+        const emptyJs = document.getElementById('emptyStateJs');
+        if (emptyJs) emptyJs.style.display = visible === 0 ? 'block' : 'none';
+    }
+
+    // ─── Ordenar ──────────────────────────────────────────────────────────────
+    function sortProducts(val) {
+        const grid = document.getElementById('productsGrid');
+        if (!grid) return;
+        const cards = Array.from(grid.querySelectorAll('.product-card'));
+        cards.sort((a, b) => {
+            if (val === 'precio-asc')  return parseFloat(a.dataset.precio) - parseFloat(b.dataset.precio);
+            if (val === 'precio-desc') return parseFloat(b.dataset.precio) - parseFloat(a.dataset.precio);
+            if (val === 'nombre')      return (a.dataset.name || '').localeCompare(b.dataset.name || '');
+            return 0;
+        });
+        cards.forEach(c => grid.appendChild(c));
+    }
+
+    // ─── Resetear filtros ─────────────────────────────────────────────────────
+    function resetFilters() {
+        document.querySelectorAll('.filter-option input').forEach(cb => cb.checked = false);
+        document.getElementById('searchInput').value = '';
+        document.getElementById('priceMax').value = 5000;
+        document.getElementById('priceMin').value = 0;
+        document.getElementById('priceRange').value = 5000;
+        filterProducts();
+    }
+
+    // ─── Badge del carrito ────────────────────────────────────────────────────
+    function updateBadge(n) {
+        const b = document.getElementById('cartBadge');
+        if (!b) return;
+        b.textContent    = n;
+        b.style.display  = n > 0 ? 'flex' : 'none';
+    }
+
+    // ─── Agregar al carrito → API ─────────────────────────────────────────────
+    function addToCart(btn) {
+        const card = btn.closest('.product-card');
+        if (!card) return;
+
+        const idProducto = card.dataset.id;
+        const nombre     = card.querySelector('.product-name')?.textContent.trim()   || '';
+        const serie      = card.querySelector('.product-series')?.textContent.trim() || '';
+        const precio     = parseFloat(card.dataset.precio) || 0;
+        const cat        = card.dataset.cat || '';
+        const stock      = parseInt(card.dataset.stock || '0');
+
+        if (stock <= 0) return;
+
+        const original = btn.textContent;
+        btn.disabled    = true;
+        btn.textContent = '…';
+
+        fetch('/carrito/agregar', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                idProducto: idProducto,
+                nombre:     nombre,
+                serie:      serie,
+                categoria:  cat,
+                precio:     precio,
+                cantidad:   1
+            })
+        })
+        .then(r => r.json())
+        .then(data => {
+            if (data.ok) {
+                updateBadge(data.totalItems);
+                btn.textContent       = '✓ Agregado';
+                btn.style.background  = '#34d399';
+                btn.style.color       = '#030712';
+                showToast(nombre);
+                setTimeout(() => {
+                    btn.textContent      = original;
+                    btn.style.background = '';
+                    btn.style.color      = '';
+                    btn.disabled         = false;
+                }, 1500);
+            } else {
+                btn.textContent = original;
+                btn.disabled    = false;
+            }
+        })
+        .catch(() => {
+            btn.textContent = original;
+            btn.disabled    = false;
+        });
+    }
+
+    // ─── Toast ────────────────────────────────────────────────────────────────
+    function showToast(name) {
+        const t = document.getElementById('dz-toast');
+        document.getElementById('dz-toast-text').textContent = name;
+        t.classList.add('dz-toast-on');
+        clearTimeout(window._dzTimer);
+        window._dzTimer = setTimeout(() => t.classList.remove('dz-toast-on'), 2800);
+    }
+</script>
 </body>
 </html>

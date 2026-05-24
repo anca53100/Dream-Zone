@@ -161,8 +161,9 @@
             width: 78px; height: 78px; background: var(--dark-surface);
             border: 1px solid var(--dark-border); border-radius: 10px;
             display: flex; align-items: center; justify-content: center;
-            font-size: 34px; flex-shrink: 0;
+            font-size: 34px; flex-shrink: 0; overflow: hidden;
         }
+        .item-thumb img { width: 100%; height: 100%; object-fit: cover; }
 
         .item-info { flex: 1; min-width: 0; }
         .item-series { font-size: 11px; color: var(--neon-blue); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 4px; }
@@ -170,9 +171,7 @@
         .item-unit { font-size: 13px; color: var(--text-secondary); }
 
         .item-right { display: flex; flex-direction: column; align-items: flex-end; gap: 10px; flex-shrink: 0; }
-        .item-total {
-            font-family: 'Orbitron', monospace; font-size: 18px; font-weight: 700; color: var(--neon-blue);
-        }
+        .item-total { font-family: 'Orbitron', monospace; font-size: 18px; font-weight: 700; color: var(--neon-blue); }
 
         .qty-wrap {
             display: flex; align-items: center;
@@ -249,11 +248,10 @@
             cursor: pointer; transition: all 0.2s; letter-spacing: 0.5px;
             display: flex; align-items: center; justify-content: center; gap: 8px;
             margin-bottom: 12px; box-shadow: 0 4px 20px rgba(0,212,255,0.2);
-            text-decoration: none;
         }
         .checkout-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 28px rgba(0,212,255,0.38); }
         .checkout-btn svg { width: 16px; height: 16px; }
-        .checkout-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+        .checkout-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; box-shadow: none; }
 
         .continue-link {
             display: flex; align-items: center; justify-content: center;
@@ -273,7 +271,7 @@
         .secure-item svg { width: 12px; height: 12px; }
 
         .empty-state {
-            display: none; flex-direction: column; align-items: center;
+            flex-direction: column; align-items: center;
             text-align: center; padding: 80px 32px; gap: 16px;
         }
         .empty-icon { font-size: 76px; opacity: 0.35; line-height: 1; }
@@ -292,6 +290,17 @@
         .promo-error { font-size: 12px; color: #f87171; margin-top: 6px; display: none; }
         .promo-ok    { font-size: 12px; color: #34d399; margin-top: 6px; display: none; }
 
+        /* ─── Overlay de compra exitosa ─── */
+        #successOverlay {
+            position: fixed; inset: 0; background: rgba(3,7,18,0.96);
+            z-index: 9999; display: none;
+            flex-direction: column; align-items: center; justify-content: center; gap: 20px;
+        }
+        .success-icon { font-size: 72px; }
+        .success-title { font-family: 'Orbitron', monospace; font-size: 26px; font-weight: 900; color: #34d399; }
+        .success-msg { font-size: 16px; color: var(--text-secondary); text-align: center; max-width: 420px; line-height: 1.5; }
+        .success-redirect { font-size: 13px; color: var(--text-secondary); margin-top: 4px; }
+
         @media (max-width: 1000px) { .cart-layout { grid-template-columns: 1fr; } .summary-panel { position: static; } }
         @media (max-width: 900px) {
             .nav-sidebar { transform: translateX(-100%); }
@@ -309,6 +318,14 @@
 </head>
 <body>
 
+<!-- ─── Overlay compra exitosa ─── -->
+<div id="successOverlay">
+    <div class="success-icon">✅</div>
+    <div class="success-title">¡Compra Exitosa!</div>
+    <div class="success-msg" id="successMsgText">Tu pedido ha sido procesado y el stock actualizado.</div>
+    <div class="success-redirect">Redirigiendo a la tienda…</div>
+</div>
+
 <aside class="nav-sidebar" id="navSidebar">
     <div class="logo">
         <div class="logo-text">DREAM<br/>ZONE</div>
@@ -324,14 +341,9 @@
             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
             Tienda
         </a>
-        <a href="/tienda" class="nav-item">
-            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg>
-            Categorías
-        </a>
         <a href="/tienda?filter=nuevo" class="nav-item">
             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
             Novedades
-            <span class="nav-badge">12</span>
         </a>
         <a href="/tienda?filter=oferta" class="nav-item">
             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/></svg>
@@ -382,25 +394,77 @@
 
     <div class="cart-header">
         <h1 class="cart-title">Mi Carrito</h1>
-        <span class="cart-subtitle" id="cartSubtitle"></span>
+        <span class="cart-subtitle" id="cartSubtitle" th:text="${subtitleText}"></span>
         <button class="clear-btn" onclick="clearCart()">
             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
             Vaciar carrito
         </button>
     </div>
 
-    <div class="cart-layout" id="cartContent" style="display:none">
+    <!-- ─── CARRITO CON ITEMS ─── -->
+    <div class="cart-layout" id="cartContent"
+         th:style="${carrito.items.isEmpty()} ? 'display:none' : 'display:grid'">
 
         <div class="items-panel">
             <div class="items-bar">
                 <label class="select-all-label">
                     <input type="checkbox" id="selectAll" onchange="toggleAll(this.checked)">
                     <div class="custom-cb"></div>
-                    <span id="selAllText">Seleccionar todo</span>
+                    <span>Seleccionar todo</span>
                 </label>
                 <button class="del-sel-btn" onclick="removeSelected()">Eliminar selección</button>
             </div>
-            <div id="cartItems"></div>
+
+            <div id="cartItems">
+                <!-- Renderizado por Thymeleaf -->
+                <div class="cart-item"
+                     th:each="item, iStat : ${carrito.items}"
+                     th:attr="data-id=${item.idProducto},data-price=${item.precio}"
+                     th:style="${'animation-delay:' + (iStat.index * 0.07) + 's'}">
+
+                    <label class="item-check">
+                        <input type="checkbox" checked onchange="recalc()">
+                        <div class="item-cb"></div>
+                    </label>
+
+                    <!-- Thumb: emoji según categoría -->
+                    <div class="item-thumb">
+                        <span th:text="${item.categoria != null and !item.categoria.isEmpty() ?
+                            (item.categoria.equalsIgnoreCase('figuras')    ? '🗿' :
+                             item.categoria.equalsIgnoreCase('mangas')     ? '📚' :
+                             item.categoria.equalsIgnoreCase('ropa')       ? '👕' :
+                             item.categoria.equalsIgnoreCase('funko')      ? '🎭' :
+                             item.categoria.equalsIgnoreCase('posters')    ? '🖼' :
+                             item.categoria.equalsIgnoreCase('accesorios') ? '🎒' : '📦')
+                            : '📦'}">📦</span>
+                    </div>
+
+                    <div class="item-info">
+                        <div class="item-series" th:text="${item.serie}"></div>
+                        <div class="item-name" th:text="${item.nombre}"></div>
+                        <div class="item-unit" th:text="${'$' + #numbers.formatDecimal(item.precio, 1, 'COMMA', 0, 'POINT') + ' c/u'}"></div>
+                    </div>
+
+                    <div class="item-right">
+                        <div class="item-total"
+                             th:id="${'itotal-' + item.idProducto}"
+                             th:text="${'$' + #numbers.formatDecimal(item.subtotal, 1, 'COMMA', 0, 'POINT')}"></div>
+
+                        <div class="qty-wrap">
+                            <button class="qty-btn" onclick="handleQtyBtn(this, -1)">−</button>
+                            <div class="qty-num"
+                                 th:id="${'iqty-' + item.idProducto}"
+                                 th:text="${item.cantidad}">1</div>
+                            <button class="qty-btn" onclick="handleQtyBtn(this, 1)">+</button>
+                        </div>
+
+                        <button class="remove-btn" onclick="handleRemoveBtn(this)">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                            Eliminar
+                        </button>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <aside class="summary-panel">
@@ -435,30 +499,32 @@
                     <button class="promo-btn" onclick="applyPromo()">Aplicar</button>
                 </div>
                 <div class="promo-error" id="promoError">Código no válido o expirado.</div>
-                <div class="promo-ok" id="promoOk">¡Descuento aplicado!</div>
+                <div class="promo-ok"    id="promoOk"></div>
 
                 <button class="checkout-btn" id="checkoutBtn" onclick="handleCheckout()">
-                    Proceder al pago
-                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                    Finalizar compra
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
                 </button>
 
                 <a href="/tienda" class="continue-link">← Seguir comprando</a>
 
                 <div class="secure-row">
                     <div class="secure-item">
-                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
-                        Pago seguro
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                        Stock garantizado
                     </div>
                     <div class="secure-item">
                         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/></svg>
-                        Envío garantizado
+                        Envío gratuito
                     </div>
                 </div>
             </div>
         </aside>
     </div>
 
-    <div class="empty-state" id="emptyState">
+    <!-- ─── CARRITO VACÍO ─── -->
+    <div class="empty-state" id="emptyState"
+         th:style="${carrito.items.isEmpty()} ? 'display:flex' : 'display:none'">
         <div class="empty-icon">🛒</div>
         <div class="empty-title">Tu carrito está vacío</div>
         <div class="empty-sub">Explora nuestra tienda y agrega los productos que más te gusten</div>
@@ -471,174 +537,210 @@
 </div>
 
 <script>
-    const DZ_CART = 'dz_cart';
-
-    function getCart() {
-        try { return JSON.parse(localStorage.getItem(DZ_CART)) || []; }
-        catch(e) { return []; }
-    }
-
-    function saveCart(cart) {
-        localStorage.setItem(DZ_CART, JSON.stringify(cart));
-    }
-
+    // ─── Utilidades ────────────────────────────────────────────────────────────
     function fmt(n) {
-        return '$' + Number(n).toLocaleString('es-CO');
+        return '$' + Number(n).toLocaleString('es-CO', { maximumFractionDigits: 0 });
     }
 
-    function catEmoji(cat) {
-        const m = { figuras:'🗿', mangas:'📚', ropa:'👕', funko:'🎭', posters:'🖼️', accesorios:'🎒' };
-        return m[(cat||'').toLowerCase()] || '📦';
+    function api(url, body) {
+        return fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body)
+        }).then(r => r.json());
     }
 
-    function renderCart() {
-        const cart = getCart();
-        const emptyEl = document.getElementById('emptyState');
-        const contentEl = document.getElementById('cartContent');
-        const itemsEl = document.getElementById('cartItems');
-        const subtitleEl = document.getElementById('cartSubtitle');
-
-        if (cart.length === 0) {
-            emptyEl.style.display = 'flex';
-            contentEl.style.display = 'none';
-            subtitleEl.textContent = '';
-            return;
-        }
-
-        emptyEl.style.display = 'none';
-        contentEl.style.display = 'grid';
-
-        const totalUnits = cart.reduce((s, i) => s + i.qty, 0);
-        subtitleEl.textContent = totalUnits + (totalUnits === 1 ? ' artículo' : ' artículos');
-
-        itemsEl.innerHTML = cart.map((item, idx) => `
-            <div class="cart-item" data-id="${item.id}" data-price="${item.price}" style="animation-delay:${idx * 0.07}s">
-                <label class="item-check">
-                    <input type="checkbox" checked onchange="recalc()">
-                    <div class="item-cb"></div>
-                </label>
-                <div class="item-thumb">${catEmoji(item.cat)}</div>
-                <div class="item-info">
-                    <div class="item-series">${escHtml(item.series)}</div>
-                    <div class="item-name">${escHtml(item.name)}</div>
-                    <div class="item-unit">${fmt(item.price)} c/u</div>
-                </div>
-                <div class="item-right">
-                    <div class="item-total" id="itotal-${item.id}">${fmt(item.price * item.qty)}</div>
-                    <div class="qty-wrap">
-                        <button class="qty-btn" onclick="changeQty('${item.id}', -1)">−</button>
-                        <div class="qty-num" id="iqty-${item.id}">${item.qty}</div>
-                        <button class="qty-btn" onclick="changeQty('${item.id}', +1)">+</button>
-                    </div>
-                    <button class="remove-btn" onclick="removeItem('${item.id}')">
-                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-                        Eliminar
-                    </button>
-                </div>
-            </div>
-        `).join('');
-
-        recalc();
+    // ─── Delegación de eventos en botones de ítem ──────────────────────────────
+    function handleQtyBtn(btn, delta) {
+        const id = btn.closest('.cart-item').dataset.id;
+        changeQty(id, delta);
     }
 
-    function escHtml(str) {
-        const d = document.createElement('div');
-        d.textContent = str;
-        return d.innerHTML;
+    function handleRemoveBtn(btn) {
+        const id = btn.closest('.cart-item').dataset.id;
+        removeItem(id);
     }
 
+    // ─── Cambiar cantidad ──────────────────────────────────────────────────────
     function changeQty(id, delta) {
-        const cart = getCart();
-        const item = cart.find(i => i.id === id);
-        if (!item) return;
-        item.qty = Math.max(1, item.qty + delta);
-        saveCart(cart);
         const qtyEl = document.getElementById('iqty-' + id);
         const totEl = document.getElementById('itotal-' + id);
-        if (qtyEl) qtyEl.textContent = item.qty;
-        if (totEl) totEl.textContent = fmt(item.price * item.qty);
-        const totalUnits = cart.reduce((s, i) => s + i.qty, 0);
-        document.getElementById('cartSubtitle').textContent = totalUnits + (totalUnits === 1 ? ' artículo' : ' artículos');
-        recalc();
+        if (!qtyEl) return;
+
+        const currentQty = parseInt(qtyEl.textContent);
+        const newQty = Math.max(1, currentQty + delta);
+        if (newQty === currentQty) return;
+
+        api('/carrito/actualizar/' + id, { cantidad: newQty })
+            .then(data => {
+                if (data.ok) {
+                    qtyEl.textContent = newQty;
+                    if (totEl) totEl.textContent = fmt(data.nuevoSubtotal);
+                    updateSubtitle(data.totalItems);
+                    recalc();
+                }
+            });
     }
 
+    // ─── Eliminar ítem ─────────────────────────────────────────────────────────
     function removeItem(id) {
         const el = document.querySelector('.cart-item[data-id="' + id + '"]');
         if (!el) return;
         el.style.opacity = '0';
         el.style.transform = 'translateX(-24px)';
-        setTimeout(() => {
-            saveCart(getCart().filter(i => i.id !== id));
-            renderCart();
-        }, 260);
+        el.style.transition = 'opacity 0.26s, transform 0.26s';
+
+        api('/carrito/eliminar/' + id, {})
+            .then(data => {
+                setTimeout(() => {
+                    el.remove();
+                    updateSubtitle(data.totalItems);
+                    checkIfEmpty();
+                    recalc();
+                }, 270);
+            });
     }
 
+    // ─── Vaciar carrito ────────────────────────────────────────────────────────
+    function clearCart() {
+        const items = document.querySelectorAll('.cart-item');
+        if (items.length === 0) return;
+        if (!confirm('¿Vaciar el carrito completamente?')) return;
+
+        api('/carrito/vaciar', {})
+            .then(data => {
+                if (data.ok) {
+                    document.getElementById('cartItems').innerHTML = '';
+                    updateSubtitle(0);
+                    checkIfEmpty();
+                }
+            });
+    }
+
+    // ─── Eliminar seleccionados ────────────────────────────────────────────────
+    function removeSelected() {
+        const ids = [];
+        document.querySelectorAll('.cart-item').forEach(el => {
+            const cb = el.querySelector('input[type="checkbox"]');
+            if (cb && cb.checked) ids.push(el.dataset.id);
+        });
+        if (ids.length === 0) return;
+
+        ids.forEach(id => {
+            const el = document.querySelector('.cart-item[data-id="' + id + '"]');
+            if (el) el.remove();
+            api('/carrito/eliminar/' + id, {});
+        });
+
+        // Actualizar subtítulo y verificar vacío tras pequeña espera
+        setTimeout(() => {
+            const remaining = document.querySelectorAll('.cart-item').length;
+            updateSubtitle(
+                Array.from(document.querySelectorAll('.cart-item'))
+                    .reduce((s, el) => s + parseInt(document.getElementById('iqty-' + el.dataset.id)?.textContent || 1), 0)
+            );
+            checkIfEmpty();
+            recalc();
+        }, 100);
+    }
+
+    // ─── Toggle selección ──────────────────────────────────────────────────────
     function toggleAll(checked) {
         document.querySelectorAll('.cart-item input[type="checkbox"]').forEach(cb => cb.checked = checked);
         recalc();
     }
 
-    function removeSelected() {
-        const ids = [];
-        document.querySelectorAll('.cart-item').forEach(el => {
-            if (el.querySelector('input[type="checkbox"]').checked) ids.push(el.dataset.id);
-        });
-        if (ids.length === 0) return;
-        saveCart(getCart().filter(i => !ids.includes(i.id)));
-        renderCart();
-    }
-
-    function clearCart() {
-        if (getCart().length === 0) return;
-        saveCart([]);
-        renderCart();
-    }
-
+    // ─── Recalcular resumen (solo DOM) ─────────────────────────────────────────
     function recalc() {
         let subtotal = 0, count = 0;
         document.querySelectorAll('.cart-item').forEach(el => {
             const cb = el.querySelector('input[type="checkbox"]');
             if (!cb || !cb.checked) return;
-            const price = parseInt(el.dataset.price);
-            const qty = parseInt(document.getElementById('iqty-' + el.dataset.id)?.textContent || 1);
+            const price = parseFloat(el.dataset.price);
+            const qty   = parseInt(document.getElementById('iqty-' + el.dataset.id)?.textContent || 1);
             subtotal += price * qty;
             count++;
         });
-        document.getElementById('sCount').textContent = count;
+        document.getElementById('sCount').textContent    = count;
         document.getElementById('sSubtotal').textContent = fmt(subtotal);
-        document.getElementById('sTotal').textContent = fmt(subtotal);
+        document.getElementById('sTotal').textContent    = fmt(subtotal);
 
-        const all = document.querySelectorAll('.cart-item input[type="checkbox"]');
+        const allCbs = document.querySelectorAll('.cart-item input[type="checkbox"]');
         const saEl = document.getElementById('selectAll');
-        if (saEl) saEl.checked = all.length > 0 && Array.from(all).every(cb => cb.checked);
+        if (saEl) saEl.checked = allCbs.length > 0 && Array.from(allCbs).every(cb => cb.checked);
 
         const btn = document.getElementById('checkoutBtn');
         if (btn) btn.disabled = count === 0;
     }
 
+    // ─── Verificar carrito vacío ───────────────────────────────────────────────
+    function checkIfEmpty() {
+        const items = document.querySelectorAll('.cart-item');
+        if (items.length === 0) {
+            document.getElementById('cartContent').style.display = 'none';
+            document.getElementById('emptyState').style.display  = 'flex';
+        }
+    }
+
+    function updateSubtitle(totalItems) {
+        const el = document.getElementById('cartSubtitle');
+        if (el) el.textContent = totalItems > 0
+            ? totalItems + (totalItems === 1 ? ' artículo' : ' artículos')
+            : '';
+    }
+
+    // ─── Promo code (solo visual) ──────────────────────────────────────────────
     function applyPromo() {
-        const code = document.getElementById('promoCode').value.trim().toUpperCase();
+        const code  = document.getElementById('promoCode').value.trim().toUpperCase();
         const errEl = document.getElementById('promoError');
         const okEl  = document.getElementById('promoOk');
         errEl.style.display = 'none';
         okEl.style.display  = 'none';
         if (!code) return;
-        const valid = { 'DREAMZONE10': 10, 'GEEK15': 15 };
-        if (valid[code]) {
-            okEl.textContent = '¡Descuento del ' + valid[code] + '% aplicado!';
+        const validos = { 'DREAMZONE10': 10, 'GEEK15': 15 };
+        if (validos[code]) {
+            okEl.textContent   = '¡Descuento del ' + validos[code] + '% aplicado!';
             okEl.style.display = 'block';
         } else {
             errEl.style.display = 'block';
         }
     }
 
+    // ─── Finalizar compra ──────────────────────────────────────────────────────
     function handleCheckout() {
-        const count = parseInt(document.getElementById('sCount').textContent);
-        if (count === 0) return;
-        window.location.href = '/checkout';
+        const ids = [];
+        document.querySelectorAll('.cart-item').forEach(el => {
+            const cb = el.querySelector('input[type="checkbox"]');
+            if (cb && cb.checked) ids.push(el.dataset.id);
+        });
+        if (ids.length === 0) return;
+
+        const btn = document.getElementById('checkoutBtn');
+        btn.disabled    = true;
+        btn.textContent = 'Procesando…';
+
+        api('/carrito/finalizar', { ids: ids })
+            .then(data => {
+                if (data.ok) {
+                    // Mostrar overlay de éxito
+                    document.getElementById('successMsgText').textContent =
+                        data.mensaje || '¡Compra realizada con éxito!';
+                    document.getElementById('successOverlay').style.display = 'flex';
+                    // Redirigir a tienda tras 2.5 s
+                    setTimeout(() => window.location.href = '/tienda', 2500);
+                } else {
+                    btn.disabled    = false;
+                    btn.textContent = 'Finalizar compra';
+                }
+            })
+            .catch(() => {
+                btn.disabled    = false;
+                btn.textContent = 'Finalizar compra';
+            });
     }
 
-    renderCart();
+    // ─── Arranque ──────────────────────────────────────────────────────────────
+    recalc();
 </script>
 </body>
 </html>
