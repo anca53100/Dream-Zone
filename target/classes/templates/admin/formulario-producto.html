@@ -184,26 +184,6 @@
             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
             Productos
         </a>
-        <a th:href="@{/admin/categorias}" class="nav-item">
-            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/></svg>
-            Categorías
-        </a>
-        <a th:href="@{/admin/stock}" class="nav-item">
-            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
-            Stock
-        </a>
-        <a th:href="@{/admin/imagenes}" class="nav-item">
-            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-            Imágenes
-        </a>
-    </nav>
-
-    <nav class="nav-section">
-        <div class="nav-label">Gestión</div>
-        <a th:href="@{/admin/usuarios}" class="nav-item">
-            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
-            Usuarios
-        </a>
     </nav>
 
     <div class="sidebar-bottom">
@@ -277,7 +257,10 @@
           onchange="mostrarSaveBar()">
 
         <input type="hidden" name="_csrf" th:value="${_csrf?.token}"/>
-        <input type="hidden" name="id" th:value="${producto?.id}"/>
+        <input type="hidden"
+               name="id"
+               th:if="${producto != null and producto.id != null}"
+               th:value="${producto.id}">
 
         <div style="display:grid; grid-template-columns:1fr 380px; gap:20px; align-items:start;">
 
@@ -400,8 +383,8 @@
                             <input type="text"
                                    name="talla"
                                    class="form-input"
-                                   placeholder="Ej. 24 cm"
-                                   th:value="${producto?.altura}"/>
+                                   placeholder="Ej. XL"
+                                   th:value="${producto?.talla}"/>
                         </div>
                         <div class="form-group" style="margin-bottom:0;">
                             <label class="form-label">Material</label>
@@ -472,10 +455,9 @@
                     <!-- Previews de imágenes existentes -->
                     <div class="img-preview-grid"
                          id="existingImgs"
-                         th:if="${producto != null and producto.imagenes != null and !producto.imagenes.isEmpty()}">
-                        <div class="img-preview-item"
-                             th:each="img : ${producto.imagenes}">
-                            <img th:src="${img}" th:alt="Imagen del producto"/>
+                         th:if="${producto != null and producto.imagen != null}">
+                        <div class="img-preview-item">
+                            <img th:src="${producto.imagen}" alt="Imagen del producto"/>
                             <div class="img-remove"
                                  onclick="this.closest('.img-preview-item').remove()">✕</div>
                         </div>
@@ -491,7 +473,7 @@
                          ondragover="handleDragOver(event)"
                          ondrop="handleDrop(event)">
                         <div class="upload-icon">📁</div>
-                        <div class="upload-text">Haz clic o arrastra imágenes aquí</div>
+                        <div class="upload-text">Haz clic o arrastra una imágen aquí</div>
                         <div class="upload-hint">JPG, PNG, WEBP — máx. 5 MB por archivo</div>
                     </div>
 
@@ -500,11 +482,7 @@
                            id="archivo"
                            accept="image/jpeg,image/png,image/webp"
                            style="display:none;"
-                           onchange="previewNewImages(this)"/>
-
-                    <p class="form-hint" style="margin-top:8px;">
-                        La primera imagen será la principal del producto.
-                    </p>
+                           onchange="previewNewImage(this)"/>
                 </div>
 
                 <!-- ── Botones de acción ── -->
@@ -513,37 +491,11 @@
                         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="18" height="18"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
                         <span th:text="${producto?.id != null} ? 'Guardar cambios' : 'Agregar producto'">Guardar</span>
                     </button>
-                    <a href="/admin/productos" class="btn btn-secondary"
+                    <a th:href="@{/admin/productos}" class="btn btn-secondary"
                        style="width:100%;justify-content:center;">
                         Cancelar
                     </a>
                 </div>
-
-                <!-- Vista previa live -->
-                <div class="card animate delay-4"
-                     style="border:1px dashed var(--dark-border); background:transparent;">
-                    <p class="label" style="margin-bottom:12px;">Vista previa de tarjeta</p>
-                    <div style="background:var(--dark-card);border:1px solid var(--dark-border);
-                                border-radius:var(--radius-lg);overflow:hidden;">
-                        <!-- Imagen preview -->
-                        <div style="aspect-ratio:1;background:var(--dark-surface);
-                                    display:flex;align-items:center;justify-content:center;
-                                    font-size:40px;color:var(--text-muted);" id="cardPreviewImg">
-                        </div>
-                        <!-- Info preview -->
-                        <div style="padding:12px;">
-                            <div style="font-size:13px;font-weight:600;margin-bottom:2px;
-                                        white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"
-                                 id="cardPreviewNombre">Nombre del producto</div>
-                            <div style="font-size:11px;color:var(--text-secondary);margin-bottom:8px;"
-                                 id="cardPreviewSerie">Serie</div>
-                            <div style="font-family:var(--font-display);font-size:16px;
-                                        font-weight:700;color:var(--neon-blue);"
-                                 id="cardPreviewPrecio">$0.00</div>
-                        </div>
-                    </div>
-                </div>
-
             </div>
             <!-- /columna derecha -->
 
@@ -595,6 +547,13 @@
 
         /* Inicializar nombre preview */
         if (nombre?.value) updateCardPreview();
+        /* Inicializar imagen existente en edición */
+        const existingImg = document.querySelector('#existingImgs img');
+
+        if (existingImg) {
+            document.getElementById('cardPreviewImg').innerHTML =
+                `<img src="${existingImg.src}" style="width:100%;height:100%;object-fit:cover;"/>`;
+        }
 
         /* Escuchar cambios para la vista previa */
         ['nombre','serie','precio'].forEach(field => {
@@ -625,31 +584,31 @@
         else          { el.textContent = '✓ Disponible'; el.style.color = 'var(--neon-green)'; }
     }
     /* ── Preview de imágenes nuevas ── */
-    function previewNewImages(input) {
+    function previewNewImage(input) {
+
         const container = document.getElementById('newImgsPreview');
         container.innerHTML = '';
-        const files = Array.from(input.files);
-        if (files.length === 0) return;
 
-        files.forEach((file, idx) => {
-            const reader = new FileReader();
-            reader.onload = e => {
-                const div = document.createElement('div');
-                div.className = 'img-preview-item';
-                div.innerHTML = `
-                    <img src="${e.target.result}" alt="Preview"/>
-                    <div class="img-remove" onclick="this.closest('.img-preview-item').remove()">✕</div>
-                `;
-                container.appendChild(div);
+        const file = input.files[0];
 
-                /* Primera imagen → actualizar vista previa de tarjeta */
-                if (idx === 0) {
-                    document.getElementById('cardPreviewImg').innerHTML =
-                        `<img src="${e.target.result}" style="width:100%;height:100%;object-fit:cover;"/>`;
-                }
-            };
-            reader.readAsDataURL(file);
-        });
+        if (!file) return;
+
+        const reader = new FileReader();
+
+        reader.onload = function(e) {
+
+            container.innerHTML = `
+            <div class="img-preview-item">
+                <img src="${e.target.result}" alt="Preview"/>
+            </div>
+        `;
+
+            document.getElementById('cardPreviewImg').innerHTML =
+                `<img src="${e.target.result}"
+                  style="width:100%;height:100%;object-fit:cover;"/>`;
+        };
+
+        reader.readAsDataURL(file);
     }
 
     /* ── Drag & drop ── */
@@ -671,7 +630,7 @@
             .filter(f => f.type.startsWith('image/'))
             .forEach(f => dt.items.add(f));
         input.files = dt.files;
-        previewNewImages(input);
+        previewNewImage(input);
     }
 
     /* ── Barra flotante ── */

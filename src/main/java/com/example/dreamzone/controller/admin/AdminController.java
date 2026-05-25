@@ -27,7 +27,9 @@ public class AdminController {
     public String dashboard(Model model) {
         List<Producto> todos = productoService.obtenerTodos();
 
-        long activos  = todos.stream().filter(p -> "Activo".equals(p.getEstado())).count();
+        long activos  = todos.stream().filter(p -> "Activo".equalsIgnoreCase(
+                p.getEstado() != null ? p.getEstado() : ""
+        )).count();
         long agotados = todos.stream().filter(p -> p.getStock() == 0).count();
         long stockBajo= todos.stream().filter(p -> p.getStock() > 0 && p.getStock() < 5).count();
 
@@ -44,6 +46,8 @@ public class AdminController {
                 .limit(5)
                 .toList();
 
+        long totalCategorias = productoService.contarPorCategoria().size();
+
         model.addAttribute("totalProductos", todos.size());
         model.addAttribute("productosActivos", activos);
         model.addAttribute("agotados", agotados);
@@ -51,6 +55,14 @@ public class AdminController {
         model.addAttribute("topStock", topStock);
         model.addAttribute("stockCritico", stockCritico);
         model.addAttribute("porCategoria", productoService.contarPorCategoria());
+        model.addAttribute("actividadReciente",
+                todos.stream()
+                        .sorted((a, b) -> b.getId().compareTo(a.getId()))
+                        .limit(5)
+                        .toList());
+
+        model.addAttribute("totalCategorias",
+                productoService.contarPorCategoria().size());
         return "admin/index";
     }
 
@@ -108,25 +120,41 @@ public class AdminController {
     public String guardar(@ModelAttribute Producto producto,
                           @RequestParam("archivo") MultipartFile archivo) throws IOException {
 
-        // Si tiene id → es edición, conservar imágenes si no sube archivo nuevo
-        if (producto.getId() != null && !producto.getId().isBlank() && archivo.isEmpty()) {
-            productoService.obtenerPorId(producto.getId())
-                    .ifPresent(p -> producto.setImagenes(p.getImagenes()));
+        // Mantener imagen anterior si no suben una nueva
+        if (producto.getId() != null && !producto.getId().isBlank()) {
+
+            Producto existente = productoService.obtenerPorId(producto.getId())
+                    .orElse(null);
+
+            if (existente != null) {
+                producto.setImagen(existente.getImagen());
+            }
         }
 
-        // Si sube archivo → guardar imagen
-        if (!archivo.isEmpty()) {
-            String filename = UUID.randomUUID() + "_" + archivo.getOriginalFilename();
-            Path dir = Paths.get("src/main/resources/static/images/productos/");
+        // Guardar nueva imagen
+        if (archivo != null && !archivo.isEmpty()) {
+
+            Path dir = Paths.get("uploads/productos/");
             Files.createDirectories(dir);
-            Files.copy(archivo.getInputStream(), dir.resolve(filename));
-            producto.setImagenes(List.of("/images/productos/" + filename));
+
+            String filename = UUID.randomUUID() + "_" + archivo.getOriginalFilename();
+
+            Files.copy(
+                    archivo.getInputStream(),
+                    dir.resolve(filename)
+            );
+
+            producto.setImagen("/uploads/productos/" + filename);
+        }
+
+        if (producto.getEstado() == null || producto.getEstado().isBlank()) {
+            producto.setEstado("Activo");
         }
 
         productoService.guardar(producto);
+
         return "redirect:/admin/productos";
     }
-
     // ── Editar (GET) ──
     @GetMapping("/productos/editar/{id}")
     public String editar(@PathVariable String id, Model model) {

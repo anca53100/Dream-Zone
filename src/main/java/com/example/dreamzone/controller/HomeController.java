@@ -15,8 +15,10 @@ public class HomeController {
 
     @GetMapping("/")
     public String inicio(Model model) {
-        model.addAttribute("novedades", productoService.obtenerNovedades());
-        model.addAttribute("ofertas", productoService.obtenerOfertas());
+
+        model.addAttribute("productos",
+                productoService.obtenerTodos());
+
         return "index";
     }
 
@@ -24,5 +26,27 @@ public class HomeController {
     public String detalle(@PathVariable String id, Model model) {
         productoService.obtenerPorId(id).ifPresent(p -> model.addAttribute("producto", p));
         return "producto-detalle";
+    }
+
+    @PostMapping("/carrito/agregar/{id}")
+    public String agregarAlCarrito(@PathVariable String id,
+                                   HttpSession session,
+                                   RedirectAttributes redirectAttributes) {
+
+        List<Producto> carrito =
+                (List<Producto>) session.getAttribute("carrito");
+
+        if (carrito == null) {
+            carrito = new java.util.ArrayList<>();
+        }
+
+        productoService.obtenerPorId(id).ifPresent(carrito::add);
+
+        session.setAttribute("carrito", carrito);
+
+        redirectAttributes.addFlashAttribute("success",
+                "Producto agregado al carrito");
+
+        return "redirect:/tienda";
     }
 }
