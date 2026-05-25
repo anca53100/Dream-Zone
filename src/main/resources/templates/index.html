@@ -485,6 +485,10 @@
       <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
       Inicio
     </a>
+    <a href="/tienda" class="nav-item">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
+      Tienda
+    </a>
   </nav>
   <div class="sidebar-bottom">
     <a href="/auth/logout" class="nav-item">
@@ -500,20 +504,16 @@
     <svg width="22" height="22" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
   </button>
 
-  <div class="search-bar">
-    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-    <input type="text" placeholder="Buscar productos, categorías..."/>
-  </div>
-
   <div class="topbar-actions">
     <a href="/favoritos" class="icon-btn" title="Favoritos">
       <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
     </a>
     <a href="/carrito" class="icon-btn" title="Carrito">
       <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
-      <span class="cart-count">3</span>
+      <span class="cart-count"
+            th:text="${session.carrito != null ? #lists.size(session.carrito) : 0}">
+      </span>
     </a>
-    <div class="avatar">DZ</div>
   </div>
 </header>
 
@@ -538,7 +538,6 @@
           <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
           Explorar tienda
         </a>
-        <a href="/tienda?filter=nuevo" class="btn-secondary">Ver novedades →</a>
       </div>
     </div>
 
@@ -547,20 +546,12 @@
         <div class="hero-char-silhouette"></div>
       </div>
     </div>
-
-    <div class="hero-stats">
-      <div class="stat-pill">
-        <span class="stat-icon">🔒</span>
-        <div><div class="stat-label">Pagos</div><div class="stat-value">100% seguros</div></div>
-      </div>
-    </div>
   </section>
 
   <!-- CATEGORÍAS -->
   <section class="animate-in delay-1">
     <div class="section-header">
       <h2 class="section-title">Categorías <span>principales</span></h2>
-      <a href="/tienda" class="see-all">Ver todas →</a>
     </div>
     <div class="categories-grid">
       <a href="/tienda?cat=figuras" class="category-card">
@@ -595,136 +586,67 @@
       </a>
     </div>
   </section>
+  <!-- Productos-->
+  <section class="animate-in delay-1">
 
-  <!-- NOVEDADES -->
-  <section class="animate-in delay-2">
     <div class="section-header">
-      <h2 class="section-title">Novedades</h2>
-      <a href="/tienda?filter=nuevo" class="see-all">Ver todas →</a>
+      <h2 class="section-title">
+        Productos <span>disponibles</span>
+      </h2>
     </div>
-    <div class="products-grid">
-      <div class="product-card">
-        <div class="product-img">
-          <div class="product-img-placeholder"></div>
-          <span class="product-badge badge-new">NUEVO</span>
-          <div class="product-actions">
-            <button class="add-cart-btn">+ Agregar</button>
-            <button class="fav-btn">♡</button>
-          </div>
-        </div>
-        <div class="product-info">
-          <div class="product-series">Jujutsu Kaisen</div>
-          <div class="product-name">Figura Satoru Gojo</div>
-          <div class="product-price">
-            <span class="price-current">$899</span>
-          </div>
-        </div>
-      </div>
-      <div class="product-card">
-        <div class="product-img">
-          <div class="product-img-placeholder"></div>
-          <span class="product-badge badge-new">NUEVO</span>
-          <div class="product-actions">
-            <button class="add-cart-btn">+ Agregar</button>
-            <button class="fav-btn">♡</button>
-          </div>
-        </div>
-        <div class="product-info">
-          <div class="product-series">Dragon Ball Z</div>
-          <div class="product-name">Funko Pop! Goku</div>
-          <div class="product-price">
-            <span class="price-current">$299</span>
-          </div>
-        </div>
-      </div>
-      <div class="product-card">
-        <div class="product-img">
-          <div class="product-img-placeholder"></div>
-          <div class="product-actions">
-            <button class="add-cart-btn">+ Agregar</button>
-            <button class="fav-btn">♡</button>
-          </div>
-        </div>
-        <div class="product-info">
-          <div class="product-series">Chainsaw Man</div>
-          <div class="product-name">Manga Chainsaw Man Vol. 1</div>
-          <div class="product-price">
-            <span class="price-current">$189</span>
-          </div>
-        </div>
-      </div>
-      <div class="product-card">
-        <div class="product-img">
-          <div class="product-img-placeholder"></div>
-          <div class="product-actions">
-            <button class="add-cart-btn">+ Agregar</button>
-            <button class="fav-btn">♡</button>
-          </div>
-        </div>
-        <div class="product-info">
-          <div class="product-series">Naruto</div>
-          <div class="product-name">Sudadera Akatsuki</div>
-          <div class="product-price">
-            <span class="price-current">$698</span>
-            <span class="price-old">$850</span>
-          </div>
-        </div>
-      </div>
-      <div class="product-card">
-        <div class="product-img">
-          <div class="product-img-placeholder"> </div>
-          <span class="product-badge badge-new">NUEVO</span>
-          <div class="product-actions">
-            <button class="add-cart-btn">+ Agregar</button>
-            <button class="fav-btn">♡</button>
-          </div>
-        </div>
-        <div class="product-info">
-          <div class="product-series">Attack on Titan</div>
-          <div class="product-name">Póster Attack on Titan Final</div>
-          <div class="product-price">
-            <span class="price-current">$199</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
 
-  <!-- BANNER OFERTAS -->
-  <section class="banner-oferta animate-in delay-3">
-    <div class="banner-oferta-bg"></div>
-    <div class="banner-content">
-      <div class="banner-eyebrow">Tiempo limitado</div>
-      <div class="banner-title">Hasta <span class="pct">50%</span> de descuento</div>
-      <div class="banner-sub">en productos seleccionados de todas las categorías</div>
-      <a href="/tienda?filter=oferta" class="btn-primary">Ver ofertas →</a>
-    </div>
-    <div class="banner-right">
-      <div style="font-size:13px;color:var(--text-secondary);margin-bottom:12px;letter-spacing:1px;">TERMINA EN</div>
-      <div class="countdown">
-        <div class="count-item">
-          <span class="count-num" id="hours">08</span>
-          <div class="count-label">HRS</div>
+    <div class="products-grid">
+
+      <div class="product-card"
+           th:each="producto : ${productos}">
+
+        <!-- Imagen -->
+        <div class="product-img">
+
+          <img th:if="${producto.imagen != null and !producto.imagen.isEmpty()}"
+               th:src="${producto.imagen}"
+               alt="Producto"
+               style="width:100%;height:100%;object-fit:cover;"/>
+
+          <div class="product-img-placeholder"
+               th:if="${producto.imagen == null or producto.imagen.isEmpty()}">
+            📦
+          </div>
+
         </div>
-        <div class="count-item" style="padding-top:8px;font-size:24px;color:var(--neon-blue);">:</div>
-        <div class="count-item">
-          <span class="count-num" id="mins">45</span>
-          <div class="count-label">MIN</div>
+
+        <!-- Info -->
+        <div class="product-info">
+
+          <div class="product-series"
+               th:text="${producto.categoria}">
+            Categoría
+          </div>
+
+          <div class="product-name"
+               th:text="${producto.nombre}">
+            Nombre
+          </div>
+
+          <div class="product-price">
+          <span class="price-current"
+                th:text="'$' + ${#numbers.formatDecimal(producto.precio, 0, 'POINT', 0, 'COMMA')}"  >
+            $0
+          </span>
+          </div>
+
         </div>
-        <div class="count-item" style="padding-top:8px;font-size:24px;color:var(--neon-blue);">:</div>
-        <div class="count-item">
-          <span class="count-num" id="secs">30</span>
-          <div class="count-label">SEG</div>
-        </div>
+
       </div>
+
     </div>
+
   </section>
 
   <!-- COLECCIONES -->
   <section class="animate-in delay-1">
     <div class="section-header">
       <h2 class="section-title">Colecciones <span>destacadas</span></h2>
-      <a href="/colecciones" class="see-all">Ver todas →</a>
     </div>
     <div class="collections-grid">
       <div class="collection-card">
@@ -732,8 +654,6 @@
         <div class="collection-overlay"></div>
         <div class="collection-info">
           <div class="collection-name">Dragon Ball</div>
-          <div class="collection-count">47 productos</div>
-          <a href="/colecciones/dragon-ball" class="collection-link">Ver colección →</a>
         </div>
       </div>
       <div class="collection-card">
@@ -741,8 +661,6 @@
         <div class="collection-overlay"></div>
         <div class="collection-info">
           <div class="collection-name">One Piece</div>
-          <div class="collection-count">63 productos</div>
-          <a href="/colecciones/one-piece" class="collection-link">Ver colección →</a>
         </div>
       </div>
       <div class="collection-card">
@@ -750,8 +668,6 @@
         <div class="collection-overlay"></div>
         <div class="collection-info">
           <div class="collection-name">My Hero Academia</div>
-          <div class="collection-count">38 productos</div>
-          <a href="/colecciones/mha" class="collection-link">Ver colección →</a>
         </div>
       </div>
       <div class="collection-card">
@@ -759,8 +675,6 @@
         <div class="collection-overlay"></div>
         <div class="collection-info">
           <div class="collection-name">Demon Slayer</div>
-          <div class="collection-count">55 productos</div>
-          <a href="/colecciones/demon-slayer" class="collection-link">Ver colección →</a>
         </div>
       </div>
     </div>
