@@ -29,7 +29,6 @@
       overflow-x: hidden;
     }
 
-    /* Scrollbar */
     ::-webkit-scrollbar { width: 6px; }
     ::-webkit-scrollbar-track { background: var(--dark-bg); }
     ::-webkit-scrollbar-thumb { background: var(--neon-purple); border-radius: 3px; }
@@ -244,19 +243,6 @@
       50% { opacity: 1; transform: scale(1.05); }
     }
 
-    .hero-stats {
-      position: absolute; bottom: 24px; right: 24px; z-index: 2;
-      display: flex; gap: 16px;
-    }
-    .stat-pill {
-      background: rgba(13, 17, 23, 0.85); backdrop-filter: blur(8px);
-      border: 1px solid var(--dark-border); border-radius: 8px;
-      padding: 10px 16px; display: flex; align-items: center; gap: 10px;
-    }
-    .stat-icon { font-size: 18px; }
-    .stat-label { font-size: 11px; color: var(--text-secondary); }
-    .stat-value { font-size: 13px; font-weight: 700; color: var(--text-primary); }
-
     /* ─── SECTION HEADER ─── */
     .section-header {
       display: flex; align-items: center; justify-content: space-between;
@@ -306,6 +292,7 @@
       background: var(--dark-card); border: 1px solid var(--dark-border);
       border-radius: 12px; overflow: hidden; cursor: pointer;
       transition: all 0.25s; position: relative;
+      text-decoration: none; display: block;
     }
     .product-card:hover {
       border-color: rgba(0, 212, 255, 0.4); transform: translateY(-4px);
@@ -343,15 +330,10 @@
       flex: 1; background: var(--neon-blue); color: var(--dark-bg);
       border: none; border-radius: 6px; padding: 8px;
       font-family: 'Rajdhani', sans-serif; font-size: 12px; font-weight: 700;
-      cursor: pointer; letter-spacing: 0.5px;
+      cursor: pointer; letter-spacing: 0.5px; transition: all 0.15s;
     }
-    .fav-btn {
-      width: 32px; height: 32px; background: rgba(255,255,255,0.1);
-      border: 1px solid rgba(255,255,255,0.15); border-radius: 6px;
-      display: flex; align-items: center; justify-content: center;
-      cursor: pointer; color: var(--text-secondary); font-size: 14px;
-    }
-    .fav-btn:hover { color: #f43f5e; border-color: #f43f5e; }
+    .add-cart-btn:hover { background: #33ddff; }
+    .add-cart-btn:disabled { background: var(--dark-surface); color: var(--text-secondary); cursor: not-allowed; }
 
     .product-info { padding: 14px; }
     .product-series { font-size: 11px; color: var(--neon-blue); letter-spacing: 1px; text-transform: uppercase; }
@@ -359,35 +341,6 @@
     .product-price { display: flex; align-items: center; gap: 8px; margin-top: 8px; }
     .price-current { font-size: 17px; font-weight: 700; color: var(--neon-blue); font-family: 'Orbitron', monospace; }
     .price-old { font-size: 12px; color: var(--text-secondary); text-decoration: line-through; }
-
-    /* ─── BANNER OFERTA ─── */
-    .banner-oferta {
-      border-radius: 16px; overflow: hidden; margin-bottom: 40px;
-      background: linear-gradient(135deg, #0f0535 0%, #1a0550 40%, #0a1a35 100%);
-      border: 1px solid rgba(124, 58, 237, 0.3);
-      padding: 40px 48px; position: relative; display: flex;
-      align-items: center; justify-content: space-between;
-    }
-    .banner-oferta-bg {
-      position: absolute; inset: 0;
-      background: radial-gradient(ellipse at 20% 50%, rgba(124,58,237,0.3), transparent 60%),
-      radial-gradient(ellipse at 80% 50%, rgba(0,212,255,0.15), transparent 50%);
-    }
-    .banner-content { position: relative; z-index: 1; }
-    .banner-eyebrow { font-size: 11px; letter-spacing: 3px; color: var(--neon-pink); text-transform: uppercase; margin-bottom: 8px; }
-    .banner-title { font-family: 'Orbitron', monospace; font-size: 36px; font-weight: 900; line-height: 1.1; margin-bottom: 8px; }
-    .banner-title .pct { color: var(--neon-blue); }
-    .banner-sub { color: var(--text-secondary); font-size: 16px; margin-bottom: 24px; }
-    .banner-right { position: relative; z-index: 1; text-align: right; }
-    .countdown { display: flex; gap: 12px; }
-    .count-item { text-align: center; }
-    .count-num {
-      font-family: 'Orbitron', monospace; font-size: 32px; font-weight: 900;
-      color: var(--neon-blue); display: block;
-      background: rgba(0,212,255,0.1); border: 1px solid rgba(0,212,255,0.3);
-      border-radius: 8px; padding: 8px 16px; min-width: 60px;
-    }
-    .count-label { font-size: 11px; color: var(--text-secondary); margin-top: 6px; letter-spacing: 1px; }
 
     /* ─── COLECCIONES ─── */
     .collections-grid {
@@ -416,12 +369,6 @@
     }
     .collection-name { font-family: 'Orbitron', monospace; font-size: 16px; font-weight: 700; margin-bottom: 4px; }
     .collection-count { font-size: 12px; color: var(--neon-blue); }
-    .collection-link {
-      display: inline-flex; align-items: center; gap: 6px;
-      font-size: 12px; color: var(--text-secondary); margin-top: 8px;
-      text-decoration: none; transition: color 0.2s;
-    }
-    .collection-link:hover { color: var(--neon-blue); }
 
     /* ─── TRUST BADGES ─── */
     .trust-bar {
@@ -490,6 +437,13 @@
       Tienda
     </a>
   </nav>
+
+  <a href="/admin" class="nav-item"
+     th:if="${session.usuarioLogueado != null and session.usuarioLogueado.rol == 'ROLE_ADMIN'}">
+    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+    Panel Admin
+  </a>
+
   <div class="sidebar-bottom">
     <a href="/auth/logout" class="nav-item">
       <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
@@ -505,9 +459,6 @@
   </button>
 
   <div class="topbar-actions">
-    <a href="/favoritos" class="icon-btn" title="Favoritos">
-      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
-    </a>
     <a href="/carrito" class="icon-btn" title="Carrito">
       <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
       <span class="cart-count"
@@ -586,61 +537,59 @@
       </a>
     </div>
   </section>
-  <!-- Productos-->
-  <section class="animate-in delay-1">
 
+  <!-- PRODUCTOS -->
+  <section class="animate-in delay-1">
     <div class="section-header">
-      <h2 class="section-title">
-        Productos <span>disponibles</span>
-      </h2>
+      <h2 class="section-title">Productos <span>disponibles</span></h2>
+      <a href="/tienda" class="see-all">Ver todos →</a>
     </div>
 
     <div class="products-grid">
 
-      <div class="product-card"
-           th:each="producto : ${productos}">
+      <a class="product-card"
+         th:each="producto : ${productos}"
+         th:href="@{/tienda/{id}(id=${producto.id})}"
+         style="text-decoration:none;">
 
         <!-- Imagen -->
         <div class="product-img">
-
           <img th:if="${producto.imagen != null and !producto.imagen.isEmpty()}"
                th:src="${producto.imagen}"
                alt="Producto"
                style="width:100%;height:100%;object-fit:cover;"/>
-
           <div class="product-img-placeholder"
                th:if="${producto.imagen == null or producto.imagen.isEmpty()}">
             📦
           </div>
-
+          <div class="product-actions">
+            <form th:action="@{/carrito/agregar/{id}(id=${producto.id})}"
+                  method="post"
+                  onclick="event.stopPropagation()">
+              <button class="add-cart-btn"
+                      type="submit"
+                      th:disabled="${producto.stock <= 0}">
+                Agregar
+              </button>
+            </form>
+          </div>
         </div>
 
         <!-- Info -->
         <div class="product-info">
-
-          <div class="product-series"
-               th:text="${producto.categoria}">
-            Categoría
-          </div>
-
-          <div class="product-name"
-               th:text="${producto.nombre}">
-            Nombre
-          </div>
-
+          <div class="product-series" th:text="${producto.categoria}">Categoría</div>
+          <div class="product-name" th:text="${producto.nombre}">Nombre</div>
           <div class="product-price">
-          <span class="price-current"
-                th:text="'$' + ${#numbers.formatDecimal(producto.precio, 0, 'POINT', 0, 'COMMA')}"  >
-            $0
-          </span>
+            <span class="price-current"
+                  th:text="'$' + ${#numbers.formatDecimal(producto.precio, 0, 'POINT', 0, 'COMMA')}">
+              $0
+            </span>
           </div>
-
         </div>
 
-      </div>
+      </a>
 
     </div>
-
   </section>
 
   <!-- COLECCIONES -->
@@ -679,15 +628,14 @@
       </div>
     </div>
   </section>
+
 </main>
 
 <script>
-  // Sidebar toggle
   function toggleSidebar() {
     document.getElementById('sidebar').classList.toggle('open');
   }
 
-  // Particles
   const container = document.getElementById('particles');
   for (let i = 0; i < 18; i++) {
     const p = document.createElement('div');
@@ -695,29 +643,15 @@
     const size = Math.random() * 4 + 1;
     const isBlue = Math.random() > 0.5;
     p.style.cssText = `
-            width: ${size}px; height: ${size}px;
-            left: ${Math.random() * 100}%;
-            background: ${isBlue ? 'rgba(0,212,255,0.7)' : 'rgba(124,58,237,0.7)'};
-            animation-duration: ${Math.random() * 8 + 6}s;
-            animation-delay: ${Math.random() * 8}s;
-            box-shadow: 0 0 ${size * 2}px ${isBlue ? 'rgba(0,212,255,0.5)' : 'rgba(124,58,237,0.5)'};
-        `;
+      width: ${size}px; height: ${size}px;
+      left: ${Math.random() * 100}%;
+      background: ${isBlue ? 'rgba(0,212,255,0.7)' : 'rgba(124,58,237,0.7)'};
+      animation-duration: ${Math.random() * 8 + 6}s;
+      animation-delay: ${Math.random() * 8}s;
+      box-shadow: 0 0 ${size * 2}px ${isBlue ? 'rgba(0,212,255,0.5)' : 'rgba(124,58,237,0.5)'};
+    `;
     container.appendChild(p);
   }
-
-  // Countdown
-  let totalSecs = 8 * 3600 + 45 * 60 + 30;
-  function updateCountdown() {
-    const h = Math.floor(totalSecs / 3600);
-    const m = Math.floor((totalSecs % 3600) / 60);
-    const s = totalSecs % 60;
-    document.getElementById('hours').textContent = String(h).padStart(2, '0');
-    document.getElementById('mins').textContent = String(m).padStart(2, '0');
-    document.getElementById('secs').textContent = String(s).padStart(2, '0');
-    if (totalSecs > 0) totalSecs--;
-  }
-  updateCountdown();
-  setInterval(updateCountdown, 1000);
 </script>
 
 </body>

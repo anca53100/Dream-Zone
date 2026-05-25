@@ -27,26 +27,4 @@ public class HomeController {
         productoService.obtenerPorId(id).ifPresent(p -> model.addAttribute("producto", p));
         return "producto-detalle";
     }
-
-    @PostMapping("/carrito/agregar/{id}")
-    public String agregarAlCarrito(@PathVariable String id,
-                                   HttpSession session,
-                                   RedirectAttributes redirectAttributes) {
-
-        List<Producto> carrito =
-                (List<Producto>) session.getAttribute("carrito");
-
-        if (carrito == null) {
-            carrito = new java.util.ArrayList<>();
-        }
-
-        productoService.obtenerPorId(id).ifPresent(carrito::add);
-
-        session.setAttribute("carrito", carrito);
-
-        redirectAttributes.addFlashAttribute("success",
-                "Producto agregado al carrito");
-
-        return "redirect:/tienda";
-    }
 }

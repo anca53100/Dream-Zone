@@ -7,4 +7,5 @@ import java.util.Optional;
 
 public interface CarritoRepository extends MongoRepository<Carrito, String> {
     Optional<Carrito> findBySessionId(String sessionId);
+    Optional<Carrito> findByUsuarioId(String usuarioId);
 }

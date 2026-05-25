@@ -1,6 +1,7 @@
 package com.example.dreamzone.controller;
 
 import com.example.dreamzone.model.Usuario;
+import com.example.dreamzone.service.CarritoService;
 import com.example.dreamzone.service.UsuarioService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,9 @@ public class AuthController {
 
     @Autowired
     private UsuarioService usuarioService;
+
+    @Autowired
+    private CarritoService carritoService;
 
     @GetMapping("/login")
     public String mostrarLogin(Model model) {
@@ -37,6 +41,7 @@ public class AuthController {
 
         Usuario usuario = usuarioOpt.get();
         session.setAttribute("usuarioLogueado", usuario);
+        carritoService.vincularCarritoAlUsuario(session.getId(), usuario.getId());
 
         return "ROLE_ADMIN".equals(usuario.getRol()) ? "redirect:/admin" : "redirect:/";
     }
