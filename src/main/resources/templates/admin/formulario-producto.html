@@ -1,159 +1,649 @@
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Agregar Producto | Dream Zone Admin</title>
-    <link rel="stylesheet" th:href="@{/css/admin.css}">
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title th:text="${producto?.id != null} ? 'Editar producto — DreamZone' : 'Nuevo producto — DreamZone'">Producto — DreamZone</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}"/>
+    <style>
+        /* ── Sección de imágenes ── */
+        .img-preview-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+        .img-preview-item {
+            position: relative;
+            aspect-ratio: 1;
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            border: 1px solid var(--dark-border);
+            background: var(--dark-surface);
+        }
+        .img-preview-item img {
+            width: 100%; height: 100%;
+            object-fit: cover;
+        }
+        .img-preview-item .img-remove {
+            position: absolute; top: 4px; right: 4px;
+            width: 20px; height: 20px;
+            background: rgba(248,113,113,0.85);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; font-size: 11px; color: white;
+            opacity: 0; transition: opacity 0.15s;
+        }
+        .img-preview-item:hover .img-remove { opacity: 1; }
+
+        /* ── Toggle switch ── */
+        .toggle-group {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--dark-border);
+        }
+        .toggle-group:last-child { border-bottom: none; }
+        .toggle-label { font-size: 14px; color: var(--text-secondary); }
+        .toggle-label span { display: block; font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+
+        .toggle {
+            position: relative;
+            width: 44px; height: 24px;
+            flex-shrink: 0;
+        }
+        .toggle input { opacity: 0; width: 0; height: 0; position: absolute; }
+        .toggle-track {
+            position: absolute; inset: 0;
+            background: var(--dark-border);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .toggle-track::after {
+            content: '';
+            position: absolute;
+            left: 3px; top: 3px;
+            width: 18px; height: 18px;
+            background: white;
+            border-radius: 50%;
+            transition: transform 0.2s;
+        }
+        .toggle input:checked + .toggle-track {
+            background: linear-gradient(135deg, var(--neon-blue), var(--neon-purple));
+        }
+        .toggle input:checked + .toggle-track::after {
+            transform: translateX(20px);
+        }
+
+        /* ── Sidebar section highlight ── */
+        .nav-item.active {
+            color: var(--text-primary);
+            background: var(--accent-glow);
+        }
+        .nav-item.active::before {
+            content: '';
+            position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
+            background: var(--neon-blue);
+            box-shadow: 0 0 8px var(--neon-blue);
+        }
+
+        /* ── Indicador de paso ── */
+        .step-indicator {
+            display: flex;
+            align-items: center;
+            gap: 0;
+            margin-bottom: 28px;
+        }
+        .step {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+        .step-num {
+            width: 26px; height: 26px;
+            border-radius: 50%;
+            background: var(--dark-surface);
+            border: 1px solid var(--dark-border);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 11px; font-weight: 700;
+            flex-shrink: 0;
+        }
+        .step.done .step-num {
+            background: linear-gradient(135deg, var(--neon-blue), var(--neon-purple));
+            border-color: transparent;
+            color: white;
+        }
+        .step.active .step-num {
+            border-color: var(--neon-blue);
+            color: var(--neon-blue);
+            box-shadow: 0 0 8px var(--accent-glow);
+        }
+        .step.active { color: var(--text-primary); }
+        .step-line {
+            flex: 1; height: 1px;
+            background: var(--dark-border);
+            margin: 0 8px;
+        }
+
+        /* ── Char counter ── */
+        .char-counter {
+            font-size: 11px;
+            color: var(--text-muted);
+            text-align: right;
+            margin-top: 4px;
+        }
+        .char-counter.warn { color: var(--neon-yellow); }
+        .char-counter.over { color: var(--neon-red); }
+
+        /* ── Float save bar ── */
+        .save-bar {
+            position: fixed;
+            bottom: 24px; right: 32px;
+            background: var(--dark-card);
+            border: 1px solid var(--dark-border);
+            border-radius: var(--radius-xl);
+            padding: 12px 20px;
+            display: flex; align-items: center; gap: 14px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+            z-index: 50;
+            transform: translateY(80px);
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+        .save-bar.visible {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        .save-bar-text { font-size: 13px; color: var(--text-secondary); }
+        .animate { opacity: 1 !important; animation: none !important; }
+    </style>
 </head>
 <body>
 
-<div class="admin-layout">
-
-    <!-- ══ SIDEBAR ══════════════════════════════════════ -->
-    <aside class="sidebar">
-        <div class="sidebar-logo">
-            <div class="logo-text">DZ<em>Admin</em></div>
-            <small>Panel de control</small>
-        </div>
-        <nav class="sidebar-menu">
-            <div class="menu-label">Catálogo</div>
-            <a th:href="@{/admin/productos}" class="menu-item active">
-                <span class="icon">◫</span> Productos
-            </a>
-            <div class="menu-label" style="margin-top:12px">Sistema</div>
-            <a href="#" class="menu-item">
-                <span class="icon">⚙</span> Configuración
-            </a>
-        </nav>
-        <div class="sidebar-footer">
-            <a href="/"><span>↩</span> Cerrar sesión</a>
-        </div>
-    </aside>
-
-    <!-- ══ MAIN ══════════════════════════════════════════ -->
-    <div class="main-content">
-
-        <!-- Topbar -->
-        <header class="topbar">
-            <div class="topbar-left">
-                <h1 th:text="${titulo}">Agregar Producto</h1>
-                <div class="breadcrumb">
-                    Admin / <a th:href="@{/admin/productos}"
-                               style="color:var(--sky);text-decoration:none">Productos</a>
-                    / <span>Nuevo</span>
-                </div>
-            </div>
-            <div class="topbar-right">
-                <a th:href="@{/admin/productos}" class="btn btn-ghost">← Volver</a>
-            </div>
-        </header>
-
-        <!-- Contenido -->
-        <main class="content">
-
-            <!-- Formulario -->
-            <form th:action="${accion}"
-                  th:object="${producto}"
-                  method="post">
-
-                <div class="form-card">
-                    <div class="form-header">
-                        <h2>Información del producto</h2>
-                    </div>
-
-                    <div class="form-body">
-
-                        <!-- Nombre -->
-                        <div class="field full">
-                            <label for="nombre">Nombre del producto</label>
-                            <input type="text"
-                                   id="nombre"
-                                   th:field="*{nombre}"
-                                   placeholder="Ej: DZ Snapback Edición Limitada">
-                            <span class="error-msg"
-                                  th:if="${#fields.hasErrors('nombre')}"
-                                  th:errors="*{nombre}">
-                            </span>
-                        </div>
-
-                        <!-- Categoría -->
-                        <div class="field">
-                            <label for="categoria">Categoría</label>
-                            <select id="categoria" th:field="*{categoria}">
-                                <option value="">-- Selecciona --</option>
-                                <option value="Gorras">Gorras</option>
-                                <option value="Ropa">Ropa</option>
-                                <option value="Accesorios">Accesorios</option>
-                                <option value="Calzado">Calzado</option>
-                            </select>
-                            <span class="error-msg"
-                                  th:if="${#fields.hasErrors('categoria')}"
-                                  th:errors="*{categoria}">
-                            </span>
-                        </div>
-
-                        <!-- Precio -->
-                        <div class="field">
-                            <label for="precio">Precio (COP)</label>
-                            <input type="number"
-                                   id="precio"
-                                   th:field="*{precio}"
-                                   placeholder="85000"
-                                   min="0">
-                            <span class="error-msg"
-                                  th:if="${#fields.hasErrors('precio')}"
-                                  th:errors="*{precio}">
-                            </span>
-                        </div>
-
-                        <!-- Stock -->
-                        <div class="field">
-                            <label for="stock">Stock disponible</label>
-                            <input type="number"
-                                   id="stock"
-                                   th:field="*{stock}"
-                                   placeholder="50"
-                                   min="0">
-                            <span class="error-msg"
-                                  th:if="${#fields.hasErrors('stock')}"
-                                  th:errors="*{stock}">
-                            </span>
-                        </div>
-
-                        <!-- SKU -->
-                        <div class="field">
-                            <label for="sku">SKU <span style="color:var(--soft);font-weight:400">(opcional)</span></label>
-                            <input type="text"
-                                   id="sku"
-                                   th:field="*{sku}"
-                                   placeholder="SKU-006">
-                        </div>
-
-                        <!-- Descripción -->
-                        <div class="field full">
-                            <label for="descripcion">Descripción</label>
-                            <textarea id="descripcion"
-                                      th:field="*{descripcion}"
-                                      placeholder="Describe el producto: materiales, tallas disponibles, colores...">
-                            </textarea>
-                        </div>
-
-                    </div>
-
-                    <!-- Footer con botones -->
-                    <div class="form-footer">
-                        <a th:href="@{/admin/productos}" class="btn btn-ghost">Cancelar</a>
-                        <button type="submit" class="btn btn-primary">Guardar producto →</button>
-                    </div>
-
-                </div>
-
-            </form>
-
-        </main>
+<!-- ═══ SIDEBAR ═══ -->
+<aside class="sidebar" id="sidebar">
+    <div class="logo">
+        <div class="logo-text">DREAM<br/>ZONE</div>
+        <div class="logo-sub">ADMIN PANEL</div>
     </div>
+
+    <nav class="nav-section">
+        <a th:href="@{/admin}" class="nav-item">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1V5zm10 0a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zM4 15a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1v-4zm10 0a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z"/></svg>
+            Panel de control
+        </a>
+    </nav>
+
+    <nav class="nav-section">
+        <div class="nav-label">Inventario</div>
+        <a th:href="@{/admin/productos}" class="nav-item active">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+            Productos
+        </a>
+    </nav>
+
+    <div class="sidebar-bottom">
+        <a th:href="@{/}" class="nav-item">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+            Ver tienda
+        </a>
+        <a th:href="@{/logout}" class="nav-item">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+            Cerrar sesión
+        </a>
+    </div>
+</aside>
+
+<!-- ═══ TOPBAR ═══ -->
+<header class="topbar">
+    <button class="hamburger" onclick="document.getElementById('sidebar').classList.toggle('open')">
+        <svg width="22" height="22" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+    </button>
+
+    <!-- Breadcrumb en topbar -->
+    <div class="breadcrumb" style="margin:0; font-size:13px;">
+        <a href="/admin">Admin</a>
+        <span class="breadcrumb-sep">›</span>
+        <a href="/admin/productos">Productos</a>
+        <span class="breadcrumb-sep">›</span>
+        <span class="breadcrumb-current"
+              th:text="${producto?.id != null} ? 'Editar producto' : 'Nuevo producto'">
+        Nuevo producto
+    </span>
+    </div>
+
+    <div class="topbar-actions">
+        <div class="avatar">AD</div>
+    </div>
+</header>
+
+<!-- ═══ MAIN ═══ -->
+<main class="main">
+
+    <!-- Encabezado -->
+    <div class="flex items-center gap-16 mb-24 animate">
+        <a th:href="@{/admin/productos}" class="btn btn-secondary btn-sm btn-icon">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="18" height="18"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+        </a>
+        <div>
+            <h1 class="page-title"
+                th:text="${producto?.id != null} ? 'EDITAR PRODUCTO' : 'NUEVO PRODUCTO'">NUEVO PRODUCTO</h1>
+            <p class="page-subtitle"
+               th:text="${producto?.id != null} ? 'Modifica la información del producto' : 'Completa los datos para agregar al catálogo'">
+                Completa los datos
+            </p>
+        </div>
+    </div>
+
+    <!-- Flash messages -->
+    <div th:if="${errorMsg}"
+         style="display:flex;align-items:center;gap:10px;padding:13px 16px;
+                background:rgba(248,113,113,0.08);border:1px solid rgba(248,113,113,0.3);
+                border-radius:var(--radius-md);margin-bottom:20px;font-size:14px;color:var(--neon-red);"
+         class="animate">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="16" height="16"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        <span th:text="${errorMsg}"></span>
+    </div>
+
+    <!-- ── FORMULARIO ── -->
+    <form th:action="@{/admin/productos/guardar}"
+          method="post"
+          enctype="multipart/form-data"
+          id="productoForm"
+          onchange="mostrarSaveBar()">
+
+        <input type="hidden" name="_csrf" th:value="${_csrf?.token}"/>
+        <input type="hidden"
+               name="id"
+               th:if="${producto != null and producto.id != null}"
+               th:value="${producto.id}">
+
+        <div style="display:grid; grid-template-columns:1fr 380px; gap:20px; align-items:start;">
+
+            <!-- ════ COLUMNA IZQUIERDA ════ -->
+            <div style="display:flex; flex-direction:column; gap:20px;">
+
+                <!-- ── Card: Información básica ── -->
+                <div class="card animate delay-1">
+                    <div class="flex items-center gap-12 mb-24">
+                        <div style="width:32px;height:32px;border-radius:var(--radius-md);
+                                    background:var(--accent-glow);border:1px solid rgba(0,212,255,0.2);
+                                    display:flex;align-items:center;justify-content:center;font-size:16px;">ℹ️</div>
+                        <h3 class="section-title">Información <span>básica</span></h3>
+                    </div>
+
+                    <!-- Nombre -->
+                    <div class="form-group">
+                        <label class="form-label">Nombre del producto *</label>
+                        <input type="text"
+                               name="nombre"
+                               class="form-input"
+                               placeholder="Ej. Figura Satoru Gojo — Jujutsu Kaisen"
+                               maxlength="100"
+                               required
+                               th:value="${producto?.nombre}"
+                               oninput="updateCharCount(this, 'nombreCount', 100)"/>
+                        <div class="char-counter" id="nombreCount">0 / 100</div>
+                    </div>
+
+                    <!-- Descripción -->
+                    <div class="form-group">
+                        <label class="form-label">Descripción</label>
+                        <textarea name="descripcion"
+                                  class="form-textarea"
+                                  placeholder="Describe el producto: materiales, tamaño, detalles especiales..."
+                                  maxlength="500"
+                                  rows="4"
+                                  oninput="updateCharCount(this, 'descCount', 500)"
+                                  th:text="${producto?.descripcion}"></textarea>
+                        <div class="char-counter" id="descCount">0 / 500</div>
+                    </div>
+
+                    <!-- Fila: Categoría + Serie -->
+                    <div class="form-grid">
+                        <div class="form-group" style="margin-bottom:0;">
+                            <label class="form-label">Categoría *</label>
+                            <select name="categoria" class="form-select" required>
+                                <option value="">Selecciona una categoría</option>
+                                <option th:each="cat : ${categorias}"
+                                        th:value="${cat}"
+                                        th:text="${cat}"
+                                        th:selected="${producto?.categoria == cat}">Categoría</option>
+                            </select>
+                        </div>
+                        <div class="form-group" style="margin-bottom:0;">
+                            <label class="form-label">Serie / Franquicia</label>
+                            <input type="text"
+                                   name="serie"
+                                   class="form-input"
+                                   placeholder="Ej. Jujutsu Kaisen"
+                                   th:value="${producto?.serie}"/>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ── Card: Precio y stock ── -->
+                <div class="card animate delay-2">
+                    <div class="flex items-center gap-12 mb-24">
+                        <div style="width:32px;height:32px;border-radius:var(--radius-md);
+                                    background:var(--green-glow);border:1px solid rgba(52,211,153,0.2);
+                                    display:flex;align-items:center;justify-content:center;font-size:16px;">💲</div>
+                        <h3 class="section-title">Precio y <span>stock</span></h3>
+                    </div>
+
+                    <div class="form-grid">
+                        <!-- Precio -->
+                        <div class="form-group" style="margin-bottom:0;">
+                            <label class="form-label">Precio *</label>
+                            <div style="position:relative;">
+                                <span style="position:absolute;left:12px;top:50%;transform:translateY(-50%);
+                                             color:var(--neon-green);font-weight:700;font-size:14px;">$</span>
+                                <input type="number"
+                                       name="precio"
+                                       class="form-input"
+                                       style="padding-left:26px;"
+                                       placeholder="0.00"
+                                       step="0.01" min="0"
+                                       required
+                                       th:value="${producto?.precio}"/>
+                            </div>
+                        </div>
+                        <!-- Stock -->
+                        <div class="form-group" style="margin-bottom:0;">
+                            <label class="form-label">Stock *</label>
+                            <input type="number"
+                                   name="stock"
+                                   class="form-input"
+                                   placeholder="0"
+                                   min="0"
+                                   required
+                                   th:value="${producto?.stock}"
+                                   oninput="updateStockPreview(this.value)"/>
+                            <div id="stockPreview" class="form-hint"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ── Card: Detalles físicos ── -->
+                <div class="card animate delay-3">
+                    <div class="flex items-center gap-12 mb-24">
+                        <div style="width:32px;height:32px;border-radius:var(--radius-md);
+                                    background:var(--purple-glow);border:1px solid rgba(124,58,237,0.2);
+                                    display:flex;align-items:center;justify-content:center;font-size:16px;">📐</div>
+                        <h3 class="section-title">Detalles <span>físicos</span></h3>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group" style="margin-bottom:0;">
+                            <label class="form-label">Talla</label>
+                            <input type="text"
+                                   name="talla"
+                                   class="form-input"
+                                   placeholder="Ej. XL"
+                                   th:value="${producto?.talla}"/>
+                        </div>
+                        <div class="form-group" style="margin-bottom:0;">
+                            <label class="form-label">Material</label>
+                            <input type="text"
+                                   name="material"
+                                   class="form-input"
+                                   placeholder="Ej. Algodon"
+                                   th:value="${producto?.material}"/>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <!-- /columna izquierda -->
+
+            <!-- ════ COLUMNA DERECHA ════ -->
+            <div style="display:flex; flex-direction:column; gap:20px;">
+
+                <!-- ── Card: Estado y visibilidad ── -->
+                <div class="card animate delay-1">
+                    <div class="flex items-center gap-12 mb-20">
+                        <div style="width:32px;height:32px;border-radius:var(--radius-md);
+                                    background:rgba(251,191,36,0.1);border:1px solid rgba(251,191,36,0.2);
+                                    display:flex;align-items:center;justify-content:center;font-size:16px;">⚙️</div>
+                        <h3 class="section-title">Estado y <span>visibilidad</span></h3>
+                    </div>
+
+                    <!-- Estado activo/inactivo -->
+                    <div class="form-group">
+                        <label class="form-label">Estado del producto</label>
+                        <select name="estado" class="form-select">
+                            <option value="Activo"
+                                    th:selected="${producto == null or producto.estado == null or producto.estado == 'Activo'}">
+                                Activo — visible en tienda
+                            </option>
+                            <option value="Inactivo"
+                                    th:selected="${producto?.estado == 'Inactivo'}">
+                                    Inactivo — oculto en tienda
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="divider" style="margin:16px 0;"></div>
+
+                    <!-- Toggles -->
+                    <div class="toggle-group">
+                        <div class="toggle-label">
+                            Marcar como nuevo
+                            <span>Muestra badge "NEW" en la tarjeta</span>
+                        </div>
+                        <label class="toggle">
+                            <input type="checkbox" name="esNuevo" value="true"
+                                   th:checked="${producto?.esNuevo}"/>
+                            <div class="toggle-track"></div>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- ── Card: Imágenes ── -->
+                <div class="card animate delay-2">
+                    <div class="flex items-center gap-12 mb-20">
+                        <div style="width:32px;height:32px;border-radius:var(--radius-md);
+                                    background:rgba(240,171,252,0.1);border:1px solid rgba(240,171,252,0.2);
+                                    display:flex;align-items:center;justify-content:center;font-size:16px;">📸</div>
+                        <h3 class="section-title">Imágenes del <span>producto</span></h3>
+                    </div>
+
+                    <!-- Previews de imágenes existentes -->
+                    <div class="img-preview-grid"
+                         id="existingImgs"
+                         th:if="${producto != null and producto.imagen != null}">
+                        <div class="img-preview-item">
+                            <img th:src="${producto.imagen}" alt="Imagen del producto"/>
+                            <div class="img-remove"
+                                 onclick="this.closest('.img-preview-item').remove()">✕</div>
+                        </div>
+                    </div>
+
+                    <!-- Previews de nuevas imágenes (JS) -->
+                    <div class="img-preview-grid" id="newImgsPreview"></div>
+
+                    <!-- Upload area -->
+                    <div class="upload-area"
+                         id="uploadArea"
+                         onclick="document.getElementById('archivo').click()"
+                         ondragover="handleDragOver(event)"
+                         ondrop="handleDrop(event)">
+                        <div class="upload-icon">📁</div>
+                        <div class="upload-text">Haz clic o arrastra una imágen aquí</div>
+                        <div class="upload-hint">JPG, PNG, WEBP — máx. 5 MB por archivo</div>
+                    </div>
+
+                    <input type="file"
+                           name="archivo"
+                           id="archivo"
+                           accept="image/jpeg,image/png,image/webp"
+                           style="display:none;"
+                           onchange="previewNewImage(this)"/>
+                </div>
+
+                <!-- ── Botones de acción ── -->
+                <div class="animate delay-3" style="display:flex; flex-direction:column; gap:10px;">
+                    <button type="submit" class="btn btn-primary btn-lg" style="width:100%;justify-content:center;">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="18" height="18"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                        <span th:text="${producto?.id != null} ? 'Guardar cambios' : 'Agregar producto'">Guardar</span>
+                    </button>
+                    <a th:href="@{/admin/productos}" class="btn btn-secondary"
+                       style="width:100%;justify-content:center;">
+                        Cancelar
+                    </a>
+                </div>
+            </div>
+            <!-- /columna derecha -->
+
+        </div><!-- /grid -->
+    </form>
+
+</main>
+
+<!-- ── Barra flotante de guardar ── -->
+<div class="save-bar" id="saveBar">
+    <svg fill="none" stroke="var(--neon-yellow)" viewBox="0 0 24 24" width="16" height="16">
+        <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+    </svg>
+    <span class="save-bar-text">Tienes cambios sin guardar</span>
+    <button type="button" class="btn btn-secondary btn-sm"
+            onclick="document.getElementById('productoForm').reset(); ocultarSaveBar()">
+        Descartar
+    </button>
+    <button type="button" class="btn btn-primary btn-sm"
+            onclick="document.getElementById('productoForm').requestSubmit()">
+        Guardar ahora
+    </button>
 </div>
 
+<script>
+    /* ── Contador de caracteres ── */
+    function updateCharCount(el, counterId, max) {
+        const len = el.value.length;
+        const counter = document.getElementById(counterId);
+        counter.textContent = len + ' / ' + max;
+        counter.className = 'char-counter' +
+            (len > max * 0.9 ? (len >= max ? ' over' : ' warn') : '');
+    }
+
+    /* Inicializar contadores al cargar */
+    window.addEventListener('DOMContentLoaded', () => {
+        const nombre = document.querySelector('[name="nombre"]');
+        const desc   = document.querySelector('[name="descripcion"]');
+        if (nombre) updateCharCount(nombre, 'nombreCount', 100);
+        if (desc)   updateCharCount(desc,   'descCount',   500);
+
+        /* Inicializar preview de precio */
+        const precioEl = document.querySelector('[name="precio"]');
+        if (precioEl?.value) updatePrecioPreview(precioEl.value);
+
+        /* Inicializar stock preview */
+        const stockEl = document.querySelector('[name="stock"]');
+        if (stockEl?.value) updateStockPreview(stockEl.value);
+
+        /* Inicializar nombre preview */
+        if (nombre?.value) updateCardPreview();
+        /* Inicializar imagen existente en edición */
+        const existingImg = document.querySelector('#existingImgs img');
+
+        if (existingImg) {
+            document.getElementById('cardPreviewImg').innerHTML =
+                `<img src="${existingImg.src}" style="width:100%;height:100%;object-fit:cover;"/>`;
+        }
+
+        /* Escuchar cambios para la vista previa */
+        ['nombre','serie','precio'].forEach(field => {
+            const el = document.querySelector('[name="' + field + '"]');
+            if (el) el.addEventListener('input', updateCardPreview);
+        });
+    });
+
+    /* ── Vista previa de tarjeta ── */
+    function updateCardPreview() {
+        const nombre = document.querySelector('[name="nombre"]')?.value || 'Nombre del producto';
+        const serie  = document.querySelector('[name="serie"]')?.value  || 'Serie';
+        const precio = document.querySelector('[name="precio"]')?.value || '0';
+
+        document.getElementById('cardPreviewNombre').textContent = nombre;
+        document.getElementById('cardPreviewSerie').textContent  = serie;
+        document.getElementById('cardPreviewPrecio').textContent =
+            '$' + parseFloat(precio || 0).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    }
+
+    /* ── Preview stock ── */
+    function updateStockPreview(val) {
+        const el = document.getElementById('stockPreview');
+        const n = parseInt(val);
+        if (isNaN(n) || val === '') { el.textContent = ''; return; }
+        if (n === 0)  { el.textContent = '⚠ Producto agotado'; el.style.color = 'var(--neon-red)'; }
+        else if (n < 5) { el.textContent = '⚠ Stock bajo'; el.style.color = 'var(--neon-yellow)'; }
+        else          { el.textContent = '✓ Disponible'; el.style.color = 'var(--neon-green)'; }
+    }
+    /* ── Preview de imágenes nuevas ── */
+    function previewNewImage(input) {
+
+        const container = document.getElementById('newImgsPreview');
+        container.innerHTML = '';
+
+        const file = input.files[0];
+
+        if (!file) return;
+
+        const reader = new FileReader();
+
+        reader.onload = function(e) {
+
+            container.innerHTML = `
+            <div class="img-preview-item">
+                <img src="${e.target.result}" alt="Preview"/>
+            </div>
+        `;
+
+            document.getElementById('cardPreviewImg').innerHTML =
+                `<img src="${e.target.result}"
+                  style="width:100%;height:100%;object-fit:cover;"/>`;
+        };
+
+        reader.readAsDataURL(file);
+    }
+
+    /* ── Drag & drop ── */
+    function handleDragOver(e) {
+        e.preventDefault();
+        document.getElementById('uploadArea').style.borderColor = 'var(--neon-blue)';
+        document.getElementById('uploadArea').style.background  = 'var(--accent-glow)';
+    }
+
+    function handleDrop(e) {
+        e.preventDefault();
+        const area = document.getElementById('uploadArea');
+        area.style.borderColor = '';
+        area.style.background  = '';
+
+        const input = document.getElementById('archivo');
+        const dt = new DataTransfer();
+        Array.from(e.dataTransfer.files)
+            .filter(f => f.type.startsWith('image/'))
+            .forEach(f => dt.items.add(f));
+        input.files = dt.files;
+        previewNewImage(input);
+    }
+
+    /* ── Barra flotante ── */
+    let saveBarTimer;
+    function mostrarSaveBar() {
+        document.getElementById('saveBar').classList.add('visible');
+        clearTimeout(saveBarTimer);
+    }
+    function ocultarSaveBar() {
+        document.getElementById('saveBar').classList.remove('visible');
+    }
+    /* Ocultar al enviar */
+    document.getElementById('productoForm').addEventListener('submit', ocultarSaveBar);
+</script>
 </body>
 </html>

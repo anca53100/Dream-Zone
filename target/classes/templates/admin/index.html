@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Admin — DreamZone</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}"/>
+    <style>
+        .chart-bar-group { display: flex; flex-direction: column; gap: 10px; }
+        .chart-bar-item  { display: flex; align-items: center; gap: 12px; }
+        .chart-bar-label { font-size: 13px; color: var(--text-secondary); width: 90px; flex-shrink: 0; text-align: right; }
+        .chart-bar-track { flex: 1; height: 8px; background: var(--dark-border); border-radius: 4px; overflow: hidden; }
+        .chart-bar-fill  { height: 100%; border-radius: 4px; transition: width 1s ease; }
+        .chart-bar-val   { font-size: 13px; font-weight: 700; width: 36px; text-align: right; }
+
+        .activity-list { display: flex; flex-direction: column; }
+        .activity-item { display: flex; align-items: flex-start; gap: 14px; padding: 13px 0; border-bottom: 1px solid var(--dark-border); }
+        .activity-item:last-child { border-bottom: none; }
+        .activity-dot  { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; margin-top: 4px; }
+        .activity-text { font-size: 14px; line-height: 1.4; }
+        .activity-text strong { color: var(--text-primary); }
+        .activity-time { font-size: 12px; color: var(--text-secondary); margin-top: 3px; }
+
+        .top-product-item { display: flex; align-items: center; gap: 12px; padding: 11px 0; border-bottom: 1px solid var(--dark-border); }
+        .top-product-item:last-child { border-bottom: none; }
+        .top-rank  { font-family: var(--font-display); font-size: 12px; font-weight: 900; color: var(--text-muted); width: 22px; text-align: center; flex-shrink: 0; }
+        .top-rank.first  { color: var(--neon-yellow); }
+        .top-rank.second { color: var(--text-secondary); }
+        .top-rank.third  { color: #cd7f32; }
+        .top-product-img { width: 36px; height: 36px; border-radius: var(--radius-sm); background: var(--dark-surface); border: 1px solid var(--dark-border); display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+        .top-product-name { font-size: 13px; font-weight: 600; }
+        .top-product-cat  { font-size: 11px; color: var(--text-secondary); }
+        .top-product-stock{ font-family: var(--font-display); font-size: 13px; font-weight: 700; color: var(--neon-blue); }
+
+        .stock-alert { display: flex; align-items: center; gap: 12px; padding: 11px 14px; border-radius: var(--radius-md); background: rgba(251,191,36,.06); border: 1px solid rgba(251,191,36,.2); margin-bottom: 10px; }
+        .stock-alert:last-child { margin-bottom: 0; }
+        .stock-alert.critical { background: rgba(248,113,113,.06); border-color: rgba(248,113,113,.25); }
+        .stock-alert-name  { font-size: 13px; font-weight: 600; flex: 1; }
+        .stock-alert-count { font-size: 13px; font-weight: 700; color: var(--neon-yellow); }
+        .stock-alert.critical .stock-alert-count { color: var(--neon-red); }
+
+        .quick-action { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 18px 10px; border-radius: var(--radius-lg); background: var(--dark-surface); border: 1px solid var(--dark-border); cursor: pointer; transition: var(--transition); text-align: center; text-decoration: none; }
+        .quick-action:hover { border-color: var(--neon-blue); background: var(--accent-glow); transform: translateY(-2px); }
+        .quick-action-icon  { font-size: 24px; }
+        .quick-action-label { font-size: 12px; font-weight: 600; color: var(--text-secondary); }
+        .quick-action:hover .quick-action-label { color: var(--text-primary); }
+
+        .top-product-img img{
+            width:100%;
+            height:100%;
+            object-fit:cover;
+            border-radius:6px;
+        }
+    </style>
+</head>
+<body>
+
+<!-- ─── SIDEBAR ─── -->
+<aside class="sidebar" id="sidebar">
+    <div class="logo">
+        <div class="logo-text">DREAM<br/>ZONE</div>
+        <div class="logo-sub">PANEL ADMIN</div>
+    </div>
+
+    <nav class="nav-section">
+        <a href="/admin" class="nav-item active">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1V5zm10 0a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zM4 15a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1v-4zm10 0a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z"/></svg>
+            Panel de control
+        </a>
+    </nav>
+
+    <nav class="nav-section">
+        <div class="nav-label">Inventario</div>
+        <a href="/admin/productos" class="nav-item">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+            Productos
+        </a>
+    </nav>
+    <div class="sidebar-bottom">
+        <a href="/" class="nav-item">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+            Ver tienda
+        </a>
+        <a href="/auth/logout" class="nav-item">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+            Cerrar sesión
+        </a>
+    </div>
+</aside>
+
+<!-- ─── TOPBAR ─── -->
+<header class="topbar">
+    <button class="hamburger" onclick="document.getElementById('sidebar').classList.toggle('open')">
+        <svg width="22" height="22" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+    </button>
+    <div class="topbar-actions">
+        <div class="icon-btn">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+            <span class="cart-count">3</span>
+        </div>
+    </div>
+</header>
+
+<!-- ─── MAIN ─── -->
+<main class="main">
+
+    <!-- Header -->
+    <div class="flex items-center justify-between mb-24 animate">
+        <div>
+            <h1 class="page-title">Panel de control</h1>
+            <p class="page-subtitle">Resumen general del inventario</p>
+        </div>
+        <a href="/admin/productos/nuevo" class="btn btn-primary">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+            Agregar producto
+        </a>
+    </div>
+
+    <!-- Stats: solo lo del MVP -->
+    <div class="grid-4 mb-24">
+        <div class="stat-card blue animate delay-1">
+            <div>
+                <div class="stat-label">TOTAL PRODUCTOS</div>
+                <div class="stat-value text-blue" th:text="${totalProductos ?: 257}">257</div>
+                <div class="stat-change up">↑ +12 este mes</div>
+            </div>
+            <div class="stat-icon blue"></div>
+        </div>
+        <div class="stat-card green animate delay-2">
+            <div>
+                <div class="stat-label">PRODUCTOS ACTIVOS</div>
+                <div class="stat-value text-green"
+                     th:text="${productosActivos}">
+                </div>
+                <div class="stat-change up">↑ En catálogo</div>
+            </div>
+            <div class="stat-icon green"></div>
+        </div>
+        <div class="stat-card yellow animate delay-3">
+            <div>
+                <div class="stat-label">CATEGORÍAS</div>
+                <div class="stat-value text-yellow"
+                     th:text="${totalCategorias}">
+                </div>
+                <div class="stat-change up">Figuras, Mangas…</div>
+            </div>
+            <div class="stat-icon yellow"></div>
+        </div>
+        <div class="stat-card red animate delay-4">
+            <div>
+                <div class="stat-label">STOCK BAJO</div>
+                <div class="stat-value text-red"
+                     th:text="${stockBajo}">
+                </div>
+                <div class="stat-change down">Requiere atención</div>
+            </div>
+            <div class="stat-icon red"></div>
+        </div>
+    </div>
+
+    <!-- Fila central -->
+    <div class="mb-24" style="display:grid;grid-template-columns:2fr 1fr;gap:16px;">
+
+        <!-- Stock por categoría -->
+        <div class="card animate delay-2">
+            <div class="flex items-center justify-between mb-24">
+                <h3 class="section-title">Productos por <span>categoría</span></h3>
+                <a href="/admin/productos" class="text-blue text-sm">Ver inventario →</a>
+            </div>
+            <div class="chart-bar-group">
+                <div class="chart-bar-item" th:each="entry : ${porCategoria}">
+                    <span class="chart-bar-label" th:text="${entry.key}">Cat</span>
+                    <div class="chart-bar-track">
+                        <div class="chart-bar-fill"
+                             style="width:0%;background:linear-gradient(90deg,#00d4ff,#7c3aed)"
+                             th:data-w="${entry.value * 100 / totalProductos}"></div>
+                    </div>
+                    <span class="chart-bar-val text-blue" th:text="${entry.value}">0</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Acciones rápidas -->
+        <div class="card animate delay-3">
+            <h3 class="section-title mb-16">Acciones <span>rápidas</span></h3>
+            <div class="grid-2 gap-8">
+                <a href="/admin/productos/nuevo" class="quick-action">
+                    <span class="quick-action-icon">➕</span>
+                    <span class="quick-action-label">Nuevo producto</span>
+                </a>
+                <a href="/admin/productos" class="quick-action">
+                    <span class="quick-action-icon">📦</span>
+                    <span class="quick-action-label">Inventario</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Fila inferior -->
+    <div class="grid-3 mb-24">
+
+        <!-- Top productos por stock -->
+        <div class="card animate delay-1">
+            <div class="flex items-center justify-between mb-16">
+                <h3 class="section-title">Mayor <span>stock</span></h3>
+                <a href="/admin/productos" class="text-blue text-sm">Ver todos →</a>
+            </div>
+            <div>
+
+                <div class="top-product-item"
+                     th:each="producto, iter : ${topStock}">
+
+                    <!-- Ranking -->
+                    <span class="top-rank"
+                          th:classappend="
+                            ${iter.index == 0} ? 'first' :
+                            (${iter.index == 1} ? 'second' :
+                            (${iter.index == 2} ? 'third' : ''))"
+                                      th:text="'#' + ${iter.count}">
+                        #1
+                    </span>
+
+                    <!-- Imagen -->
+                    <div class="top-product-img">
+                        <img th:if="${producto.imagen != null and !producto.imagen.isEmpty()}"
+                             th:src="${producto.imagen}"
+                             alt="Producto"
+                             style="width:100%;height:100%;object-fit:cover;border-radius:6px"/>
+
+                        <span th:if="${producto.imagen == null or producto.imagen.isEmpty()}">
+                            📦
+                        </span>
+                    </div>
+
+                    <!-- Info -->
+                    <div style="flex:1">
+                        <div class="top-product-name"
+                             th:text="${producto.nombre}">
+                            Producto
+                        </div>
+
+                        <div class="top-product-cat"
+                             th:text="${producto.categoria}">
+                            Categoría
+                        </div>
+                    </div>
+
+                    <!-- Stock -->
+                    <span class="top-product-stock"
+                          th:text="${producto.stock} + ' uds.'">
+                        0 uds.
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stock bajo -->
+        <div class="card animate delay-2">
+            <div class="flex items-center justify-between mb-16">
+                <h3 class="section-title">
+                    Stock <span style="color:var(--neon-red)">bajo</span>
+                </h3>
+            </div>
+
+            <div th:if="${#lists.isEmpty(stockCritico)}">
+                <p class="text-secondary">No hay productos con stock bajo.</p>
+            </div>
+
+            <div th:each="producto : ${stockCritico}"
+                 class="stock-alert"
+                 th:classappend="${producto.stock == 0} ? 'critical'">
+
+                <span th:text="${producto.stock == 0} ? '🔴' : '⚠️'"></span>
+
+                <span class="stock-alert-name"
+                      th:text="${producto.nombre}">
+                    Producto
+                </span>
+
+                <span class="stock-alert-count"
+                      th:text="${producto.stock} + ' uds.'">
+                    0 uds.
+                </span>
+            </div>
+        </div>
+
+        <!-- Actividad reciente -->
+        <div class="card animate delay-3">
+
+            <h3 class="section-title mb-16">
+                Actividad <span>reciente</span>
+            </h3>
+            <div class="activity-list">
+                <div class="activity-item"
+                     th:each="producto : ${actividadReciente}">
+                    <div class="activity-dot"
+                         style="background:var(--neon-green)">
+                    </div>
+                    <div>
+                        <div class="activity-text">
+                            Producto
+                            <strong th:text="${producto.nombre}">
+                                Producto
+                            </strong>
+                            agregado o actualizado
+                        </div>
+                        <div class="activity-time">
+                            ID:
+                            <span th:text="${producto.id}"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</main>
+
+<script>
+    setTimeout(() => {
+        document.querySelectorAll('.chart-bar-fill').forEach(bar => {
+            bar.style.width = bar.dataset.w + '%';
+        });
+    }, 400);
+</script>
+
+</body>
+</html>

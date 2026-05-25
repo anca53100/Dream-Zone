@@ -1,70 +1,33 @@
 package com.example.dreamzone.model;
 
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
+import lombok.Data;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.ArrayList;
+import java.util.List;
+
+@Data
+@Document(collection = "productos")
 public class Producto {
+    @Id
+    private String id;
 
-    private Long id;
-
-    @NotBlank(message = "El nombre es obligatorio")
     private String nombre;
-
-    @NotBlank(message = "La categoría es obligatoria")
-    private String categoria;
-
-    @NotNull(message = "El precio es obligatorio")
-    @Min(value = 0, message = "El precio no puede ser negativo")
-    private Double precio;
-
-    @NotNull(message = "El stock es obligatorio")
-    @Min(value = 0, message = "El stock no puede ser negativo")
-    private Integer stock;
-
-    private String sku;
     private String descripcion;
+    private String categoria;    // "Figuras", "Mangas", "Ropa", etc.
+    private String marca;
+    private double precio;
+    private int stock;
+    private String estado;       // "Activo", "Inactivo"
+    private boolean esNuevo;
+    private boolean esOferta;
+    private double precioAnterior;
+    private String serie;          // "Jujutsu Kaisen", "One Piece", etc.
 
-    // ── Constructores ──────────────────────────────────
-    public Producto() {}
+    // Detalles extra
+    private String talla;
+    private String material;
+    private String imagen;
 
-    public Producto(Long id, String nombre, String categoria,
-                    Double precio, Integer stock, String sku, String descripcion) {
-        this.id          = id;
-        this.nombre      = nombre;
-        this.categoria   = categoria;
-        this.precio      = precio;
-        this.stock       = stock;
-        this.sku         = sku;
-        this.descripcion = descripcion;
-    }
-
-    // Helper: estado de stock para la vista
-    public String getEstadoStock() {
-        if (stock == null || stock == 0) return "Sin stock";
-        if (stock <= 5)                  return "Stock bajo";
-        return "En stock";
-    }
-
-    // ── Getters y Setters ───────────────────────────────
-    public Long getId()                  { return id; }
-    public void setId(Long id)           { this.id = id; }
-
-    public String getNombre()            { return nombre; }
-    public void setNombre(String n)      { this.nombre = n; }
-
-    public String getCategoria()         { return categoria; }
-    public void setCategoria(String c)   { this.categoria = c; }
-
-    public Double getPrecio()            { return precio; }
-    public void setPrecio(Double p)      { this.precio = p; }
-
-    public Integer getStock()            { return stock; }
-    public void setStock(Integer s)      { this.stock = s; }
-
-    public String getSku()               { return sku; }
-    public void setSku(String sku)       { this.sku = sku; }
-
-    public String getDescripcion()       { return descripcion; }
-    public void setDescripcion(String d) { this.descripcion = d; }
 }

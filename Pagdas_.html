@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dream Zone</title>
+    <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800;900&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+        html,body{height:100%;font-family:'Barlow',sans-serif;}
+        :root{
+            --bg:#0f1520;--navy:#111827;--panel:#1a2236;
+            --border:#1e2a3a;--accent:#f5a623;--blue:#3b82f6;
+            --text:#fff;--muted:#8492a6;--price:#3b82f6;
+        }
+        .screen{display:none;}
+        .screen.active{display:flex;flex-direction:column;min-height:100vh;}
+        .auth-screen{display:none;}
+        .auth-screen.active{display:grid;grid-template-columns:1fr 1fr;min-height:100vh;}
+
+        /* NAVBAR */
+        .navbar{background:var(--navy);display:flex;align-items:center;padding:0 28px;height:54px;flex-shrink:0;}
+        .brand{font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:900;color:#fff;letter-spacing:1px;text-transform:uppercase;cursor:pointer;white-space:nowrap;margin-right:32px;}
+        .brand span{color:var(--accent);}
+        .nav-links{display:flex;gap:2px;flex:1;}
+        .nav-link{background:none;border:none;font-family:'Barlow',sans-serif;font-size:14px;font-weight:500;color:#c0c8d8;padding:6px 16px;cursor:pointer;transition:color .15s;border-bottom:2px solid transparent;}
+        .nav-link:hover{color:#fff;}
+        .nav-link.active{color:var(--accent);border-bottom-color:var(--accent);font-weight:600;}
+        .nav-icons{display:flex;gap:10px;}
+        .nav-icon{background:none;border:none;color:#c0c8d8;font-size:18px;cursor:pointer;padding:4px;transition:color .15s;position:relative;display:flex;align-items:center;}
+        .nav-icon:hover{color:#fff;}
+        .cart-badge{position:absolute;top:-4px;right:-4px;background:var(--accent);color:#000;font-size:9px;font-weight:800;width:15px;height:15px;border-radius:50%;display:flex;align-items:center;justify-content:center;}
+
+        /* SEARCH */
+        .search-bar{background:var(--bg);border-bottom:1px solid var(--border);padding:10px 28px;display:none;}
+        .search-bar.open{display:block;}
+        .search-inner{display:flex;align-items:center;gap:8px;background:var(--panel);border:1.5px solid var(--accent);border-radius:6px;padding:0 14px;max-width:540px;}
+        .search-inner input{flex:1;background:none;border:none;outline:none;color:#fff;font-size:14px;padding:10px 0;font-family:'Barlow',sans-serif;}
+        .search-inner input::placeholder{color:var(--muted);}
+        .search-inner button{background:none;border:none;color:var(--muted);font-size:16px;cursor:pointer;}
+        .search-inner button:hover{color:#fff;}
+
+        /* MAIN */
+        .main{flex:1;background:var(--bg);padding:20px 28px 36px;}
+        .section-title{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:#fff;margin-bottom:12px;}
+
+        /* CAROUSEL */
+        .carousel-outer{position:relative;margin-bottom:28px;}
+        .carousel-track{display:flex;gap:14px;overflow:hidden;}
+        .c-arrow{position:absolute;top:50%;transform:translateY(-50%);background:rgba(17,24,39,.8);border:1px solid var(--border);color:#fff;font-size:22px;font-weight:700;width:32px;height:32px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:2;transition:background .15s;}
+        .c-arrow:hover{background:var(--border);}
+        .c-arrow.prev{left:-16px;}
+        .c-arrow.next{right:-16px;}
+
+        /* PRODUCT CARD */
+        .p-card{background:#fff;border:1px solid #d0d4de;border-radius:6px;overflow:hidden;cursor:pointer;transition:box-shadow .2s,transform .2s;flex-shrink:0;}
+        .carousel-track .p-card{min-width:calc(20% - 12px);}
+        .p-card:hover{box-shadow:0 4px 20px rgba(0,0,0,.3);transform:translateY(-2px);}
+        .p-img-wrap{background:#c8cad4;aspect-ratio:1;display:flex;align-items:center;justify-content:center;position:relative;}
+        .p-placeholder{width:48%;height:48%;opacity:.45;}
+        .p-badge{position:absolute;top:6px;left:6px;background:#e53935;color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:800;letter-spacing:1px;padding:2px 6px;border-radius:2px;}
+        .p-info{padding:8px 10px 10px;}
+        .p-name{font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;color:#111;margin-bottom:1px;}
+        .p-cat{font-size:10px;color:#888;margin-bottom:6px;}
+        .p-bottom{display:flex;align-items:center;justify-content:space-between;}
+        .p-price{font-size:13px;font-weight:700;color:var(--price);}
+        .p-cart-btn{background:none;border:none;cursor:pointer;color:var(--price);font-size:16px;transition:transform .15s;padding:2px;display:flex;align-items:center;}
+        .p-cart-btn:hover{transform:scale(1.2);}
+
+        /* GRID */
+        .grid-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+        .ver-todo-btn{background:none;border:none;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:2px;color:var(--accent);cursor:pointer;text-transform:uppercase;}
+        .ver-todo-btn:hover{text-decoration:underline;}
+        .products-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;}
+        .products-grid .p-card{min-width:0;}
+        .empty{grid-column:1/-1;text-align:center;padding:50px;color:var(--muted);font-size:14px;}
+
+        /* FOOTER */
+        .footer{background:var(--navy);display:flex;align-items:center;justify-content:space-between;padding:12px 28px;flex-shrink:0;}
+        .footer .brand{font-size:18px;cursor:default;}
+        .footer-copy{font-size:11px;color:var(--muted);}
+        .footer-icons{display:flex;gap:10px;align-items:center;}
+
+        /* AUTH */
+        .auth-left{background:var(--navy);display:flex;flex-direction:column;justify-content:center;padding:60px 50px;position:relative;overflow:hidden;}
+        .auth-left::after{content:'';position:absolute;bottom:-60px;left:-60px;width:300px;height:300px;border-radius:50%;background:radial-gradient(circle,rgba(245,166,35,.07) 0%,transparent 70%);pointer-events:none;}
+        .auth-brand{font-family:'Barlow Condensed',sans-serif;font-size:80px;font-weight:900;line-height:.88;text-transform:uppercase;color:#fff;}
+        .auth-brand span{color:var(--accent);display:block;}
+        .auth-left-copy{position:absolute;bottom:18px;left:50px;font-size:11px;color:var(--muted);letter-spacing:1px;}
+        .auth-right{background:#fff;display:flex;flex-direction:column;justify-content:center;padding:54px 50px;}
+        .auth-title{font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:800;letter-spacing:3px;text-transform:uppercase;color:var(--accent);text-align:center;margin-bottom:26px;}
+        .f-group{margin-bottom:14px;}
+        .f-label{font-size:12px;color:#555;margin-bottom:5px;display:block;}
+        .f-input{width:100%;padding:10px 12px;background:#eff1f5;border:1.5px solid #d2d6e0;border-radius:5px;outline:none;font-family:'Barlow',sans-serif;font-size:13px;color:#111;transition:border .15s;}
+        .f-input:focus{border-color:var(--blue);background:#fff;}
+        .f-input.err{border-color:#e53935;}
+        .f-err{font-size:11px;color:#e53935;margin-top:3px;display:none;}
+        .f-err.show{display:block;}
+        .forgot-row{text-align:right;margin-top:4px;}
+        .lnk{background:none;border:none;font-size:11px;color:var(--blue);cursor:pointer;font-family:'Barlow',sans-serif;}
+        .lnk:hover{text-decoration:underline;}
+        .big-btn{width:100%;padding:12px;margin-top:6px;background:var(--blue);border:none;border-radius:5px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;letter-spacing:3px;cursor:pointer;transition:background .15s;}
+        .big-btn:hover{background:#2563eb;}
+        .big-btn.orange{background:var(--accent);color:#000;}
+        .big-btn.orange:hover{background:#d9911a;}
+        .divider{display:flex;align-items:center;gap:10px;margin:16px 0;}
+        .divider::before,.divider::after{content:'';flex:1;height:1px;background:#d2d6e0;}
+        .divider span{font-size:11px;color:#aaa;}
+        .social-row{display:flex;gap:10px;}
+        .social-btn{flex:1;padding:9px;background:#f0f2f6;border:1.5px solid #d2d6e0;border-radius:5px;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:1px;color:#444;cursor:pointer;transition:background .15s;}
+        .social-btn:hover{background:#e2e5ec;}
+        .auth-foot{text-align:center;margin-top:14px;font-size:12px;color:#777;}
+        .auth-foot .lnk{font-size:12px;font-weight:600;}
+        .sbox{background:#ecfdf5;border:1px solid #6ee7b7;border-radius:5px;padding:9px 12px;font-size:12px;color:#065f46;text-align:center;margin-bottom:12px;display:none;}
+        .sbox.show{display:block;}
+
+        /* TOAST */
+        .toast{position:fixed;bottom:24px;right:24px;background:var(--navy);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:7px;padding:11px 16px;font-size:13px;color:#fff;z-index:9999;transform:translateX(140%);transition:transform .3s ease;max-width:280px;}
+        .toast.show{transform:translateX(0);}
+        .toast.red{border-left-color:#e53935;}
+        .toast.green{border-left-color:#22c55e;}
+    </style>
+</head>
+<body>
+
+<!-- HOME -->
+<div id="home" class="screen active">
+    <nav class="navbar">
+        <div class="brand" onclick="goHome()">DREAM <span>ZONE</span></div>
+        <div class="nav-links" id="navLinks"></div>
+        <div class="nav-icons">
+            <button class="nav-icon" onclick="toggleSearch()">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            </button>
+            <button class="nav-icon" onclick="handleCart()">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+                <div class="cart-badge" id="cartBadge">0</div>
+            </button>
+            <button class="nav-icon" onclick="handleProfile()">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            </button>
+        </div>
+    </nav>
+
+    <div class="search-bar" id="searchBar">
+        <div class="search-inner">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#f5a623" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input id="searchInput" type="text" placeholder="Buscar productos…" oninput="doSearch()" onkeydown="if(event.key==='Escape')toggleSearch()">
+            <button onclick="toggleSearch()">✕</button>
+        </div>
+    </div>
+
+    <main class="main">
+        <div id="featuredSection">
+            <div class="section-title">Destacado</div>
+            <div class="carousel-outer">
+                <button class="c-arrow prev" onclick="slide(-1)">‹</button>
+                <div class="carousel-track" id="carousel"></div>
+                <button class="c-arrow next" onclick="slide(1)">›</button>
+            </div>
+        </div>
+        <div class="grid-header">
+            <div class="section-title" id="gridLabel" style="margin-bottom:0">Todos los productos</div>
+            <button class="ver-todo-btn" onclick="setCategory('Todos')">VER TODO →</button>
+        </div>
+        <div class="products-grid" id="grid"></div>
+    </main>
+
+    <footer class="footer">
+        <div class="brand">DREAM <span>ZONE</span></div>
+        <div class="footer-copy">© 2026 Dream Zone · Todos los derechos reservados</div>
+        <div class="footer-icons">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="#25d366"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"/></svg>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#e1306c" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r=".5" fill="#e1306c"/></svg>
+        </div>
+    </footer>
+</div>
+
+<!-- LOGIN -->
+<div id="login" class="auth-screen">
+    <div class="auth-left">
+        <div class="auth-brand">DREAM<span>ZONE</span></div>
+        <div class="auth-left-copy">© DREAM ZONE 2026</div>
+    </div>
+    <div class="auth-right">
+        <div class="auth-title">Inicio de Sesión</div>
+        <div class="sbox" id="loginOk">¡Sesión iniciada correctamente!</div>
+        <div class="f-group">
+            <label class="f-label">Correo electrónico</label>
+            <input id="lEmail" class="f-input" type="email" placeholder="correo@ejemplo.com">
+            <div class="f-err" id="eLE">Ingresa un correo válido.</div>
+        </div>
+        <div class="f-group">
+            <label class="f-label">Contraseña</label>
+            <input id="lPass" class="f-input" type="password" placeholder="••••••••">
+            <div class="f-err" id="eLP">Ingresa tu contraseña.</div>
+            <div class="forgot-row"><button class="lnk" onclick="show('forgot')">¿Olvidaste tu contraseña?</button></div>
+        </div>
+        <button class="big-btn" onclick="doLogin()">INGRESAR</button>
+        <div class="divider"><span>o</span></div>
+        <div class="social-row">
+            <button class="social-btn" onclick="socialLogin('Google')">🌐 &nbsp;GOOGLE</button>
+            <button class="social-btn" onclick="socialLogin('Facebook')">📘 &nbsp;FACEBOOK</button>
+        </div>
+        <div class="auth-foot">¿Sin cuenta? <button class="lnk" onclick="show('register')">Regístrate gratis aquí</button></div>
+        <div class="auth-foot" style="margin-top:6px;"><button class="lnk" onclick="goHome()">← Volver al inicio</button></div>
+    </div>
+</div>
+
+<!-- REGISTER -->
+<div id="register" class="auth-screen">
+    <div class="auth-left">
+        <div class="auth-brand">DREAM<span>ZONE</span></div>
+        <div class="auth-left-copy">© DREAM ZONE 2026</div>
+    </div>
+    <div class="auth-right">
+        <div class="auth-title">Crear Cuenta</div>
+        <div class="sbox" id="regOk">¡Cuenta creada! Ahora puedes iniciar sesión.</div>
+        <div class="f-group">
+            <label class="f-label">Nombre completo</label>
+            <input id="rName" class="f-input" type="text" placeholder="Tu nombre completo">
+            <div class="f-err" id="eRN">Ingresa tu nombre.</div>
+        </div>
+        <div class="f-group">
+            <label class="f-label">Correo electrónico</label>
+            <input id="rEmail" class="f-input" type="email" placeholder="correo@ejemplo.com">
+            <div class="f-err" id="eRE">Ingresa un correo válido.</div>
+        </div>
+        <div class="f-group">
+            <label class="f-label">Contraseña</label>
+            <input id="rPass" class="f-input" type="password" placeholder="Mínimo 6 caracteres">
+            <div class="f-err" id="eRP">Mínimo 6 caracteres.</div>
+        </div>
+        <div class="f-group">
+            <label class="f-label">Confirmar contraseña</label>
+            <input id="rPass2" class="f-input" type="password" placeholder="Repite la contraseña">
+            <div class="f-err" id="eRP2">Las contraseñas no coinciden.</div>
+        </div>
+        <button class="big-btn orange" onclick="doRegister()">REGISTRARME</button>
+        <div class="auth-foot">¿Ya tienes cuenta? <button class="lnk" onclick="show('login')">Inicia sesión</button></div>
+        <div class="auth-foot" style="margin-top:6px;"><button class="lnk" onclick="goHome()">← Volver al inicio</button></div>
+    </div>
+</div>
+
+<!-- FORGOT -->
+<div id="forgot" class="auth-screen">
+    <div class="auth-left">
+        <div class="auth-brand">DREAM<span>ZONE</span></div>
+        <div class="auth-left-copy">© DREAM ZONE 2026</div>
+    </div>
+    <div class="auth-right">
+        <div class="auth-title">Recuperar Contraseña</div>
+        <p style="font-size:13px;color:#666;text-align:center;margin-bottom:22px;line-height:1.6;">Ingresa tu correo registrado y te enviaremos un enlace para restablecer tu contraseña.</p>
+        <div class="sbox" id="forgotOk">¡Enlace enviado! Revisa tu bandeja de entrada.</div>
+        <div class="f-group">
+            <label class="f-label">Correo electrónico</label>
+            <input id="fEmail" class="f-input" type="email" placeholder="correo@ejemplo.com">
+            <div class="f-err" id="eFE">Ingresa un correo válido.</div>
+        </div>
+        <button class="big-btn" onclick="doForgot()">ENVIAR ENLACE</button>
+        <div class="auth-foot" style="margin-top:16px;"><button class="lnk" onclick="show('login')">← Volver al inicio de sesión</button></div>
+    </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+    const CATS=['Todos','Camisas','Sacos','Accesorios','Otros'];
+    const PRODS=[
+        {id:1,name:'Taza .',sub:'Taza',cat:'Otros',price:'$25.000',badge:'NEW'},
+        {id:2,name:'Camiseta',sub:'Camisa',cat:'Camisas',price:'$25.000',badge:'NEW'},
+        {id:3,name:'Billetera',sub:'Accesorio',cat:'Accesorios',price:'$25.000',badge:'NEW'},
+        {id:4,name:'Figura',sub:'Figura',cat:'Otros',price:'$25.000',badge:'NEW'},
+        {id:5,name:'Gorra',sub:'Accesorio',cat:'Accesorios',price:'$25.000',badge:'NEW'},
+        {id:6,name:'Taza .',sub:'Taza',cat:'Otros',price:'$25.000',badge:null},
+        {id:7,name:'Saco .',sub:'Saco',cat:'Sacos',price:'$25.000',badge:null},
+        {id:8,name:'Pin',sub:'Accesorio',cat:'Accesorios',price:'$25.000',badge:null},
+        {id:9,name:'Figura .',sub:'Figura',cat:'Otros',price:'$25.000',badge:null},
+        {id:10,name:'Aretes',sub:'Accesorio',cat:'Accesorios',price:'$25.000',badge:null},
+        {id:11,name:'Camisa',sub:'Camisa',cat:'Camisas',price:'$25.000',badge:null},
+        {id:12,name:'Saco largo',sub:'Saco',cat:'Sacos',price:'$25.000',badge:null},
+        {id:13,name:'Collar',sub:'Accesorio',cat:'Accesorios',price:'$25.000',badge:null},
+        {id:14,name:'Figura 2',sub:'Figura',cat:'Otros',price:'$25.000',badge:null},
+        {id:15,name:'Camisa 2',sub:'Camisa',cat:'Camisas',price:'$25.000',badge:null},
+    ];
+
+    const IMG_SVG=`<svg viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="1.3" width="42%" height="42%"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>`;
+
+    let activeCat='Todos', cartCount=0, loggedIn=false, activeUser=null;
+
+    function cardHTML(p){
+        return`<div class="p-card" onclick="addCart(${p.id})">
+    <div class="p-img-wrap">${IMG_SVG}${p.badge?`<div class="p-badge">${p.badge}</div>`:''}</div>
+    <div class="p-info">
+      <div class="p-name">${p.name}</div>
+      <div class="p-cat">${p.sub}</div>
+      <div class="p-bottom">
+        <div class="p-price">${p.price}</div>
+        <button class="p-cart-btn" onclick="event.stopPropagation();addCart(${p.id})"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg></button>
+      </div>
+    </div>
+  </div>`;
+    }
+
+    function renderGrid(list,q=''){
+        const g=document.getElementById('grid');
+        if(!list.length){g.innerHTML=`<div class="empty">Sin resultados${q?' para "'+q+'"':''}.</div>`;return;}
+        g.innerHTML=list.map(p=>cardHTML(p)).join('');
+    }
+
+    // Init
+    (function(){
+        const nl=document.getElementById('navLinks');
+        nl.innerHTML=CATS.map(c=>`<button class="nav-link ${c==='Todos'?'active':''}" data-cat="${c}" onclick="setCategory('${c}')">${c}</button>`).join('');
+        document.getElementById('carousel').innerHTML=PRODS.filter(p=>p.badge).map(p=>{
+            const clone=Object.assign({},p);
+            const el=document.createElement('div');
+            el.style.cssText='min-width:calc(20% - 12px);flex-shrink:0;';
+            el.innerHTML=cardHTML(clone);
+            return el.outerHTML;
+        }).join('');
+        // Fix carousel card widths
+        document.querySelectorAll('#carousel .p-card').forEach(c=>c.style.cssText='min-width:0;width:100%;');
+        renderGrid(PRODS);
+    })();
+
+    function setCategory(cat){
+        activeCat=cat;
+        document.querySelectorAll('.nav-link').forEach(b=>b.classList.toggle('active',b.dataset.cat===cat));
+        document.getElementById('featuredSection').style.display=cat==='Todos'?'':'none';
+        document.getElementById('gridLabel').textContent=cat==='Todos'?'Todos los productos':cat;
+        renderGrid(cat==='Todos'?PRODS:PRODS.filter(p=>p.cat===cat));
+        document.getElementById('searchBar').classList.remove('open');
+        document.getElementById('searchInput').value='';
+    }
+
+    function toggleSearch(){
+        const b=document.getElementById('searchBar');
+        const o=b.classList.toggle('open');
+        if(o)setTimeout(()=>document.getElementById('searchInput').focus(),40);
+        else{document.getElementById('searchInput').value='';setCategory(activeCat);}
+    }
+    function doSearch(){
+        const q=document.getElementById('searchInput').value.trim().toLowerCase();
+        document.getElementById('featuredSection').style.display=q?'none':'';
+        document.getElementById('gridLabel').textContent=q?`Resultados para "${q}"`:activeCat==='Todos'?'Todos los productos':activeCat;
+        renderGrid(PRODS.filter(p=>p.name.toLowerCase().includes(q)||p.cat.toLowerCase().includes(q)||p.sub.toLowerCase().includes(q)),q);
+    }
+
+    function slide(dir){
+        const t=document.getElementById('carousel');
+        t.scrollLeft+=dir*((t.children[0]?.offsetWidth||0)+14);
+    }
+
+    function handleCart(){
+        if(!loggedIn){toast('Debes iniciar sesión para ver el carrito.','red');setTimeout(()=>show('login'),700);}
+        else toast(`Tienes ${cartCount} producto(s) en el carrito. 🛒`);
+    }
+    function handleProfile(){
+        if(!loggedIn){toast('Inicia sesión para acceder a tu perfil.','red');setTimeout(()=>show('login'),700);}
+        else toast(`Hola, ${activeUser}! 👋`);
+    }
+    function addCart(id){
+        if(!loggedIn){toast('Inicia sesión para agregar al carrito.','red');setTimeout(()=>show('login'),700);return;}
+        cartCount++;document.getElementById('cartBadge').textContent=cartCount;
+        toast(`"${PRODS.find(x=>x.id===id).name}" agregado ✓`,'green');
+    }
+
+    function doLogin(){
+        const e=document.getElementById('lEmail'),p=document.getElementById('lPass');
+        clrErr(['eLE','eLP']);e.classList.remove('err');p.classList.remove('err');
+        let ok=true;
+        if(!e.value||!isEmail(e.value)){shErr('eLE');e.classList.add('err');ok=false;}
+        if(!p.value){shErr('eLP');p.classList.add('err');ok=false;}
+        if(!ok)return;
+        document.getElementById('loginOk').classList.add('show');
+        loggedIn=true;activeUser=e.value.split('@')[0];
+        setTimeout(()=>{document.getElementById('loginOk').classList.remove('show');goHome();toast(`¡Bienvenido, ${activeUser}! 🎉`,'green');},1200);
+    }
+    function doRegister(){
+        const n=document.getElementById('rName'),e=document.getElementById('rEmail'),
+            p=document.getElementById('rPass'),p2=document.getElementById('rPass2');
+        clrErr(['eRN','eRE','eRP','eRP2']);[n,e,p,p2].forEach(x=>x.classList.remove('err'));
+        let ok=true;
+        if(!n.value){shErr('eRN');n.classList.add('err');ok=false;}
+        if(!e.value||!isEmail(e.value)){shErr('eRE');e.classList.add('err');ok=false;}
+        if(!p.value||p.value.length<6){shErr('eRP');p.classList.add('err');ok=false;}
+        if(p.value!==p2.value){shErr('eRP2');p2.classList.add('err');ok=false;}
+        if(!ok)return;
+        document.getElementById('regOk').classList.add('show');
+        setTimeout(()=>{document.getElementById('regOk').classList.remove('show');show('login');toast('¡Cuenta creada! Ahora inicia sesión.','green');},1400);
+    }
+    function doForgot(){
+        const e=document.getElementById('fEmail');
+        clrErr(['eFE']);e.classList.remove('err');
+        if(!e.value||!isEmail(e.value)){shErr('eFE');e.classList.add('err');return;}
+        document.getElementById('forgotOk').classList.add('show');
+        setTimeout(()=>{document.getElementById('forgotOk').classList.remove('show');show('login');toast('Enlace enviado a '+e.value,'green');},1600);
+    }
+    function socialLogin(prov){
+        loggedIn=true;activeUser=prov+' User';
+        goHome();toast(`Sesión iniciada con ${prov} ✅`,'green');
+    }
+
+    function show(id){
+        document.querySelectorAll('.screen,.auth-screen').forEach(s=>s.classList.remove('active'));
+        document.getElementById(id).classList.add('active');window.scrollTo(0,0);
+    }
+    function goHome(){show('home');}
+    function isEmail(v){return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);}
+    function shErr(id){document.getElementById(id).classList.add('show');}
+    function clrErr(ids){ids.forEach(id=>document.getElementById(id).classList.remove('show'));}
+    let tt;
+    function toast(msg,type=''){
+        const t=document.getElementById('toast');
+        t.textContent=msg;t.className='toast show'+(type?' '+type:'');
+        clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('show'),3000);
+    }
+</script>
+</body>
+</html>
