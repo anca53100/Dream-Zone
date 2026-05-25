@@ -4,25 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="796707c2-83dd-4d95-8574-35bd03ad96fc" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/dreamzone/controller/AuthController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/dreamzone/controller/AuthController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/dreamzone/controller/CarritoController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/dreamzone/controller/CarritoController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/dreamzone/controller/HomeController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/dreamzone/controller/HomeController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/dreamzone/controller/TiendaController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/dreamzone/controller/TiendaController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/dreamzone/repository/CarritoRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/dreamzone/repository/CarritoRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/dreamzone/service/CarritoService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/dreamzone/service/CarritoService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/templates/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/templates/index.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/templates/producto-detalle.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/templates/producto-detalle.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/templates/tienda.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/templates/tienda.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/dreamzone/controller/AuthController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/example/dreamzone/controller/AuthController.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/dreamzone/controller/CarritoController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/example/dreamzone/controller/CarritoController.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/dreamzone/controller/HomeController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/example/dreamzone/controller/HomeController.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/dreamzone/controller/TiendaController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/example/dreamzone/controller/TiendaController.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/templates/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/templates/index.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/templates/producto-detalle.html" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/templates/producto-detalle.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/templates/tienda.html" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/templates/tienda.html" afterDir="false" />
-    </list>
+    <list default="true" id="796707c2-83dd-4d95-8574-35bd03ad96fc" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
