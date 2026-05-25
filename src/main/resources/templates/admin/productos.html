@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin — Productos | Dream Zone</title>
+    <link rel="stylesheet" th:href="@{/css/admin.css}">
+</head>
+<body>
+
+<!-- Modal confirmar eliminar -->
+<div class="modal-overlay" id="modalEliminar">
+    <div class="modal-box">
+        <div class="modal-icon">🗑️</div>
+        <h3>Eliminar producto</h3>
+        <p>¿Estás segura de que quieres eliminar <strong id="modalNombre"></strong>?<br>Esta acción no se puede deshacer.</p>
+        <div class="modal-actions">
+            <button class="btn btn-ghost" onclick="cerrarModal()">Cancelar</button>
+            <a id="modalConfirmar" href="#" class="btn btn-danger">Sí, eliminar</a>
+        </div>
+    </div>
+</div>
+
+<div class="admin-layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="sidebar-logo">
+            <div class="logo-text">DZ<em>Admin</em></div>
+            <small>Panel de control</small>
+        </div>
+        <nav class="sidebar-menu">
+            <div class="menu-label">Catálogo</div>
+            <a th:href="@{/admin/productos}" class="menu-item active">
+                <span class="icon">◫</span> Productos
+            </a>
+        </nav>
+        <div class="sidebar-footer">
+            <a href="/"><span>↩</span> Cerrar sesión</a>
+        </div>
+    </aside>
+
+    <!-- MAIN -->
+    <div class="main-content">
+
+        <!-- Topbar ámbar -->
+        <header class="topbar">
+            <div class="topbar-left">
+                <h1>Productos</h1>
+            </div>
+            <div class="topbar-right">
+                <form th:action="@{/admin/productos}" method="get" style="display:flex">
+                    <div class="search-box">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="2">
+                            <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+                        </svg>
+                        <input type="text" name="buscar" placeholder="Buscar producto..." th:value="${buscar}">
+                    </div>
+                </form>
+                <a th:href="@{/admin/productos/nuevo}" class="btn btn-primary">+ Agregar Producto</a>
+            </div>
+        </header>
+
+        <main class="content">
+
+            <div th:if="${mensaje}" class="alert alert-success">✓ <span th:text="${mensaje}"></span></div>
+            <div th:if="${error}"   class="alert alert-error">✕ <span th:text="${error}"></span></div>
+
+            <!-- Tarjetas estadísticas -->
+            <div class="stat-grid">
+                <div class="stat-card total">
+                    <div class="stat-label">Total</div>
+                    <div class="stat-value" th:text="${totalProductos}">0</div>
+                    <div class="stat-delta">productos en catálogo</div>
+                </div>
+                <div class="stat-card bajo">
+                    <div class="stat-label">Stock bajo</div>
+                    <div class="stat-value" th:text="${stockBajo}">0</div>
+                    <div class="stat-delta">requieren atención</div>
+                </div>
+                <div class="stat-card sin">
+                    <div class="stat-label">Sin stock</div>
+                    <div class="stat-value" th:text="${sinStock}">0</div>
+                    <div class="stat-delta">agotados</div>
+                </div>
+                <div class="stat-card activo">
+                    <div class="stat-label">Activos</div>
+                    <div class="stat-value" th:text="${activos}">0</div>
+                    <div class="stat-delta">disponibles</div>
+                </div>
+            </div>
+
+            <!-- Tabla -->
+            <div class="panel">
+                <div class="panel-header">
+                    <h2>Catálogo de productos</h2>
+                    <span class="count" th:text="${productos.size()} + ' productos'"></span>
+                </div>
+                <table>
+                    <thead>
+                    <tr>
+                        <th>Producto</th>
+                        <th>Categoría</th>
+                        <th>Precio</th>
+                        <th>Stock</th>
+                        <th>Acciones</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:if="${productos.isEmpty()}">
+                        <td colspan="5" style="text-align:center;padding:36px;color:#3A5470;">
+                            No se encontraron productos.
+                        </td>
+                    </tr>
+                    <tr th:each="p : ${productos}">
+                        <td>
+                            <span class="td-name" th:text="${p.nombre}">Nombre</span>
+                            <span class="td-sku"  th:text="${p.sku}">SKU</span>
+                        </td>
+                        <td th:text="${p.categoria}">Categoría</td>
+                        <td>
+                            <span class="td-price" th:text="'$' + ${#numbers.formatInteger(p.precio, 1, 'COMMA')}"></span>
+                        </td>
+                        <td>
+                            <span th:if="${p.estadoStock == 'En stock'}"   class="badge badge-ok"  th:text="${p.estadoStock}"></span>
+                            <span th:if="${p.estadoStock == 'Stock bajo'}" class="badge badge-low" th:text="${p.estadoStock}"></span>
+                            <span th:if="${p.estadoStock == 'Sin stock'}"  class="badge badge-out" th:text="${p.estadoStock}"></span>
+                        </td>
+                        <td>
+                            <div class="action-btns">
+                                <a th:href="@{/admin/productos/editar/{id}(id=${p.id})}"
+                                   class="action-btn edit" title="Editar">✏</a>
+                                <a th:href="@{/admin/productos/ver/{id}(id=${p.id})}"
+                                   class="action-btn" title="Ver detalle" style="font-size:14px">👁</a>
+                                <button class="action-btn delete" title="Eliminar"
+                                        th:data-id="${p.id}"
+                                        th:data-nombre="${p.nombre}"
+                                        onclick="abrirModal(this.dataset.id, this.dataset.nombre)">✕</button>
+                            </div>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </main>
+    </div>
+</div>
+
+<script>
+    const baseUrl = /*[[@{/admin/productos/eliminar/}]]*/ '/admin/productos/eliminar/';
+    function abrirModal(id, nombre) {
+        document.getElementById('modalNombre').textContent = nombre;
+        document.getElementById('modalConfirmar').href = baseUrl + id;
+        document.getElementById('modalEliminar').classList.add('show');
+    }
+    function cerrarModal() {
+        document.getElementById('modalEliminar').classList.remove('show');
+    }
+    document.getElementById('modalEliminar').addEventListener('click', function(e) {
+        if (e.target === this) cerrarModal();
+    });
+</script>
+</body>
+</html>
