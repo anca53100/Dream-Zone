@@ -4,24 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="796707c2-83dd-4d95-8574-35bd03ad96fc" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/dreamzone/config/WebConfig.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/dreamzone/DreamZoneApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/dreamzone/DreamZoneApplication.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/dreamzone/controller/admin/AdminController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/dreamzone/controller/admin/AdminController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/dreamzone/model/Producto.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/dreamzone/model/Producto.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/templates/admin/formulario-producto.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/templates/admin/formulario-producto.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/templates/admin/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/templates/admin/index.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/templates/admin/productos.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/templates/admin/productos.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/templates/admin/ver-producto.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/templates/admin/ver-producto.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/templates/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/templates/index.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/dreamzone/DreamZoneApplication.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/example/dreamzone/DreamZoneApplication.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/dreamzone/model/Producto.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/example/dreamzone/model/Producto.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/templates/admin/formulario-producto.html" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/templates/admin/formulario-producto.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/templates/admin/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/templates/admin/index.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/templates/admin/productos.html" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/templates/admin/productos.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/templates/admin/ver-producto.html" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/templates/admin/ver-producto.html" afterDir="false" />
-    </list>
+    <list default="true" id="796707c2-83dd-4d95-8574-35bd03ad96fc" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
