@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Carrito – Dream Zone</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="styles.css"/>
+</head>
+<body>
+
+  <%- include('partials/header') %>
+
+  <main>
+    <h1>MI CARRITO</h1>
+
+    <div class="cart-layout">
+
+      <div class="cart-items" id="cartItems">
+
+        <div class="cart-item" data-id="1" data-price="50000">
+          <input type="checkbox" checked onchange="recalc()">
+          <div class="item-thumb">
+            <svg width="36" height="36" fill="none" stroke="#888" stroke-width="1.5" viewBox="0 0 24 24">
+              <rect x="3" y="3" width="18" height="18" rx="2"/>
+              <path d="M3 9l4-4 4 4 4-4 4 4"/>
+              <circle cx="8.5" cy="13.5" r="1.5"/>
+            </svg>
+          </div>
+          <div class="item-info">
+            <span class="item-name">Producto #1</span>
+            <span class="item-desc">descripcion</span>
+            <div class="item-controls">
+              <button class="qty-btn" onclick="changeQty(this, -1)">−</button>
+              <span class="qty-val">1</span>
+              <button class="qty-btn" onclick="changeQty(this, 1)">+</button>
+              <button class="btn-remove" onclick="removeItem(this)">Eliminar</button>
+            </div>
+          </div>
+          <span class="item-price">$50.000</span>
+        </div>
+
+        <div class="cart-item" data-id="2" data-price="70000">
+          <input type="checkbox" onchange="recalc()">
+          <div class="item-thumb">
+            <svg width="36" height="36" fill="none" stroke="#888" stroke-width="1.5" viewBox="0 0 24 24">
+              <rect x="3" y="3" width="18" height="18" rx="2"/>
+              <path d="M3 9l4-4 4 4 4-4 4 4"/>
+              <circle cx="8.5" cy="13.5" r="1.5"/>
+            </svg>
+          </div>
+          <div class="item-info">
+            <span class="item-name">Producto #2</span>
+            <span class="item-desc">descripcion</span>
+            <div class="item-controls">
+              <button class="qty-btn" onclick="changeQty(this, -1)">−</button>
+              <span class="qty-val">1</span>
+              <button class="qty-btn" onclick="changeQty(this, 1)">+</button>
+              <button class="btn-remove" onclick="removeItem(this)">Eliminar</button>
+            </div>
+          </div>
+          <span class="item-price">$70.000</span>
+        </div>
+
+        <div class="cart-item" data-id="3" data-price="100000">
+          <input type="checkbox" checked onchange="recalc()">
+          <div class="item-thumb">
+            <svg width="36" height="36" fill="none" stroke="#888" stroke-width="1.5" viewBox="0 0 24 24">
+              <rect x="3" y="3" width="18" height="18" rx="2"/>
+              <path d="M3 9l4-4 4 4 4-4 4 4"/>
+              <circle cx="8.5" cy="13.5" r="1.5"/>
+            </svg>
+          </div>
+          <div class="item-info">
+            <span class="item-name">Producto #3</span>
+            <span class="item-desc">descripcion</span>
+            <div class="item-controls">
+              <button class="qty-btn" onclick="changeQty(this, -1)">−</button>
+              <span class="qty-val">2</span>
+              <button class="qty-btn" onclick="changeQty(this, 1)">+</button>
+              <button class="btn-remove" onclick="removeItem(this)">Eliminar</button>
+            </div>
+          </div>
+          <span class="item-price">$200.000</span>
+        </div>
+
+      </div>
+
+      <!-- Resumen -->
+      <aside class="order-summary">
+        <div class="summary-title">RESUMEN DE ORDEN</div>
+        <div class="summary-row">
+          <span class="label">Subtotal (<span id="itemCount">2</span> Items)</span>
+          <span class="val" id="subtotalVal">$150.000</span>
+        </div>
+        <div class="summary-row">
+          <span class="label">Envío estimado</span>
+          <span class="free">GRATIS</span>
+        </div>
+        <div class="summary-row">
+          <span class="label">Descuento</span>
+          <span class="dash">—</span>
+        </div>
+        <hr class="summary-divider">
+        <div class="summary-total">
+          <span class="total-label">TOTAL</span>
+          <span class="total-amount" id="totalVal">$150.000</span>
+        </div>
+        <button class="btn-checkout">FINALIZAR COMPRA</button>
+      </aside>
+
+    </div>
+  </main>
+
+
+  <%- include('partials/footer') %>
+
+  <script src="components.js"></script>
+  <script src="carrito.js"></script>
+
+</body>
+</html>
