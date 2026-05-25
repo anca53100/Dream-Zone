@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>DreamZone — Tu universo geek y anime</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;500;600;700&family=Noto+Sans+JP:wght@300;400;700&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --neon-blue: #00d4ff;
+      --neon-purple: #7c3aed;
+      --neon-pink: #f0abfc;
+      --dark-bg: #030712;
+      --dark-card: #0d1117;
+      --dark-surface: #111827;
+      --dark-border: #1f2937;
+      --text-primary: #f9fafb;
+      --text-secondary: #9ca3af;
+      --accent-glow: rgba(0, 212, 255, 0.15);
+      --purple-glow: rgba(124, 58, 237, 0.2);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Rajdhani', sans-serif;
+      background: var(--dark-bg);
+      color: var(--text-primary);
+      overflow-x: hidden;
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--dark-bg); }
+    ::-webkit-scrollbar-thumb { background: var(--neon-purple); border-radius: 3px; }
+
+    /* ─── SIDEBAR ─── */
+    .sidebar {
+      position: fixed; left: 0; top: 0; bottom: 0;
+      width: 220px; background: var(--dark-card);
+      border-right: 1px solid var(--dark-border);
+      display: flex; flex-direction: column;
+      z-index: 100; padding: 24px 0;
+    }
+
+    .logo {
+      padding: 0 20px 24px;
+      border-bottom: 1px solid var(--dark-border);
+    }
+    .logo-text {
+      font-family: 'Orbitron', monospace;
+      font-size: 22px; font-weight: 900;
+      background: linear-gradient(135deg, var(--neon-blue), var(--neon-purple));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      letter-spacing: 2px;
+    }
+    .logo-sub { font-size: 10px; color: var(--text-secondary); letter-spacing: 1px; margin-top: 2px; }
+
+    .nav-section { padding: 16px 0; }
+    .nav-label {
+      font-size: 10px; letter-spacing: 2px; color: var(--text-secondary);
+      padding: 0 20px 8px; text-transform: uppercase;
+    }
+    .nav-item {
+      display: flex; align-items: center; gap: 12px;
+      padding: 10px 20px; cursor: pointer; transition: all 0.2s;
+      font-size: 15px; font-weight: 500; color: var(--text-secondary);
+      text-decoration: none; position: relative;
+    }
+    .nav-item:hover, .nav-item.active {
+      color: var(--text-primary);
+      background: var(--accent-glow);
+    }
+    .nav-item.active::before {
+      content: ''; position: absolute; left: 0; top: 0; bottom: 0;
+      width: 3px; background: var(--neon-blue);
+      box-shadow: 0 0 8px var(--neon-blue);
+    }
+    .nav-item svg { width: 18px; height: 18px; flex-shrink: 0; }
+
+    .nav-badge {
+      margin-left: auto; background: var(--neon-purple);
+      color: white; font-size: 10px; padding: 2px 6px; border-radius: 10px;
+    }
+
+    .sidebar-bottom {
+      margin-top: auto; border-top: 1px solid var(--dark-border);
+      padding-top: 16px;
+    }
+
+    /* ─── TOPBAR ─── */
+    .topbar {
+      position: fixed; top: 0; left: 220px; right: 0; height: 64px;
+      background: rgba(3, 7, 18, 0.95); backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--dark-border);
+      display: flex; align-items: center; padding: 0 32px; gap: 16px;
+      z-index: 99;
+    }
+
+    .hamburger {
+      display: none; background: none; border: none;
+      color: var(--text-primary); cursor: pointer; padding: 4px;
+    }
+
+    .search-bar {
+      flex: 1; max-width: 480px;
+      display: flex; align-items: center; gap: 10px;
+      background: var(--dark-surface); border: 1px solid var(--dark-border);
+      border-radius: 8px; padding: 8px 16px;
+      transition: border-color 0.2s;
+    }
+    .search-bar:focus-within { border-color: var(--neon-blue); box-shadow: 0 0 0 3px var(--accent-glow); }
+    .search-bar svg { color: var(--text-secondary); width: 16px; height: 16px; flex-shrink: 0; }
+    .search-bar input {
+      background: none; border: none; outline: none;
+      color: var(--text-primary); font-family: 'Rajdhani', sans-serif;
+      font-size: 14px; width: 100%;
+    }
+    .search-bar input::placeholder { color: var(--text-secondary); }
+
+    .topbar-actions { margin-left: auto; display: flex; align-items: center; gap: 8px; }
+    .icon-btn {
+      width: 40px; height: 40px; border-radius: 8px;
+      background: var(--dark-surface); border: 1px solid var(--dark-border);
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: all 0.2s; color: var(--text-secondary);
+      text-decoration: none; position: relative;
+    }
+    .icon-btn:hover { border-color: var(--neon-blue); color: var(--neon-blue); box-shadow: 0 0 8px var(--accent-glow); }
+    .icon-btn svg { width: 18px; height: 18px; }
+    .cart-count {
+      position: absolute; top: -4px; right: -4px;
+      width: 16px; height: 16px; background: var(--neon-purple);
+      border-radius: 50%; font-size: 10px; font-weight: 700;
+      display: flex; align-items: center; justify-content: center; color: white;
+    }
+    .avatar {
+      width: 40px; height: 40px; border-radius: 8px;
+      background: linear-gradient(135deg, var(--neon-purple), var(--neon-blue));
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Orbitron', monospace; font-size: 12px; font-weight: 700;
+      cursor: pointer; border: 1px solid var(--dark-border);
+    }
+
+    /* ─── MAIN CONTENT ─── */
+    .main {
+      margin-left: 220px; margin-top: 64px;
+      padding: 32px; min-height: calc(100vh - 64px);
+    }
+
+    /* ─── HERO ─── */
+    .hero {
+      border-radius: 16px; overflow: hidden;
+      background: var(--dark-card);
+      border: 1px solid var(--dark-border);
+      position: relative; min-height: 360px;
+      display: flex; align-items: center;
+      margin-bottom: 32px;
+    }
+    .hero-bg {
+      position: absolute; inset: 0;
+      background:
+              radial-gradient(ellipse at 70% 50%, rgba(124, 58, 237, 0.3) 0%, transparent 60%),
+              radial-gradient(ellipse at 30% 80%, rgba(0, 212, 255, 0.15) 0%, transparent 50%),
+              linear-gradient(135deg, #050a18 0%, #0a0520 50%, #050a18 100%);
+    }
+    .hero-grid {
+      position: absolute; inset: 0; opacity: 0.07;
+      background-image:
+              linear-gradient(rgba(0,212,255,0.5) 1px, transparent 1px),
+              linear-gradient(90deg, rgba(0,212,255,0.5) 1px, transparent 1px);
+      background-size: 40px 40px;
+    }
+    .hero-particles {
+      position: absolute; inset: 0; overflow: hidden;
+    }
+    .particle {
+      position: absolute; border-radius: 50%;
+      animation: float linear infinite;
+    }
+    @keyframes float {
+      0% { transform: translateY(100%) translateX(0); opacity: 0; }
+      10% { opacity: 1; }
+      90% { opacity: 1; }
+      100% { transform: translateY(-100px) translateX(30px); opacity: 0; }
+    }
+
+    .hero-content { position: relative; z-index: 2; padding: 48px; max-width: 55%; }
+    .hero-eyebrow {
+      font-size: 11px; letter-spacing: 4px; color: var(--neon-blue);
+      text-transform: uppercase; margin-bottom: 16px; font-weight: 600;
+    }
+    .hero-title {
+      font-family: 'Orbitron', monospace;
+      font-size: clamp(28px, 4vw, 52px);
+      font-weight: 900; line-height: 1.1;
+      margin-bottom: 16px;
+    }
+    .hero-title .highlight {
+      background: linear-gradient(135deg, var(--neon-blue) 0%, var(--neon-purple) 50%, var(--neon-pink) 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      display: block;
+    }
+    .hero-sub { color: var(--text-secondary); font-size: 16px; line-height: 1.6; margin-bottom: 32px; }
+    .hero-cta { display: flex; gap: 12px; flex-wrap: wrap; }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--neon-blue), var(--neon-purple));
+      color: white; border: none; padding: 12px 28px; border-radius: 8px;
+      font-family: 'Rajdhani', sans-serif; font-size: 15px; font-weight: 700;
+      cursor: pointer; letter-spacing: 1px; transition: all 0.3s;
+      box-shadow: 0 4px 20px rgba(0, 212, 255, 0.3); text-decoration: none;
+      display: inline-flex; align-items: center; gap: 8px;
+    }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(0, 212, 255, 0.5); }
+    .btn-secondary {
+      background: transparent; color: var(--text-primary);
+      border: 1px solid var(--dark-border); padding: 12px 28px; border-radius: 8px;
+      font-family: 'Rajdhani', sans-serif; font-size: 15px; font-weight: 600;
+      cursor: pointer; transition: all 0.2s; text-decoration: none;
+      display: inline-flex; align-items: center; gap: 8px;
+    }
+    .btn-secondary:hover { border-color: var(--neon-blue); color: var(--neon-blue); }
+
+    .hero-image {
+      position: absolute; right: 0; top: 0; bottom: 0; width: 50%;
+      display: flex; align-items: center; justify-content: center;
+      overflow: hidden;
+    }
+    .hero-image-placeholder {
+      width: 100%; height: 100%;
+      background: linear-gradient(135deg, rgba(124, 58, 237, 0.2), rgba(0, 212, 255, 0.1));
+      display: flex; align-items: center; justify-content: center;
+      flex-direction: column; gap: 12px;
+    }
+    .hero-char-silhouette {
+      width: 220px; height: 300px;
+      background: linear-gradient(180deg, rgba(0,212,255,0.6) 0%, rgba(124,58,237,0.4) 100%);
+      clip-path: polygon(50% 0%, 80% 20%, 95% 50%, 85% 80%, 60% 95%, 40% 95%, 15% 80%, 5% 50%, 20% 20%);
+      filter: blur(2px);
+      animation: pulse-glow 3s ease-in-out infinite;
+    }
+    @keyframes pulse-glow {
+      0%, 100% { opacity: 0.6; transform: scale(1); }
+      50% { opacity: 1; transform: scale(1.05); }
+    }
+
+    .hero-stats {
+      position: absolute; bottom: 24px; right: 24px; z-index: 2;
+      display: flex; gap: 16px;
+    }
+    .stat-pill {
+      background: rgba(13, 17, 23, 0.85); backdrop-filter: blur(8px);
+      border: 1px solid var(--dark-border); border-radius: 8px;
+      padding: 10px 16px; display: flex; align-items: center; gap: 10px;
+    }
+    .stat-icon { font-size: 18px; }
+    .stat-label { font-size: 11px; color: var(--text-secondary); }
+    .stat-value { font-size: 13px; font-weight: 700; color: var(--text-primary); }
+
+    /* ─── SECTION HEADER ─── */
+    .section-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 20px;
+    }
+    .section-title {
+      font-family: 'Orbitron', monospace; font-size: 16px; font-weight: 700;
+      letter-spacing: 1px;
+    }
+    .section-title span { color: var(--neon-blue); }
+    .see-all {
+      font-size: 13px; color: var(--neon-blue); text-decoration: none;
+      display: flex; align-items: center; gap: 4px; transition: gap 0.2s;
+    }
+    .see-all:hover { gap: 8px; }
+
+    /* ─── CATEGORIES ─── */
+    .categories-grid {
+      display: grid; grid-template-columns: repeat(6, 1fr); gap: 12px;
+      margin-bottom: 40px;
+    }
+    .category-card {
+      background: var(--dark-card); border: 1px solid var(--dark-border);
+      border-radius: 12px; padding: 20px 12px; text-align: center;
+      cursor: pointer; transition: all 0.25s; text-decoration: none;
+      display: flex; flex-direction: column; align-items: center; gap: 10px;
+    }
+    .category-card:hover {
+      border-color: var(--neon-blue); transform: translateY(-4px);
+      box-shadow: 0 8px 24px var(--accent-glow);
+      background: var(--dark-surface);
+    }
+    .cat-icon {
+      width: 52px; height: 52px; border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 24px;
+    }
+    .cat-name { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+    .cat-count { font-size: 11px; color: var(--text-secondary); }
+
+    /* ─── PRODUCT GRID ─── */
+    .products-grid {
+      display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px;
+      margin-bottom: 40px;
+    }
+    .product-card {
+      background: var(--dark-card); border: 1px solid var(--dark-border);
+      border-radius: 12px; overflow: hidden; cursor: pointer;
+      transition: all 0.25s; position: relative;
+    }
+    .product-card:hover {
+      border-color: rgba(0, 212, 255, 0.4); transform: translateY(-4px);
+      box-shadow: 0 12px 32px rgba(0, 212, 255, 0.1);
+    }
+    .product-card:hover .product-actions { opacity: 1; transform: translateY(0); }
+
+    .product-img {
+      aspect-ratio: 1; background: var(--dark-surface);
+      display: flex; align-items: center; justify-content: center;
+      position: relative; overflow: hidden;
+    }
+    .product-img-placeholder {
+      width: 70%; height: 70%;
+      background: linear-gradient(135deg, var(--dark-border), var(--dark-surface));
+      border-radius: 8px; display: flex; align-items: center; justify-content: center;
+      font-size: 32px;
+    }
+    .product-badge {
+      position: absolute; top: 10px; left: 10px;
+      padding: 3px 8px; border-radius: 4px;
+      font-size: 10px; font-weight: 700; letter-spacing: 1px;
+    }
+    .badge-new { background: var(--neon-blue); color: var(--dark-bg); }
+    .badge-sale { background: #ef4444; color: white; }
+    .badge-hot { background: #f97316; color: white; }
+
+    .product-actions {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      padding: 12px; display: flex; gap: 8px;
+      opacity: 0; transform: translateY(8px); transition: all 0.2s;
+      background: linear-gradient(to top, rgba(3,7,18,0.95), transparent);
+    }
+    .add-cart-btn {
+      flex: 1; background: var(--neon-blue); color: var(--dark-bg);
+      border: none; border-radius: 6px; padding: 8px;
+      font-family: 'Rajdhani', sans-serif; font-size: 12px; font-weight: 700;
+      cursor: pointer; letter-spacing: 0.5px;
+    }
+    .fav-btn {
+      width: 32px; height: 32px; background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.15); border-radius: 6px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; color: var(--text-secondary); font-size: 14px;
+    }
+    .fav-btn:hover { color: #f43f5e; border-color: #f43f5e; }
+
+    .product-info { padding: 14px; }
+    .product-series { font-size: 11px; color: var(--neon-blue); letter-spacing: 1px; text-transform: uppercase; }
+    .product-name { font-size: 14px; font-weight: 600; margin: 4px 0; color: var(--text-primary); line-height: 1.3; }
+    .product-price { display: flex; align-items: center; gap: 8px; margin-top: 8px; }
+    .price-current { font-size: 17px; font-weight: 700; color: var(--neon-blue); font-family: 'Orbitron', monospace; }
+    .price-old { font-size: 12px; color: var(--text-secondary); text-decoration: line-through; }
+
+    /* ─── BANNER OFERTA ─── */
+    .banner-oferta {
+      border-radius: 16px; overflow: hidden; margin-bottom: 40px;
+      background: linear-gradient(135deg, #0f0535 0%, #1a0550 40%, #0a1a35 100%);
+      border: 1px solid rgba(124, 58, 237, 0.3);
+      padding: 40px 48px; position: relative; display: flex;
+      align-items: center; justify-content: space-between;
+    }
+    .banner-oferta-bg {
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse at 20% 50%, rgba(124,58,237,0.3), transparent 60%),
+      radial-gradient(ellipse at 80% 50%, rgba(0,212,255,0.15), transparent 50%);
+    }
+    .banner-content { position: relative; z-index: 1; }
+    .banner-eyebrow { font-size: 11px; letter-spacing: 3px; color: var(--neon-pink); text-transform: uppercase; margin-bottom: 8px; }
+    .banner-title { font-family: 'Orbitron', monospace; font-size: 36px; font-weight: 900; line-height: 1.1; margin-bottom: 8px; }
+    .banner-title .pct { color: var(--neon-blue); }
+    .banner-sub { color: var(--text-secondary); font-size: 16px; margin-bottom: 24px; }
+    .banner-right { position: relative; z-index: 1; text-align: right; }
+    .countdown { display: flex; gap: 12px; }
+    .count-item { text-align: center; }
+    .count-num {
+      font-family: 'Orbitron', monospace; font-size: 32px; font-weight: 900;
+      color: var(--neon-blue); display: block;
+      background: rgba(0,212,255,0.1); border: 1px solid rgba(0,212,255,0.3);
+      border-radius: 8px; padding: 8px 16px; min-width: 60px;
+    }
+    .count-label { font-size: 11px; color: var(--text-secondary); margin-top: 6px; letter-spacing: 1px; }
+
+    /* ─── COLECCIONES ─── */
+    .collections-grid {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;
+      margin-bottom: 40px;
+    }
+    .collection-card {
+      border-radius: 12px; overflow: hidden; position: relative;
+      aspect-ratio: 3/4; cursor: pointer; border: 1px solid var(--dark-border);
+      transition: all 0.25s;
+    }
+    .collection-card:hover { transform: translateY(-4px); border-color: rgba(0,212,255,0.4); }
+    .collection-card:hover .collection-overlay { opacity: 1; }
+    .collection-bg {
+      width: 100%; height: 100%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 64px;
+    }
+    .collection-overlay {
+      position: absolute; inset: 0; opacity: 0.8;
+      background: linear-gradient(to top, rgba(3,7,18,0.98) 0%, rgba(3,7,18,0.4) 60%, transparent 100%);
+      transition: opacity 0.25s;
+    }
+    .collection-info {
+      position: absolute; bottom: 0; left: 0; right: 0; padding: 20px 16px;
+    }
+    .collection-name { font-family: 'Orbitron', monospace; font-size: 16px; font-weight: 700; margin-bottom: 4px; }
+    .collection-count { font-size: 12px; color: var(--neon-blue); }
+    .collection-link {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 12px; color: var(--text-secondary); margin-top: 8px;
+      text-decoration: none; transition: color 0.2s;
+    }
+    .collection-link:hover { color: var(--neon-blue); }
+
+    /* ─── TRUST BADGES ─── */
+    .trust-bar {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;
+      margin-bottom: 40px;
+    }
+    .trust-item {
+      background: var(--dark-card); border: 1px solid var(--dark-border);
+      border-radius: 12px; padding: 20px; display: flex; align-items: center; gap: 14px;
+    }
+    .trust-icon {
+      width: 44px; height: 44px; border-radius: 10px;
+      background: var(--accent-glow); border: 1px solid rgba(0,212,255,0.2);
+      display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0;
+    }
+    .trust-title { font-size: 14px; font-weight: 700; }
+    .trust-sub { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+
+    /* ─── ANIMATIONS ─── */
+    @keyframes slide-up {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-in { animation: slide-up 0.5s ease forwards; }
+    .delay-1 { animation-delay: 0.1s; opacity: 0; }
+    .delay-2 { animation-delay: 0.2s; opacity: 0; }
+    .delay-3 { animation-delay: 0.3s; opacity: 0; }
+
+    /* ─── RESPONSIVE ─── */
+    @media (max-width: 1200px) {
+      .products-grid { grid-template-columns: repeat(4, 1fr); }
+      .categories-grid { grid-template-columns: repeat(4, 1fr); }
+    }
+    @media (max-width: 900px) {
+      .sidebar { transform: translateX(-100%); transition: transform 0.3s; }
+      .sidebar.open { transform: translateX(0); }
+      .main { margin-left: 0; }
+      .topbar { left: 0; }
+      .hamburger { display: block; }
+      .products-grid { grid-template-columns: repeat(2, 1fr); }
+      .categories-grid { grid-template-columns: repeat(3, 1fr); }
+      .collections-grid { grid-template-columns: repeat(2, 1fr); }
+      .trust-bar { grid-template-columns: repeat(2, 1fr); }
+      .hero-image { display: none; }
+      .hero-content { max-width: 100%; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ─── SIDEBAR ─── -->
+<aside class="sidebar" id="sidebar">
+  <div class="logo">
+    <div class="logo-text">DREAM<br/>ZONE</div>
+    <div class="logo-sub">TU UNIVERSO GEEK</div>
+  </div>
+
+  <nav class="nav-section">
+    <div class="nav-label">Menú</div>
+    <a href="/" class="nav-item active">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+      Inicio
+    </a>
+    <a href="/tienda" class="nav-item">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
+      Tienda
+    </a>
+    <a href="/tienda" class="nav-item">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg>
+      Categorías
+    </a>
+    <a href="/tienda?filter=nuevo" class="nav-item">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+      Novedades
+      <span class="nav-badge">12</span>
+    </a>
+    <a href="/tienda?filter=oferta" class="nav-item">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/></svg>
+      Ofertas
+    </a>
+    <a href="/colecciones" class="nav-item">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+      Colecciones
+    </a>
+    <a href="/favoritos" class="nav-item">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
+      Favoritos
+    </a>
+  </nav>
+
+  <nav class="nav-section">
+    <div class="nav-label">Mi Cuenta</div>
+    <a href="/perfil" class="nav-item">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+      Perfil
+    </a>
+  </nav>
+
+  <div class="sidebar-bottom">
+    <a href="/auth/logout" class="nav-item">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+      Cerrar sesión
+    </a>
+  </div>
+</aside>
+
+<!-- ─── TOPBAR ─── -->
+<header class="topbar">
+  <button class="hamburger" onclick="toggleSidebar()">
+    <svg width="22" height="22" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+  </button>
+
+  <div class="search-bar">
+    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+    <input type="text" placeholder="Buscar productos, categorías..."/>
+  </div>
+
+  <div class="topbar-actions">
+    <a href="/favoritos" class="icon-btn" title="Favoritos">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
+    </a>
+    <a href="/carrito" class="icon-btn" title="Carrito">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+      <span class="cart-count">3</span>
+    </a>
+    <div class="avatar">DZ</div>
+  </div>
+</header>
+
+<!-- ─── MAIN ─── -->
+<main class="main">
+
+  <!-- HERO -->
+  <section class="hero animate-in">
+    <div class="hero-bg"></div>
+    <div class="hero-grid"></div>
+    <div class="hero-particles" id="particles"></div>
+
+    <div class="hero-content">
+      <div class="hero-eyebrow">✦ Bienvenido a</div>
+      <h1 class="hero-title">
+        <span class="highlight">DREAM ZONE</span>
+        Tu universo geek y anime en un solo lugar
+      </h1>
+      <p class="hero-sub">Figuras, mangas, ropa y coleccionables de tus series favoritas. Envíos a todo el país.</p>
+      <div class="hero-cta">
+        <a href="/tienda" class="btn-primary">
+          <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
+          Explorar tienda
+        </a>
+        <a href="/tienda?filter=nuevo" class="btn-secondary">Ver novedades →</a>
+      </div>
+    </div>
+
+    <div class="hero-image">
+      <div class="hero-image-placeholder">
+        <div class="hero-char-silhouette"></div>
+      </div>
+    </div>
+
+    <div class="hero-stats">
+      <div class="stat-pill">
+        <span class="stat-icon">🔒</span>
+        <div><div class="stat-label">Pagos</div><div class="stat-value">100% seguros</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CATEGORÍAS -->
+  <section class="animate-in delay-1">
+    <div class="section-header">
+      <h2 class="section-title">Categorías <span>principales</span></h2>
+      <a href="/tienda" class="see-all">Ver todas →</a>
+    </div>
+    <div class="categories-grid">
+      <a href="/tienda?cat=figuras" class="category-card">
+        <div class="cat-icon" style="background: rgba(0,212,255,0.1);"></div>
+        <div class="cat-name">Figuras</div>
+        <div class="cat-count">212 productos</div>
+      </a>
+      <a href="/tienda?cat=mangas" class="category-card">
+        <div class="cat-icon" style="background: rgba(124,58,237,0.1);"></div>
+        <div class="cat-name">Mangas</div>
+        <div class="cat-count">198 productos</div>
+      </a>
+      <a href="/tienda?cat=ropa" class="category-card">
+        <div class="cat-icon" style="background: rgba(240,171,252,0.1);"></div>
+        <div class="cat-name">Ropa</div>
+        <div class="cat-count">176 productos</div>
+      </a>
+      <a href="/tienda?cat=funko" class="category-card">
+        <div class="cat-icon" style="background: rgba(249,115,22,0.1);"></div>
+        <div class="cat-name">Funko Pop!</div>
+        <div class="cat-count">182 productos</div>
+      </a>
+      <a href="/tienda?cat=posters" class="category-card">
+        <div class="cat-icon" style="background: rgba(34,197,94,0.1);"></div>
+        <div class="cat-name">Pósters</div>
+        <div class="cat-count">85 productos</div>
+      </a>
+      <a href="/tienda?cat=accesorios" class="category-card">
+        <div class="cat-icon" style="background: rgba(239,68,68,0.1);"></div>
+        <div class="cat-name">Accesorios</div>
+        <div class="cat-count">100 productos</div>
+      </a>
+    </div>
+  </section>
+
+  <!-- NOVEDADES -->
+  <section class="animate-in delay-2">
+    <div class="section-header">
+      <h2 class="section-title">Novedades</h2>
+      <a href="/tienda?filter=nuevo" class="see-all">Ver todas →</a>
+    </div>
+    <div class="products-grid">
+      <div class="product-card">
+        <div class="product-img">
+          <div class="product-img-placeholder"></div>
+          <span class="product-badge badge-new">NUEVO</span>
+          <div class="product-actions">
+            <button class="add-cart-btn">+ Agregar</button>
+            <button class="fav-btn">♡</button>
+          </div>
+        </div>
+        <div class="product-info">
+          <div class="product-series">Jujutsu Kaisen</div>
+          <div class="product-name">Figura Satoru Gojo</div>
+          <div class="product-price">
+            <span class="price-current">$899</span>
+          </div>
+        </div>
+      </div>
+      <div class="product-card">
+        <div class="product-img">
+          <div class="product-img-placeholder"></div>
+          <span class="product-badge badge-new">NUEVO</span>
+          <div class="product-actions">
+            <button class="add-cart-btn">+ Agregar</button>
+            <button class="fav-btn">♡</button>
+          </div>
+        </div>
+        <div class="product-info">
+          <div class="product-series">Dragon Ball Z</div>
+          <div class="product-name">Funko Pop! Goku</div>
+          <div class="product-price">
+            <span class="price-current">$299</span>
+          </div>
+        </div>
+      </div>
+      <div class="product-card">
+        <div class="product-img">
+          <div class="product-img-placeholder"></div>
+          <div class="product-actions">
+            <button class="add-cart-btn">+ Agregar</button>
+            <button class="fav-btn">♡</button>
+          </div>
+        </div>
+        <div class="product-info">
+          <div class="product-series">Chainsaw Man</div>
+          <div class="product-name">Manga Chainsaw Man Vol. 1</div>
+          <div class="product-price">
+            <span class="price-current">$189</span>
+          </div>
+        </div>
+      </div>
+      <div class="product-card">
+        <div class="product-img">
+          <div class="product-img-placeholder"></div>
+          <div class="product-actions">
+            <button class="add-cart-btn">+ Agregar</button>
+            <button class="fav-btn">♡</button>
+          </div>
+        </div>
+        <div class="product-info">
+          <div class="product-series">Naruto</div>
+          <div class="product-name">Sudadera Akatsuki</div>
+          <div class="product-price">
+            <span class="price-current">$698</span>
+            <span class="price-old">$850</span>
+          </div>
+        </div>
+      </div>
+      <div class="product-card">
+        <div class="product-img">
+          <div class="product-img-placeholder"> </div>
+          <span class="product-badge badge-new">NUEVO</span>
+          <div class="product-actions">
+            <button class="add-cart-btn">+ Agregar</button>
+            <button class="fav-btn">♡</button>
+          </div>
+        </div>
+        <div class="product-info">
+          <div class="product-series">Attack on Titan</div>
+          <div class="product-name">Póster Attack on Titan Final</div>
+          <div class="product-price">
+            <span class="price-current">$199</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- BANNER OFERTAS -->
+  <section class="banner-oferta animate-in delay-3">
+    <div class="banner-oferta-bg"></div>
+    <div class="banner-content">
+      <div class="banner-eyebrow">Tiempo limitado</div>
+      <div class="banner-title">Hasta <span class="pct">50%</span> de descuento</div>
+      <div class="banner-sub">en productos seleccionados de todas las categorías</div>
+      <a href="/tienda?filter=oferta" class="btn-primary">Ver ofertas →</a>
+    </div>
+    <div class="banner-right">
+      <div style="font-size:13px;color:var(--text-secondary);margin-bottom:12px;letter-spacing:1px;">TERMINA EN</div>
+      <div class="countdown">
+        <div class="count-item">
+          <span class="count-num" id="hours">08</span>
+          <div class="count-label">HRS</div>
+        </div>
+        <div class="count-item" style="padding-top:8px;font-size:24px;color:var(--neon-blue);">:</div>
+        <div class="count-item">
+          <span class="count-num" id="mins">45</span>
+          <div class="count-label">MIN</div>
+        </div>
+        <div class="count-item" style="padding-top:8px;font-size:24px;color:var(--neon-blue);">:</div>
+        <div class="count-item">
+          <span class="count-num" id="secs">30</span>
+          <div class="count-label">SEG</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- COLECCIONES -->
+  <section class="animate-in delay-1">
+    <div class="section-header">
+      <h2 class="section-title">Colecciones <span>destacadas</span></h2>
+      <a href="/colecciones" class="see-all">Ver todas →</a>
+    </div>
+    <div class="collections-grid">
+      <div class="collection-card">
+        <div class="collection-bg" style="background: linear-gradient(135deg,#1a0a0a,#3b0000);"></div>
+        <div class="collection-overlay"></div>
+        <div class="collection-info">
+          <div class="collection-name">Dragon Ball</div>
+          <div class="collection-count">47 productos</div>
+          <a href="/colecciones/dragon-ball" class="collection-link">Ver colección →</a>
+        </div>
+      </div>
+      <div class="collection-card">
+        <div class="collection-bg" style="background: linear-gradient(135deg,#0a1a1a,#001a3b);"></div>
+        <div class="collection-overlay"></div>
+        <div class="collection-info">
+          <div class="collection-name">One Piece</div>
+          <div class="collection-count">63 productos</div>
+          <a href="/colecciones/one-piece" class="collection-link">Ver colección →</a>
+        </div>
+      </div>
+      <div class="collection-card">
+        <div class="collection-bg" style="background: linear-gradient(135deg,#0a0a1a,#1a003b);"></div>
+        <div class="collection-overlay"></div>
+        <div class="collection-info">
+          <div class="collection-name">My Hero Academia</div>
+          <div class="collection-count">38 productos</div>
+          <a href="/colecciones/mha" class="collection-link">Ver colección →</a>
+        </div>
+      </div>
+      <div class="collection-card">
+        <div class="collection-bg" style="background: linear-gradient(135deg,#1a0a0a,#2a0015);"></div>
+        <div class="collection-overlay"></div>
+        <div class="collection-info">
+          <div class="collection-name">Demon Slayer</div>
+          <div class="collection-count">55 productos</div>
+          <a href="/colecciones/demon-slayer" class="collection-link">Ver colección →</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script>
+  // Sidebar toggle
+  function toggleSidebar() {
+    document.getElementById('sidebar').classList.toggle('open');
+  }
+
+  // Particles
+  const container = document.getElementById('particles');
+  for (let i = 0; i < 18; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    const size = Math.random() * 4 + 1;
+    const isBlue = Math.random() > 0.5;
+    p.style.cssText = `
+            width: ${size}px; height: ${size}px;
+            left: ${Math.random() * 100}%;
+            background: ${isBlue ? 'rgba(0,212,255,0.7)' : 'rgba(124,58,237,0.7)'};
+            animation-duration: ${Math.random() * 8 + 6}s;
+            animation-delay: ${Math.random() * 8}s;
+            box-shadow: 0 0 ${size * 2}px ${isBlue ? 'rgba(0,212,255,0.5)' : 'rgba(124,58,237,0.5)'};
+        `;
+    container.appendChild(p);
+  }
+
+  // Countdown
+  let totalSecs = 8 * 3600 + 45 * 60 + 30;
+  function updateCountdown() {
+    const h = Math.floor(totalSecs / 3600);
+    const m = Math.floor((totalSecs % 3600) / 60);
+    const s = totalSecs % 60;
+    document.getElementById('hours').textContent = String(h).padStart(2, '0');
+    document.getElementById('mins').textContent = String(m).padStart(2, '0');
+    document.getElementById('secs').textContent = String(s).padStart(2, '0');
+    if (totalSecs > 0) totalSecs--;
+  }
+  updateCountdown();
+  setInterval(updateCountdown, 1000);
+</script>
+
+</body>
+</html>
