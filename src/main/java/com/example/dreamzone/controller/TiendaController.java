@@ -10,6 +10,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.List;
 
@@ -52,4 +53,17 @@ public class TiendaController {
         model.addAttribute("totalItems",  totalItems);
         return "tienda";
     }
+    @GetMapping("/{id}")
+    public String verDetalle(@PathVariable String id, Model model, HttpSession session) {
+        Producto producto = productoService.obtenerPorId(id).orElse(null);
+        if (producto == null) return "redirect:/tienda";
+
+        boolean esAdmin = session.getAttribute("usuarioLogueado") != null &&
+                "ROLE_ADMIN".equals(((com.example.dreamzone.model.Usuario) session.getAttribute("usuarioLogueado")).getRol());
+
+        model.addAttribute("producto", producto);
+        model.addAttribute("esAdmin", esAdmin);
+        return "producto-detalle";
+    }
 }
+

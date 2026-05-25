@@ -2,6 +2,7 @@ package com.example.dreamzone.controller;
 
 import com.example.dreamzone.model.Carrito;
 import com.example.dreamzone.model.ItemCarrito;
+import com.example.dreamzone.model.Usuario;
 import com.example.dreamzone.repository.ProductoRepository;
 import com.example.dreamzone.service.CarritoService;
 import jakarta.servlet.http.HttpSession;
@@ -24,12 +25,21 @@ public class CarritoController {
     @Autowired
     private ProductoRepository productoRepository;
 
+    // ─── Helper: obtener usuarioId de la sesión ──────────────────────────────
+
+    private String getUsuarioId(HttpSession session) {
+        Usuario usuario = (Usuario) session.getAttribute("usuarioLogueado");
+        return usuario != null ? usuario.getId() : null;
+    }
+
     // ─── Vista ───────────────────────────────────────────────────────────────
 
     @GetMapping
     public String verCarrito(HttpSession session, Model model) {
-        Carrito carrito = carritoService.obtenerCarrito(session.getId());
-        int totalItems  = carrito.contarItems();
+        String usuarioId = getUsuarioId(session);
+        Carrito carrito  = carritoService.obtenerCarrito(usuarioId, session.getId());
+
+        int totalItems = carrito.contarItems();
         String subtitleText = totalItems > 0
                 ? totalItems + (totalItems == 1 ? " artículo" : " artículos")
                 : "";
@@ -46,10 +56,11 @@ public class CarritoController {
     @GetMapping("/datos")
     @ResponseBody
     public ResponseEntity<Carrito> obtenerDatos(HttpSession session) {
-        return ResponseEntity.ok(carritoService.obtenerCarrito(session.getId()));
+        String usuarioId = getUsuarioId(session);
+        return ResponseEntity.ok(carritoService.obtenerCarrito(usuarioId, session.getId()));
     }
 
-    // ─── REST: agregar ───────────────────────────────────────────────────────
+    // ─── REST: agregar (llamada JSON) ────────────────────────────────────────
 
     @PostMapping("/agregar")
     @ResponseBody
@@ -57,6 +68,7 @@ public class CarritoController {
             @RequestBody Map<String, Object> body,
             HttpSession session) {
 
+        String usuarioId  = getUsuarioId(session);
         String idProducto = (String) body.get("idProducto");
         int cantidad = body.containsKey("cantidad")
                 ? Integer.parseInt(body.get("cantidad").toString()) : 1;
@@ -65,24 +77,22 @@ public class CarritoController {
         item.setIdProducto(idProducto);
         item.setCantidad(cantidad);
 
-        // Intentar enriquecer con datos autoritativos de MongoDB
         productoRepository.findById(idProducto).ifPresentOrElse(
-            producto -> {
-                item.setNombre(producto.getNombre());
-                item.setSerie(producto.getSerie()     != null ? producto.getSerie()     : "");
-                item.setCategoria(producto.getCategoria() != null ? producto.getCategoria() : "");
-                item.setPrecio(producto.getPrecio());
-            },
-            () -> {
-                // Fallback: usar datos enviados desde el cliente (tienda.html estático)
-                item.setNombre(   body.getOrDefault("nombre",    "Producto").toString());
-                item.setSerie(    body.getOrDefault("serie",     "").toString());
-                item.setCategoria(body.getOrDefault("categoria", "").toString());
-                item.setPrecio(Double.parseDouble(body.getOrDefault("precio", "0").toString()));
-            }
+                producto -> {
+                    item.setNombre(producto.getNombre());
+                    item.setSerie(producto.getSerie()         != null ? producto.getSerie()     : "");
+                    item.setCategoria(producto.getCategoria() != null ? producto.getCategoria() : "");
+                    item.setPrecio(producto.getPrecio());
+                },
+                () -> {
+                    item.setNombre(   body.getOrDefault("nombre",    "Producto").toString());
+                    item.setSerie(    body.getOrDefault("serie",     "").toString());
+                    item.setCategoria(body.getOrDefault("categoria", "").toString());
+                    item.setPrecio(Double.parseDouble(body.getOrDefault("precio", "0").toString()));
+                }
         );
 
-        Carrito carrito = carritoService.agregarItem(session.getId(), item);
+        Carrito carrito = carritoService.agregarItem(usuarioId, session.getId(), item);
         return ResponseEntity.ok(Map.of(
                 "ok",         true,
                 "totalItems", carrito.contarItems(),
@@ -98,7 +108,8 @@ public class CarritoController {
             @PathVariable String idProducto,
             HttpSession session) {
 
-        Carrito carrito = carritoService.eliminarProducto(session.getId(), idProducto);
+        String usuarioId = getUsuarioId(session);
+        Carrito carrito  = carritoService.eliminarProducto(usuarioId, session.getId(), idProducto);
         return ResponseEntity.ok(Map.of(
                 "ok",         true,
                 "totalItems", carrito.contarItems(),
@@ -115,8 +126,9 @@ public class CarritoController {
             @RequestBody Map<String, Object> body,
             HttpSession session) {
 
-        int cantidad = Integer.parseInt(body.get("cantidad").toString());
-        Carrito carrito = carritoService.actualizarCantidad(session.getId(), idProducto, cantidad);
+        String usuarioId = getUsuarioId(session);
+        int cantidad     = Integer.parseInt(body.get("cantidad").toString());
+        Carrito carrito  = carritoService.actualizarCantidad(usuarioId, session.getId(), idProducto, cantidad);
 
         double nuevoSubtotal = carrito.getItems().stream()
                 .filter(i -> i.getIdProducto().equals(idProducto))
@@ -136,7 +148,8 @@ public class CarritoController {
     @PostMapping("/vaciar")
     @ResponseBody
     public ResponseEntity<Map<String, Object>> vaciar(HttpSession session) {
-        carritoService.vaciarCarrito(session.getId());
+        String usuarioId = getUsuarioId(session);
+        carritoService.vaciarCarrito(usuarioId, session.getId());
         return ResponseEntity.ok(Map.of("ok", true, "totalItems", 0, "total", 0.0));
     }
 
@@ -148,10 +161,11 @@ public class CarritoController {
             @RequestBody Map<String, Object> body,
             HttpSession session) {
 
+        String usuarioId = getUsuarioId(session);
         @SuppressWarnings("unchecked")
         List<String> ids = body.containsKey("ids") ? (List<String>) body.get("ids") : null;
 
-        boolean ok = carritoService.finalizarCompra(session.getId(), ids);
+        boolean ok = carritoService.finalizarCompra(usuarioId, session.getId(), ids);
         return ResponseEntity.ok(Map.of(
                 "ok",      ok,
                 "mensaje", "¡Compra realizada con éxito! El stock fue descontado."
