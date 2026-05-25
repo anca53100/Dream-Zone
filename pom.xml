@@ -56,6 +56,13 @@
             <artifactId>spring-boot-starter-validation</artifactId>
         </dependency>
 
+        <!-- BCrypt para hashing de contraseñas (módulo criptográfico independiente,
+             NO activa Spring Security ni su auto-configuración) -->
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-crypto</artifactId>
+        </dependency>
+
         <!-- Lombok — genera getters/setters automáticamente con @Data -->
         <dependency>
             <groupId>org.projectlombok</groupId>
