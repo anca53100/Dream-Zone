@@ -503,6 +503,7 @@
         <div class="products-grid" id="productsGrid" th:if="${!productos.isEmpty()}">
 
             <div class="product-card"
+                 th:href="@{/producto/{id}(id=${p.id})}"
                  th:each="p, pStat : ${productos}"
                  th:attr="data-id=${p.id},
                           data-name=${#strings.toLowerCase(p.nombre ?: '')},
@@ -539,7 +540,7 @@
                                 onclick="addToCart(this)">Agregar</button>
                         <button class="fav-btn">♡</button>
                     </div>
-                </div>
+                </div>D
 
                 <div class="product-info">
                     <div class="product-series" th:text="${p.serie ?: ''}"></div>

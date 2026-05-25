@@ -27,7 +27,10 @@ public class AuthController {
                                 @RequestParam String password,
                                 HttpSession session,
                                 Model model) {
-        Optional<Usuario> usuarioOpt = usuarioService.login(email, password);
+        Optional<Usuario> usuarioOpt = usuarioService.findByEmail(email);
+        if (usuarioOpt.isPresent() && !usuarioService.validarPassword(password, usuarioOpt.get().getPassword())) {
+            usuarioOpt = Optional.empty();
+        }
 
         if (usuarioOpt.isPresent()) {
             session.setAttribute("usuarioLogueado", usuarioOpt.get());
@@ -51,16 +54,11 @@ public class AuthController {
                                    @RequestParam String email,
                                    @RequestParam String password,
                                    Model model) {
-        if (usuarioService.existeEmail(email)) {
+        boolean registrado = usuarioService.registrar(nombre, email, password);
+        if (!registrado) {
             model.addAttribute("error", "Ya existe una cuenta con ese correo");
             return "auth/register";
         }
-        Usuario usuario = new Usuario();
-        usuario.setNombre(nombre);
-        usuario.setEmail(email);
-        usuario.setPassword(password);
-        usuario.setRol("ROLE_USER");
-        usuarioService.registrar(usuario);
         return "redirect:/auth/login?registrado=true";
     }
 
@@ -69,6 +67,7 @@ public class AuthController {
         session.invalidate();
         return "redirect:/auth/login";
     }
+
     @GetMapping("/recuperar")
     public String mostrarRecuperar() {
         return "auth/recuperar";
@@ -76,7 +75,7 @@ public class AuthController {
 
     @PostMapping("/recuperar")
     public String procesarRecuperar(@RequestParam String email, Model model) {
-        if (usuarioService.existeEmail(email)) {
+        if (usuarioService.findByEmail(email).isPresent()) {
             model.addAttribute("exito", "Si el correo existe recibirás un enlace en breve");
         } else {
             model.addAttribute("error", "No existe una cuenta con ese correo");
