@@ -157,4 +157,24 @@ public class CarritoController {
                 "mensaje", "¡Compra realizada con éxito! El stock fue descontado."
         ));
     }
+
+    @PostMapping("/agregar/{id}")
+    public String agregarDesdeVista(@PathVariable String id,
+                                    HttpSession session) {
+
+        ItemCarrito item = new ItemCarrito();
+        item.setIdProducto(id);
+        item.setCantidad(1);
+
+        productoRepository.findById(id).ifPresent(producto -> {
+            item.setNombre(producto.getNombre());
+            item.setSerie(producto.getSerie() != null ? producto.getSerie() : "");
+            item.setCategoria(producto.getCategoria() != null ? producto.getCategoria() : "");
+            item.setPrecio(producto.getPrecio());
+        });
+
+        carritoService.agregarItem(session.getId(), item);
+
+        return "redirect:/carrito";
+    }
 }
