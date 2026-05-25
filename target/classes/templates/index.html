@@ -519,6 +519,14 @@
       Perfil
     </a>
   </nav>
+  <a href="/admin" class="nav-item" th:if="${esAdmin}">
+    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+    </svg>
+    Panel Admin
+  </a>
 
   <div class="sidebar-bottom">
     <a href="/auth/logout" class="nav-item">
@@ -636,91 +644,61 @@
       <h2 class="section-title">Novedades</h2>
       <a href="/tienda?filter=nuevo" class="see-all">Ver todas →</a>
     </div>
-    <div class="products-grid">
-      <div class="product-card">
+    <div class="products-grid" th:if="${novedades != null and !novedades.isEmpty()}">
+      <div class="product-card"
+           th:each="p : ${novedades}"
+           th:attr="data-id=${p.id},
+                  data-name=${#strings.toLowerCase(p.nombre ?: '')},
+                  data-cat=${#strings.toLowerCase(p.categoria ?: '')},
+                  data-precio=${p.precio.intValue()},
+                  data-stock=${p.stock}">
+
         <div class="product-img">
-          <div class="product-img-placeholder"></div>
-          <span class="product-badge badge-new">NUEVO</span>
+          <img th:if="${p.imagenes != null and !p.imagenes.isEmpty()}"
+               th:src="${p.imagenes[0]}"
+               th:alt="${p.nombre}"
+               style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;"/>
+          <div class="product-img-placeholder"
+               th:unless="${p.imagenes != null and !p.imagenes.isEmpty()}"
+               th:text="${p.categoria != null ?
+               (p.categoria.equalsIgnoreCase('figuras')    ? '🗿' :
+                p.categoria.equalsIgnoreCase('mangas')     ? '📚' :
+                p.categoria.equalsIgnoreCase('ropa')       ? '👕' :
+                p.categoria.equalsIgnoreCase('funko')      ? '🎭' :
+                p.categoria.equalsIgnoreCase('posters')    ? '🖼' :
+                p.categoria.equalsIgnoreCase('accesorios') ? '🎒' : '📦')
+               : '📦'}">📦</div>
+
+          <span class="product-badge badge-new" th:if="${p.esNuevo}">NUEVO</span>
+          <span class="product-badge badge-sale" th:if="${p.esOferta and !p.esNuevo}">OFERTA</span>
+
           <div class="product-actions">
-            <button class="add-cart-btn">+ Agregar</button>
+            <button class="add-cart-btn"
+                    th:disabled="${p.stock <= 0}"
+                    th:text="${p.stock > 0 ? '+ Agregar' : 'Sin stock'}">+ Agregar</button>
             <button class="fav-btn">♡</button>
           </div>
         </div>
+
         <div class="product-info">
-          <div class="product-series">Jujutsu Kaisen</div>
-          <div class="product-name">Figura Satoru Gojo</div>
+          <div class="product-series" th:text="${p.serie ?: ''}"></div>
+          <div class="product-name" th:text="${p.nombre}"></div>
           <div class="product-price">
-            <span class="price-current">$899</span>
+          <span class="price-current"
+                th:text="${'$' + #numbers.formatDecimal(p.precio, 1, 'COMMA', 0, 'POINT')}">$0</span>
+            <span class="price-old"
+                  th:if="${p.esOferta and p.precioAnterior > 0}"
+                  th:text="${'$' + #numbers.formatDecimal(p.precioAnterior, 1, 'COMMA', 0, 'POINT')}"></span>
           </div>
         </div>
       </div>
-      <div class="product-card">
-        <div class="product-img">
-          <div class="product-img-placeholder"></div>
-          <span class="product-badge badge-new">NUEVO</span>
-          <div class="product-actions">
-            <button class="add-cart-btn">+ Agregar</button>
-            <button class="fav-btn">♡</button>
-          </div>
-        </div>
-        <div class="product-info">
-          <div class="product-series">Dragon Ball Z</div>
-          <div class="product-name">Funko Pop! Goku</div>
-          <div class="product-price">
-            <span class="price-current">$299</span>
-          </div>
-        </div>
-      </div>
-      <div class="product-card">
-        <div class="product-img">
-          <div class="product-img-placeholder"></div>
-          <div class="product-actions">
-            <button class="add-cart-btn">+ Agregar</button>
-            <button class="fav-btn">♡</button>
-          </div>
-        </div>
-        <div class="product-info">
-          <div class="product-series">Chainsaw Man</div>
-          <div class="product-name">Manga Chainsaw Man Vol. 1</div>
-          <div class="product-price">
-            <span class="price-current">$189</span>
-          </div>
-        </div>
-      </div>
-      <div class="product-card">
-        <div class="product-img">
-          <div class="product-img-placeholder"></div>
-          <div class="product-actions">
-            <button class="add-cart-btn">+ Agregar</button>
-            <button class="fav-btn">♡</button>
-          </div>
-        </div>
-        <div class="product-info">
-          <div class="product-series">Naruto</div>
-          <div class="product-name">Sudadera Akatsuki</div>
-          <div class="product-price">
-            <span class="price-current">$698</span>
-            <span class="price-old">$850</span>
-          </div>
-        </div>
-      </div>
-      <div class="product-card">
-        <div class="product-img">
-          <div class="product-img-placeholder"> </div>
-          <span class="product-badge badge-new">NUEVO</span>
-          <div class="product-actions">
-            <button class="add-cart-btn">+ Agregar</button>
-            <button class="fav-btn">♡</button>
-          </div>
-        </div>
-        <div class="product-info">
-          <div class="product-series">Attack on Titan</div>
-          <div class="product-name">Póster Attack on Titan Final</div>
-          <div class="product-price">
-            <span class="price-current">$199</span>
-          </div>
-        </div>
-      </div>
+    </div>
+
+    <!-- Si no hay novedades aún -->
+    <div th:if="${novedades == null or novedades.isEmpty()}"
+         style="text-align:center;padding:40px;color:var(--text-secondary);">
+      <div style="font-size:40px;margin-bottom:12px;">📦</div>
+      <div>No hay novedades disponibles por el momento.</div>
     </div>
   </section>
 

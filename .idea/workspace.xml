@@ -5,29 +5,28 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="796707c2-83dd-4d95-8574-35bd03ad96fc" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/claudeCodeTabState.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/dataSources.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/dreamzone/controller/AuthController.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/dreamzone/controller/CarritoController.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/dreamzone/controller/TiendaController.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/dreamzone/controller/admin/AdminController.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/dreamzone/model/Categoria.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/dreamzone/model/Pedido.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/dreamzone/model/Usuario.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/dreamzone/repository/PedidoRepository.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/dreamzone/repository/ProductoRepository.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/dreamzone/repository/UsuarioRepository.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/dreamzone/service/PedidoService.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/dreamzone/service/UsuarioService.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/static/images/productos/b946aad3-6729-4907-92e4-7e05e10ce669_DemonSlayerInozukeart.webp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/static/js/main.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/templates/auth/login.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/templates/auth/register.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/templates/carrito.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/templates/index.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/templates/producto-detalle.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/templates/tienda.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/dreamzone/config/WebConfig.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/dreamzone/interceptor/SessionInterceptor.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/dreamzone/controller/AuthController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/dreamzone/controller/AuthController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/templates/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/templates/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/templates/producto-detalle.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/templates/producto-detalle.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/templates/tienda.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/templates/tienda.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/application.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/example/dreamzone/controller/AuthController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/example/dreamzone/controller/AuthController.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/example/dreamzone/controller/CarritoController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/example/dreamzone/controller/CarritoController.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/example/dreamzone/controller/TiendaController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/example/dreamzone/controller/TiendaController.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/example/dreamzone/model/Pedido.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/example/dreamzone/model/Pedido.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/example/dreamzone/repository/PedidoRepository.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/example/dreamzone/repository/PedidoRepository.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/example/dreamzone/repository/UsuarioRepository.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/example/dreamzone/repository/UsuarioRepository.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/example/dreamzone/service/UsuarioService.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/example/dreamzone/service/UsuarioService.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/templates/auth/login.html" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/templates/auth/login.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/templates/auth/register.html" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/templates/auth/register.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/templates/carrito.html" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/templates/carrito.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/templates/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/templates/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/templates/producto-detalle.html" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/templates/producto-detalle.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/templates/tienda.html" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/templates/tienda.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -146,7 +145,7 @@
     "Spring Boot.DreamZoneApplication.executor": "Run",
     "codeWithMe.voiceChat.enabledByDefault": "false",
     "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
-    "git-widget-placeholder": "Merging Mariana-Ussa",
+    "git-widget-placeholder": "Mariana-Ussa",
     "ignore.virus.scanning.warn.message": "true",
     "junie.onboarding.icon.badge.shown": "true",
     "kotlin-language-version-configured": "true",

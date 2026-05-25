@@ -27,21 +27,18 @@ public class AuthController {
                                 @RequestParam String password,
                                 HttpSession session,
                                 Model model) {
+
         Optional<Usuario> usuarioOpt = usuarioService.findByEmail(email);
-        if (usuarioOpt.isPresent() && !usuarioService.validarPassword(password, usuarioOpt.get().getPassword())) {
-            usuarioOpt = Optional.empty();
+
+        if (usuarioOpt.isEmpty() || !usuarioService.validarPassword(password, usuarioOpt.get().getPassword())) {
+            model.addAttribute("error", "Correo o contraseña incorrectos");
+            return "auth/login";
         }
 
-        if (usuarioOpt.isPresent()) {
-            session.setAttribute("usuarioLogueado", usuarioOpt.get());
-            if ("ROLE_ADMIN".equals(usuarioOpt.get().getRol())) {
-                return "redirect:/admin";
-            }
-            return "redirect:/";
-        }
+        Usuario usuario = usuarioOpt.get();
+        session.setAttribute("usuarioLogueado", usuario);
 
-        model.addAttribute("error", "Correo o contraseña incorrectos");
-        return "auth/login";
+        return "ROLE_ADMIN".equals(usuario.getRol()) ? "redirect:/admin" : "redirect:/";
     }
 
     @GetMapping("/register")
