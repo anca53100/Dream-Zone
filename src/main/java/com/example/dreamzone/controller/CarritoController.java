@@ -60,27 +60,6 @@ public class CarritoController {
         return ResponseEntity.ok(carritoService.obtenerCarrito(usuarioId, session.getId()));
     }
 
-    // ─── Form POST: agregar desde tienda (botón Agregar) ─────────────────────
-
-    @PostMapping("/agregar/{id}")
-    public String agregarDesdeForm(@PathVariable String id, HttpSession session) {
-        String usuarioId = getUsuarioId(session);
-
-        ItemCarrito item = new ItemCarrito();
-        item.setIdProducto(id);
-        item.setCantidad(1);
-
-        productoRepository.findById(id).ifPresent(producto -> {
-            item.setNombre(producto.getNombre());
-            item.setSerie(producto.getSerie()         != null ? producto.getSerie()     : "");
-            item.setCategoria(producto.getCategoria() != null ? producto.getCategoria() : "");
-            item.setPrecio(producto.getPrecio());
-        });
-
-        carritoService.agregarItem(usuarioId, session.getId(), item);
-        return "redirect:/carrito";
-    }
-
     // ─── REST: agregar (llamada JSON) ────────────────────────────────────────
 
     @PostMapping("/agregar")

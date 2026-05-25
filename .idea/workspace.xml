@@ -4,7 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="796707c2-83dd-4d95-8574-35bd03ad96fc" name="Changes" comment="" />
+    <list default="true" id="796707c2-83dd-4d95-8574-35bd03ad96fc" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/dreamzone/controller/CarritoController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/dreamzone/controller/CarritoController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/example/dreamzone/controller/CarritoController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/example/dreamzone/controller/CarritoController.class" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
