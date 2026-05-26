@@ -44,4 +44,22 @@ public class UsuarioService {
     public boolean validarPassword(String rawPassword, String encodedPassword) {
         return encoder.matches(rawPassword, encodedPassword);
     }
+    public boolean guardarTokenRecuperacion(String email, String token) {
+        Optional<Usuario> usuarioOpt = usuarioRepository.findByEmail(email);
+        if (usuarioOpt.isEmpty()) return false;
+        Usuario usuario = usuarioOpt.get();
+        usuario.setTokenRecuperacion(token);
+        usuarioRepository.save(usuario);
+        return true;
+    }
+
+    public boolean cambiarPassword(String token, String nuevaPassword) {
+        Optional<Usuario> usuarioOpt = usuarioRepository.findByTokenRecuperacion(token);
+        if (usuarioOpt.isEmpty()) return false;
+        Usuario usuario = usuarioOpt.get();
+        usuario.setPassword(encoder.encode(nuevaPassword)); // BCrypt aplicado
+        usuario.setTokenRecuperacion(null);
+        usuarioRepository.save(usuario);
+        return true;
+    }
 }

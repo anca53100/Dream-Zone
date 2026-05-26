@@ -17,4 +17,6 @@ public class Usuario {
     private String password;      // BCrypt
     private String rol;           // "ROLE_USER" o "ROLE_ADMIN"
     private List<String> favoritos; // IDs de productos
+    private String tokenRecuperacion;
+// con su getter y setter
 }
