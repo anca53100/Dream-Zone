@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Crear cuenta - Dream Zone</title>
+    <title>Nueva contraseña - Dream Zone</title>
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
@@ -15,41 +15,19 @@
 
     <div class="auth-card">
 
-        <div class="auth-logo">
-            DREAM<br>ZONE
-        </div>
-
-        <h2 class="auth-title">Crear cuenta</h2>
-        <p class="auth-subtitle">Únete a Dream Zone</p>
+        <div class="auth-logo">DREAM<br>ZONE</div>
+        <h2 class="auth-title">Nueva contraseña</h2>
+        <p class="auth-subtitle">Elige una contraseña segura</p>
 
         <div th:if="${error}" class="auth-alert auth-alert-error">
             <span th:text="${error}"></span>
         </div>
 
-        <form method="post" action="/auth/register">
+        <form th:action="@{/auth/nueva-contrasena}" method="post">
+            <input type="hidden" name="token" th:value="${token}">
 
             <div class="auth-field">
-                <label for="nombre">Nombre completo</label>
-                <input type="text"
-                       id="nombre"
-                       name="nombre"
-                       placeholder="Tu nombre completo"
-                       required
-                       class="auth-input">
-            </div>
-
-            <div class="auth-field">
-                <label for="email">Correo electrónico</label>
-                <input type="email"
-                       id="email"
-                       name="email"
-                       placeholder="correo@ejemplo.com"
-                       required
-                       class="auth-input">
-            </div>
-
-            <div class="auth-field">
-                <label for="password">Contraseña</label>
+                <label for="password">Nueva contraseña</label>
                 <div class="input-password-wrapper">
                     <input type="password"
                            id="password"
@@ -74,14 +52,8 @@
                 </div>
             </div>
 
-            <button type="submit" class="btn-auth-primary">Crear cuenta</button>
-
+            <button type="submit" class="btn-auth-primary">Guardar contraseña</button>
         </form>
-
-        <p class="auth-footer-text">
-            ¿Ya tienes cuenta?
-            <a href="/auth/login" class="auth-link">Inicia sesión</a>
-        </p>
 
     </div>
 </div>
