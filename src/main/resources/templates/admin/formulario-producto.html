@@ -178,14 +178,6 @@
         </a>
     </nav>
 
-    <nav class="nav-section">
-        <div class="nav-label">Inventario</div>
-        <a th:href="@{/admin/productos}" class="nav-item active">
-            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
-            Productos
-        </a>
-    </nav>
-
     <div class="sidebar-bottom">
         <a th:href="@{/}" class="nav-item">
             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
@@ -303,11 +295,11 @@
                         <div class="char-counter" id="descCount">0 / 500</div>
                     </div>
 
-                    <!-- Fila: Categoría + Serie -->
+                    <!-- Fila: Categoría + Colección -->
                     <div class="form-grid">
                         <div class="form-group" style="margin-bottom:0;">
                             <label class="form-label">Categoría *</label>
-                            <select name="categoria" class="form-select" required>
+                            <select name="categoria" class="form-select" required onchange="onCategoriaChange()">
                                 <option value="">Selecciona una categoría</option>
                                 <option th:each="cat : ${categorias}"
                                         th:value="${cat}"
@@ -316,12 +308,14 @@
                             </select>
                         </div>
                         <div class="form-group" style="margin-bottom:0;">
-                            <label class="form-label">Serie / Franquicia</label>
-                            <input type="text"
-                                   name="serie"
-                                   class="form-input"
-                                   placeholder="Ej. Jujutsu Kaisen"
-                                   th:value="${producto?.serie}"/>
+                            <label class="form-label">Colección</label>
+                            <select name="serie" class="form-select">
+                                <option value="">Sin colección</option>
+                                <option th:each="col : ${colecciones}"
+                                        th:value="${col}"
+                                        th:text="${col}"
+                                        th:selected="${producto?.serie == col}">Colección</option>
+                            </select>
                         </div>
                     </div>
                 </div>
@@ -354,8 +348,14 @@
                         </div>
                         <!-- Stock -->
                         <div class="form-group" style="margin-bottom:0;">
-                            <label class="form-label">Stock *</label>
+                            <label class="form-label">Stock *
+                                <span id="stockAutoLabel"
+                                      style="font-size:10px;color:var(--neon-blue);margin-left:6px;display:none;">
+                                    (auto desde tallas)
+                                </span>
+                            </label>
                             <input type="number"
+                                   id="stockInput"
                                    name="stock"
                                    class="form-input"
                                    placeholder="0"
@@ -379,21 +379,89 @@
 
                     <div class="form-grid">
                         <div class="form-group" style="margin-bottom:0;">
-                            <label class="form-label">Talla</label>
-                            <input type="text"
-                                   name="talla"
-                                   class="form-input"
-                                   placeholder="Ej. XL"
-                                   th:value="${producto?.talla}"/>
-                        </div>
-                        <div class="form-group" style="margin-bottom:0;">
                             <label class="form-label">Material</label>
                             <input type="text"
                                    name="material"
                                    class="form-input"
-                                   placeholder="Ej. Algodon"
+                                   placeholder="Ej. Algodón"
                                    th:value="${producto?.material}"/>
                         </div>
+                    </div>
+                </div>
+
+                <!-- ── Card: Tallas (solo Camisas) ── -->
+                <div class="card animate delay-3" id="tallasCard"
+                     th:style="${producto != null and (producto.categoria == 'Camisas Importadas' or producto.categoria == 'Camisas Nacionales')} ? '' : 'display:none'">
+                    <div class="flex items-center gap-12 mb-16">
+                        <div style="width:32px;height:32px;border-radius:var(--radius-md);
+                                    background:rgba(0,212,255,0.08);border:1px solid rgba(0,212,255,0.2);
+                                    display:flex;align-items:center;justify-content:center;font-size:16px;">📏</div>
+                        <h3 class="section-title">Stock por <span>talla</span></h3>
+                    </div>
+                    <p style="font-size:12px;color:var(--text-secondary);margin-bottom:16px;">
+                        El stock total se calcula automáticamente como la suma de todas las tallas.
+                    </p>
+
+                    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;">
+
+                        <div class="form-group" style="margin-bottom:0;">
+                            <label class="form-label" style="text-align:center;">XS</label>
+                            <input type="number" name="tallaXS" id="tallaXS" class="form-input"
+                                   style="text-align:center;" min="0" placeholder="0"
+                                   oninput="recalcularStock()"
+                                   th:value="${producto?.stockPorTalla?.get('XS') ?: 0}"/>
+                        </div>
+
+                        <div class="form-group" style="margin-bottom:0;">
+                            <label class="form-label" style="text-align:center;">S</label>
+                            <input type="number" name="tallaS" id="tallaS" class="form-input"
+                                   style="text-align:center;" min="0" placeholder="0"
+                                   oninput="recalcularStock()"
+                                   th:value="${producto?.stockPorTalla?.get('S') ?: 0}"/>
+                        </div>
+
+                        <div class="form-group" style="margin-bottom:0;">
+                            <label class="form-label" style="text-align:center;">M</label>
+                            <input type="number" name="tallaM" id="tallaM" class="form-input"
+                                   style="text-align:center;" min="0" placeholder="0"
+                                   oninput="recalcularStock()"
+                                   th:value="${producto?.stockPorTalla?.get('M') ?: 0}"/>
+                        </div>
+
+                        <div class="form-group" style="margin-bottom:0;">
+                            <label class="form-label" style="text-align:center;">L</label>
+                            <input type="number" name="tallaL" id="tallaL" class="form-input"
+                                   style="text-align:center;" min="0" placeholder="0"
+                                   oninput="recalcularStock()"
+                                   th:value="${producto?.stockPorTalla?.get('L') ?: 0}"/>
+                        </div>
+
+                        <div class="form-group" style="margin-bottom:0;">
+                            <label class="form-label" style="text-align:center;">XL</label>
+                            <input type="number" name="tallaXL" id="tallaXL" class="form-input"
+                                   style="text-align:center;" min="0" placeholder="0"
+                                   oninput="recalcularStock()"
+                                   th:value="${producto?.stockPorTalla?.get('XL') ?: 0}"/>
+                        </div>
+
+                        <div class="form-group" style="margin-bottom:0;">
+                            <label class="form-label" style="text-align:center;">XXL</label>
+                            <input type="number" name="tallaXXL" id="tallaXXL" class="form-input"
+                                   style="text-align:center;" min="0" placeholder="0"
+                                   oninput="recalcularStock()"
+                                   th:value="${producto?.stockPorTalla?.get('XXL') ?: 0}"/>
+                        </div>
+
+                    </div>
+
+                    <div style="margin-top:16px;padding:12px 16px;background:var(--accent-glow);
+                                border:1px solid rgba(0,212,255,0.2);border-radius:var(--radius-md);
+                                display:flex;align-items:center;justify-content:space-between;">
+                        <span style="font-size:13px;color:var(--text-secondary);">Stock total calculado:</span>
+                        <span id="stockTotalPreview"
+                              style="font-family:var(--font-display);font-size:18px;font-weight:700;color:var(--neon-blue);">
+                            0
+                        </span>
                     </div>
                 </div>
 
@@ -530,16 +598,51 @@
             (len > max * 0.9 ? (len >= max ? ' over' : ' warn') : '');
     }
 
+    /* ── Tallas ── */
+    const TALLAS_CATS = ['Camisas Importadas', 'Camisas Nacionales'];
+    const TALLA_IDS   = ['tallaXS','tallaS','tallaM','tallaL','tallaXL','tallaXXL'];
+
+    function onCategoriaChange() {
+        const cat       = document.querySelector('[name="categoria"]').value;
+        const esCamisa  = TALLAS_CATS.includes(cat);
+        const tallasCard = document.getElementById('tallasCard');
+        const stockInput = document.getElementById('stockInput');
+        const autoLabel  = document.getElementById('stockAutoLabel');
+
+        if (tallasCard) tallasCard.style.display = esCamisa ? '' : 'none';
+        if (stockInput) {
+            stockInput.readOnly = esCamisa;
+            stockInput.style.color = esCamisa ? 'var(--text-secondary)' : '';
+        }
+        if (autoLabel) autoLabel.style.display = esCamisa ? 'inline' : 'none';
+
+        if (esCamisa) recalcularStock();
+    }
+
+    function recalcularStock() {
+        const total = TALLA_IDS.reduce((sum, id) => {
+            const el = document.getElementById(id);
+            return sum + (el ? Math.max(0, parseInt(el.value) || 0) : 0);
+        }, 0);
+
+        const stockInput = document.getElementById('stockInput');
+        if (stockInput) stockInput.value = total;
+
+        const preview = document.getElementById('stockTotalPreview');
+        if (preview) preview.textContent = total;
+
+        updateStockPreview(total);
+    }
+
     /* Inicializar contadores al cargar */
     window.addEventListener('DOMContentLoaded', () => {
         const nombre = document.querySelector('[name="nombre"]');
         const desc   = document.querySelector('[name="descripcion"]');
-        if (nombre) updateCharCount(nombre, 'nombreCount', 100);
-        if (desc)   updateCharCount(desc,   'descCount',   500);
+        try { if (nombre) updateCharCount(nombre, 'nombreCount', 100); } catch(e) {}
+        try { if (desc)   updateCharCount(desc,   'descCount',   500); } catch(e) {}
 
         /* Inicializar preview de precio */
         const precioEl = document.querySelector('[name="precio"]');
-        if (precioEl?.value) updatePrecioPreview(precioEl.value);
 
         /* Inicializar stock preview */
         const stockEl = document.querySelector('[name="stock"]');
@@ -547,12 +650,15 @@
 
         /* Inicializar nombre preview */
         if (nombre?.value) updateCardPreview();
+
         /* Inicializar imagen existente en edición */
         const existingImg = document.querySelector('#existingImgs img');
-
         if (existingImg) {
-            document.getElementById('cardPreviewImg').innerHTML =
-                `<img src="${existingImg.src}" style="width:100%;height:100%;object-fit:cover;"/>`;
+            const cardPreviewImgEl = document.getElementById('cardPreviewImg');
+            if (cardPreviewImgEl) {
+                cardPreviewImgEl.innerHTML =
+                    `<img src="${existingImg.src}" style="width:100%;height:100%;object-fit:cover;"/>`;
+            }
         }
 
         /* Escuchar cambios para la vista previa */
@@ -560,17 +666,37 @@
             const el = document.querySelector('[name="' + field + '"]');
             if (el) el.addEventListener('input', updateCardPreview);
         });
+
+        /* Aplicar lógica de tallas al cargar (para edición) */
+        const catEl = document.querySelector('[name="categoria"]');
+        if (catEl) {
+            catEl.addEventListener('change', onCategoriaChange);
+            onCategoriaChange(); // estado inicial
+        }
+
+        /* Recalcular stock cuando cambia cualquier talla */
+        TALLA_IDS.forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.addEventListener('input', recalcularStock);
+        });
+
+        /* Preview de stock total inicial si es camisa */
+        recalcularStock();
     });
 
-    /* ── Vista previa de tarjeta ── */
+    /* ── Vista previa de tarjeta (elementos opcionales) ── */
     function updateCardPreview() {
-        const nombre = document.querySelector('[name="nombre"]')?.value || 'Nombre del producto';
-        const serie  = document.querySelector('[name="serie"]')?.value  || 'Serie';
-        const precio = document.querySelector('[name="precio"]')?.value || '0';
+        const nombre    = document.querySelector('[name="nombre"]')?.value    || 'Nombre del producto';
+        const coleccion = document.querySelector('[name="serie"]')?.value     || '';
+        const precio    = document.querySelector('[name="precio"]')?.value    || '0';
 
-        document.getElementById('cardPreviewNombre').textContent = nombre;
-        document.getElementById('cardPreviewSerie').textContent  = serie;
-        document.getElementById('cardPreviewPrecio').textContent =
+        const elNombre = document.getElementById('cardPreviewNombre');
+        const elSerie  = document.getElementById('cardPreviewSerie');
+        const elPrecio = document.getElementById('cardPreviewPrecio');
+
+        if (elNombre) elNombre.textContent = nombre;
+        if (elSerie)  elSerie.textContent  = coleccion || 'Sin colección';
+        if (elPrecio) elPrecio.textContent =
             '$' + parseFloat(precio || 0).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
     }
 
@@ -603,9 +729,12 @@
             </div>
         `;
 
-            document.getElementById('cardPreviewImg').innerHTML =
-                `<img src="${e.target.result}"
-                  style="width:100%;height:100%;object-fit:cover;"/>`;
+            const cardPreviewImgEl = document.getElementById('cardPreviewImg');
+            if (cardPreviewImgEl) {
+                cardPreviewImgEl.innerHTML =
+                    `<img src="${e.target.result}"
+                      style="width:100%;height:100%;object-fit:cover;"/>`;
+            }
         };
 
         reader.readAsDataURL(file);

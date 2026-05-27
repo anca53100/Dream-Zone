@@ -69,13 +69,6 @@
         </a>
     </nav>
 
-    <nav class="nav-section">
-        <div class="nav-label">Inventario</div>
-        <a href="/admin/productos" class="nav-item">
-            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
-            Productos
-        </a>
-    </nav>
     <div class="sidebar-bottom">
         <a href="/" class="nav-item">
             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
@@ -93,12 +86,6 @@
     <button class="hamburger" onclick="document.getElementById('sidebar').classList.toggle('open')">
         <svg width="22" height="22" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
     </button>
-    <div class="topbar-actions">
-        <div class="icon-btn">
-            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
-            <span class="cart-count">3</span>
-        </div>
-    </div>
 </header>
 
 <!-- ─── MAIN ─── -->
@@ -116,46 +103,65 @@
         </a>
     </div>
 
-    <!-- Stats: solo lo del MVP -->
+    <!-- Stats -->
     <div class="grid-4 mb-24">
+
+        <!-- Total productos — cuadro azul -->
         <div class="stat-card blue animate delay-1">
-            <div>
+            <div style="display:flex;flex-direction:column;justify-content:center;gap:4px;">
                 <div class="stat-label">TOTAL PRODUCTOS</div>
-                <div class="stat-value text-blue" th:text="${totalProductos ?: 257}">257</div>
-                <div class="stat-change up">↑ +12 este mes</div>
             </div>
-            <div class="stat-icon blue"></div>
+            <div th:text="${totalProductos ?: 0}"
+                 style="width:62px;height:62px;border-radius:10px;flex-shrink:0;
+                        display:flex;align-items:center;justify-content:center;
+                        font-family:var(--font-display);font-size:24px;font-weight:900;
+                        color:#00d4ff;
+                        background:rgba(0,212,255,0.18);
+                        border:2px solid rgba(0,212,255,0.55);">0</div>
         </div>
+
+        <!-- Productos activos — cuadro verde -->
         <div class="stat-card green animate delay-2">
-            <div>
+            <div style="display:flex;flex-direction:column;justify-content:center;gap:4px;">
                 <div class="stat-label">PRODUCTOS ACTIVOS</div>
-                <div class="stat-value text-green"
-                     th:text="${productosActivos}">
-                </div>
-                <div class="stat-change up">↑ En catálogo</div>
             </div>
-            <div class="stat-icon green"></div>
+            <div th:text="${productosActivos ?: 0}"
+                 style="width:62px;height:62px;border-radius:10px;flex-shrink:0;
+                        display:flex;align-items:center;justify-content:center;
+                        font-family:var(--font-display);font-size:24px;font-weight:900;
+                        color:#34d399;
+                        background:rgba(52,211,153,0.18);
+                        border:2px solid rgba(52,211,153,0.55);">0</div>
         </div>
+
+        <!-- Categorías — cuadro amarillo -->
         <div class="stat-card yellow animate delay-3">
-            <div>
+            <div style="display:flex;flex-direction:column;justify-content:center;gap:4px;">
                 <div class="stat-label">CATEGORÍAS</div>
-                <div class="stat-value text-yellow"
-                     th:text="${totalCategorias}">
-                </div>
-                <div class="stat-change up">Figuras, Mangas…</div>
             </div>
-            <div class="stat-icon yellow"></div>
+            <div th:text="${totalCategorias ?: 0}"
+                 style="width:62px;height:62px;border-radius:10px;flex-shrink:0;
+                        display:flex;align-items:center;justify-content:center;
+                        font-family:var(--font-display);font-size:24px;font-weight:900;
+                        color:#fbbf24;
+                        background:rgba(251,191,36,0.18);
+                        border:2px solid rgba(251,191,36,0.55);">0</div>
         </div>
+
+        <!-- Stock bajo / agotado — cuadro rojo -->
         <div class="stat-card red animate delay-4">
-            <div>
-                <div class="stat-label">STOCK BAJO</div>
-                <div class="stat-value text-red"
-                     th:text="${stockBajo}">
-                </div>
-                <div class="stat-change down">Requiere atención</div>
+            <div style="display:flex;flex-direction:column;justify-content:center;gap:4px;">
+                <div class="stat-label">STOCK BAJO / AGOTADO</div>
             </div>
-            <div class="stat-icon red"></div>
+            <div th:text="${stockBajo ?: 0}"
+                 style="width:62px;height:62px;border-radius:10px;flex-shrink:0;
+                        display:flex;align-items:center;justify-content:center;
+                        font-family:var(--font-display);font-size:24px;font-weight:900;
+                        color:#f87171;
+                        background:rgba(248,113,113,0.18);
+                        border:2px solid rgba(248,113,113,0.55);">0</div>
         </div>
+
     </div>
 
     <!-- Fila central -->

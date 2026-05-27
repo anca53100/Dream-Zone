@@ -12,20 +12,14 @@
 <!-- ═══ SIDEBAR ═══ -->
 <aside class="sidebar" id="sidebar">
     <div class="logo">
-        <div class="logo-text">DREAM ZONE</div>
-        <div class="logo-sub">ADMIN PANEL</div>
+        <div class="logo-text">DREAM<br/>ZONE</div>
+        <div class="logo-sub">PANEL ADMIN</div>
     </div>
 
     <nav class="nav-section">
-        <p class="nav-label">Inventario</p>
         <a th:href="@{/admin}" class="nav-item">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-            Dashboard
-        </a>
-        <a th:href="@{/admin/productos}" class="nav-item active">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
-            Productos
-            <span class="nav-badge" th:text="${totalProductos ?: 0}">0</span>
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1V5zm10 0a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zM4 15a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1v-4zm10 0a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z"/></svg>
+            Panel de control
         </a>
     </nav>
 
@@ -34,7 +28,7 @@
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
             Ver tienda
         </a>
-        <a th:href="@{/logout}" class="nav-item">
+        <a th:href="@{/auth/logout}" class="nav-item">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
             Cerrar sesión
         </a>
@@ -87,34 +81,42 @@
     </div>
 
     <!-- ── Filtros rápidos ── -->
-    <div class="flex gap-8 mb-24 animate delay-1" style="flex-wrap:wrap;">
+    <div class="flex gap-8 mb-24 animate delay-1" style="flex-wrap:wrap;align-items:center;">
+
+        <!-- Todos -->
         <a th:href="@{/admin/productos}"
-           class="btn btn-sm"
-           th:classappend="${param.categoria == null and param.estado == null} ? 'btn-primary' : 'btn-secondary'">
-            Todos
+           th:classappend="${param.estado == null and param.sinStock == null} ? ' btn-primary' : ' btn-secondary'"
+           class="btn btn-sm">
+            📦 Todos
         </a>
+
+        <!-- Activos -->
         <a th:href="@{/admin/productos(estado='Activo')}"
-           class="btn btn-sm"
-           th:classappend="${param.estado != null and param.estado[0] == 'Activo'} ? 'btn-success' : 'btn-secondary'">
-            Activos
+           th:classappend="${param.estado != null and param.estado[0] == 'Activo'} ? ' btn-success' : ' btn-secondary'"
+           class="btn btn-sm">
+            ✅ Activos
         </a>
+
+        <!-- Inactivos -->
         <a th:href="@{/admin/productos(estado='Inactivo')}"
-           class="btn btn-sm"
-           th:classappend="${param.estado != null and param.estado[0] == 'Inactivo'} ? 'btn-secondary' : 'btn-secondary'">
-            Inactivos
+           th:classappend="${param.estado != null and param.estado[0] == 'Inactivo'} ? ' btn-danger' : ' btn-secondary'"
+           class="btn btn-sm">
+            🚫 Inactivos
         </a>
+
+        <!-- Sin stock -->
         <a th:href="@{/admin/productos(sinStock=true)}"
-           class="btn btn-sm"
-           th:classappend="${param.sinStock != null} ? 'btn-danger' : 'btn-secondary'">
-            Sin stock
+           th:classappend="${param.sinStock != null} ? ' btn-danger' : ' btn-secondary'"
+           class="btn btn-sm">
+            ⚠️ Sin stock
         </a>
 
         <!-- Filtro categoría -->
         <form th:action="@{/admin/productos}" method="get" style="margin-left:auto;">
-            <select name="categoria" class="form-select" style="width:180px;padding:7px 36px 7px 12px;"
+            <select name="categoria" class="form-select" style="width:200px;padding:7px 36px 7px 12px;"
                     onchange="this.form.submit()">
                 <option value="">Todas las categorías</option>
-                <option th:each="cat : ${ {'Figuras','Mangas','Ropa','Funko Pop!','Pósters','Accesorios'} }"
+                <option th:each="cat : ${ {'Camisas Importadas','Camisas Nacionales','Gorras','Tulas','Medias','Billeteras'} }"
                         th:value="${cat}" th:text="${cat}"
                         th:selected="${param.categoria != null and param.categoria[0] == cat}">Cat</option>
             </select>

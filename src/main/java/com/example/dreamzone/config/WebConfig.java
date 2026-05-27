@@ -16,13 +16,14 @@ public class WebConfig implements WebMvcConfigurer {
                         "/css/**",
                         "/js/**",
                         "/images/**",
+                        "/uploads/**",   // Imágenes de productos: acceso público
                         "/favicon.ico",
                         "/auth/**"
                 );
     }
 
+    @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-
         registry.addResourceHandler("/uploads/**")
                 .addResourceLocations("file:uploads/");
     }

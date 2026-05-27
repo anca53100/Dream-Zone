@@ -350,14 +350,13 @@
     .collection-card {
       border-radius: 12px; overflow: hidden; position: relative;
       aspect-ratio: 3/4; cursor: pointer; border: 1px solid var(--dark-border);
-      transition: all 0.25s;
+      transition: all 0.25s; text-decoration: none; color: var(--text-primary); display: block;
     }
     .collection-card:hover { transform: translateY(-4px); border-color: rgba(0,212,255,0.4); }
     .collection-card:hover .collection-overlay { opacity: 1; }
     .collection-bg {
       width: 100%; height: 100%;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 64px;
+      object-fit: cover; display: block;
     }
     .collection-overlay {
       position: absolute; inset: 0; opacity: 0.8;
@@ -461,9 +460,7 @@
   <div class="topbar-actions">
     <a href="/carrito" class="icon-btn" title="Carrito">
       <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
-      <span class="cart-count"
-            th:text="${session.carrito != null ? #lists.size(session.carrito) : 0}">
-      </span>
+      <span class="cart-count" th:text="${totalItems != null ? totalItems : 0}"></span>
     </a>
   </div>
 </header>
@@ -499,45 +496,6 @@
     </div>
   </section>
 
-  <!-- CATEGORÍAS -->
-  <section class="animate-in delay-1">
-    <div class="section-header">
-      <h2 class="section-title">Categorías <span>principales</span></h2>
-    </div>
-    <div class="categories-grid">
-      <a href="/tienda?cat=figuras" class="category-card">
-        <div class="cat-icon" style="background: rgba(0,212,255,0.1);"></div>
-        <div class="cat-name">Figuras</div>
-        <div class="cat-count">212 productos</div>
-      </a>
-      <a href="/tienda?cat=mangas" class="category-card">
-        <div class="cat-icon" style="background: rgba(124,58,237,0.1);"></div>
-        <div class="cat-name">Mangas</div>
-        <div class="cat-count">198 productos</div>
-      </a>
-      <a href="/tienda?cat=ropa" class="category-card">
-        <div class="cat-icon" style="background: rgba(240,171,252,0.1);"></div>
-        <div class="cat-name">Ropa</div>
-        <div class="cat-count">176 productos</div>
-      </a>
-      <a href="/tienda?cat=funko" class="category-card">
-        <div class="cat-icon" style="background: rgba(249,115,22,0.1);"></div>
-        <div class="cat-name">Funko Pop!</div>
-        <div class="cat-count">182 productos</div>
-      </a>
-      <a href="/tienda?cat=posters" class="category-card">
-        <div class="cat-icon" style="background: rgba(34,197,94,0.1);"></div>
-        <div class="cat-name">Pósters</div>
-        <div class="cat-count">85 productos</div>
-      </a>
-      <a href="/tienda?cat=accesorios" class="category-card">
-        <div class="cat-icon" style="background: rgba(239,68,68,0.1);"></div>
-        <div class="cat-name">Accesorios</div>
-        <div class="cat-count">100 productos</div>
-      </a>
-    </div>
-  </section>
-
   <!-- PRODUCTOS -->
   <section class="animate-in delay-1">
     <div class="section-header">
@@ -562,17 +520,6 @@
                th:if="${producto.imagen == null or producto.imagen.isEmpty()}">
             📦
           </div>
-          <div class="product-actions">
-            <form th:action="@{/carrito/agregar/{id}(id=${producto.id})}"
-                  method="post"
-                  onclick="event.stopPropagation()">
-              <button class="add-cart-btn"
-                      type="submit"
-                      th:disabled="${producto.stock <= 0}">
-                Agregar
-              </button>
-            </form>
-          </div>
         </div>
 
         <!-- Info -->
@@ -592,40 +539,91 @@
     </div>
   </section>
 
+  <!-- CATEGORÍAS -->
+  <section class="animate-in delay-2">
+    <div class="section-header">
+      <h2 class="section-title">Categorías <span>principales</span></h2>
+      <a href="/tienda" class="see-all">Ver todo →</a>
+    </div>
+    <div class="categories-grid">
+      <a th:href="@{/tienda(cat='Camisas Importadas')}" class="category-card">
+        <div class="cat-icon" style="background: rgba(0,212,255,0.12);">👔</div>
+        <div class="cat-name">Camisas Importadas</div>
+        <div class="cat-count"
+             th:text="${(categoryCounts['Camisas Importadas'] ?: 0) + ' productos'}">0 productos</div>
+      </a>
+      <a th:href="@{/tienda(cat='Camisas Nacionales')}" class="category-card">
+        <div class="cat-icon" style="background: rgba(255,193,7,0.12);">🌿</div>
+        <div class="cat-name">Camisas Nacionales</div>
+        <div class="cat-count"
+             th:text="${(categoryCounts['Camisas Nacionales'] ?: 0) + ' productos'}">0 productos</div>
+      </a>
+      <a th:href="@{/tienda(cat='Gorras')}" class="category-card">
+        <div class="cat-icon" style="background: rgba(124,58,237,0.12);">🧢</div>
+        <div class="cat-name">Gorras</div>
+        <div class="cat-count"
+             th:text="${(categoryCounts['Gorras'] ?: 0) + ' productos'}">0 productos</div>
+      </a>
+      <a th:href="@{/tienda(cat='Tulas')}" class="category-card">
+        <div class="cat-icon" style="background: rgba(249,115,22,0.12);">🎒</div>
+        <div class="cat-name">Tulas</div>
+        <div class="cat-count"
+             th:text="${(categoryCounts['Tulas'] ?: 0) + ' productos'}">0 productos</div>
+      </a>
+      <a th:href="@{/tienda(cat='Medias')}" class="category-card">
+        <div class="cat-icon" style="background: rgba(34,197,94,0.12);">🧦</div>
+        <div class="cat-name">Medias</div>
+        <div class="cat-count"
+             th:text="${(categoryCounts['Medias'] ?: 0) + ' productos'}">0 productos</div>
+      </a>
+      <a th:href="@{/tienda(cat='Billeteras')}" class="category-card">
+        <div class="cat-icon" style="background: rgba(240,171,252,0.12);">👛</div>
+        <div class="cat-name">Billeteras</div>
+        <div class="cat-count"
+             th:text="${(categoryCounts['Billeteras'] ?: 0) + ' productos'}">0 productos</div>
+      </a>
+    </div>
+  </section>
+
   <!-- COLECCIONES -->
   <section class="animate-in delay-1">
     <div class="section-header">
       <h2 class="section-title">Colecciones <span>destacadas</span></h2>
+      <a href="/tienda" class="see-all">Ver todas →</a>
     </div>
     <div class="collections-grid">
-      <div class="collection-card">
-        <div class="collection-bg" style="background: linear-gradient(135deg,#1a0a0a,#3b0000);"></div>
+      <a th:href="@{/tienda(coleccion='Death Note')}" class="collection-card">
+        <img src="/images/colecciones/deathnote.png" alt="Death Note" class="collection-bg">
         <div class="collection-overlay"></div>
         <div class="collection-info">
-          <div class="collection-name">Dragon Ball</div>
+          <div class="collection-name">Death Note</div>
+          <div class="collection-count">Colección anime</div>
         </div>
-      </div>
-      <div class="collection-card">
-        <div class="collection-bg" style="background: linear-gradient(135deg,#0a1a1a,#001a3b);"></div>
+      </a>
+      <a th:href="@{/tienda(coleccion='One Piece')}" class="collection-card">
+        <img src="/images/colecciones/onepiece.png" alt="One Piece" class="collection-bg">
         <div class="collection-overlay"></div>
         <div class="collection-info">
           <div class="collection-name">One Piece</div>
+          <div class="collection-count">Colección anime</div>
         </div>
-      </div>
-      <div class="collection-card">
-        <div class="collection-bg" style="background: linear-gradient(135deg,#0a0a1a,#1a003b);"></div>
+      </a>
+      <a th:href="@{/tienda(coleccion='Naruto')}" class="collection-card">
+        <img src="/images/colecciones/naruto.png" alt="Naruto" class="collection-bg">
         <div class="collection-overlay"></div>
         <div class="collection-info">
-          <div class="collection-name">My Hero Academia</div>
+          <div class="collection-name">Naruto</div>
+          <div class="collection-count">Colección anime</div>
         </div>
-      </div>
-      <div class="collection-card">
-        <div class="collection-bg" style="background: linear-gradient(135deg,#1a0a0a,#2a0015);"></div>
+      </a>
+      <a th:href="@{/tienda(coleccion='Demon Slayer')}" class="collection-card">
+        <img src="/images/colecciones/demonslayer.png" alt="Demon Slayer" class="collection-bg">
         <div class="collection-overlay"></div>
         <div class="collection-info">
           <div class="collection-name">Demon Slayer</div>
+          <div class="collection-count">Colección anime</div>
         </div>
-      </div>
+      </a>
     </div>
   </section>
 

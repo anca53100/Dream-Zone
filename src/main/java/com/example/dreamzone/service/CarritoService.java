@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -21,8 +22,6 @@ public class CarritoService {
     private ProductoRepository productoRepository;
 
     // ─── Clave de búsqueda ───────────────────────────────────────────────────
-    // Si hay usuarioId lo usamos; si no, usamos sessionId (usuario anónimo)
-
     private Optional<Carrito> buscarCarrito(String usuarioId, String sessionId) {
         if (usuarioId != null) {
             return carritoRepository.findByUsuarioId(usuarioId);
@@ -31,7 +30,6 @@ public class CarritoService {
     }
 
     // ─── Obtener o crear ─────────────────────────────────────────────────────
-
     public Carrito obtenerCarrito(String sessionId) {
         return obtenerCarrito(null, sessionId);
     }
@@ -46,25 +44,17 @@ public class CarritoService {
     }
 
     // ─── Vincular sesión anónima al usuario al hacer login ───────────────────
-    /**
-     * Llamar desde AuthController justo después del login exitoso.
-     * Fusiona el carrito anónimo (sessionId) con el del usuario logueado.
-     * Si el usuario ya tiene carrito, suma las cantidades; si no, le asigna
-     * el carrito anónimo directamente.
-     */
     public void vincularCarritoAlUsuario(String sessionId, String usuarioId) {
-        Optional<Carrito> carritoAnonimo  = carritoRepository.findBySessionId(sessionId);
-        Optional<Carrito> carritoUsuario  = carritoRepository.findByUsuarioId(usuarioId);
+        Optional<Carrito> carritoAnonimo = carritoRepository.findBySessionId(sessionId);
+        Optional<Carrito> carritoUsuario = carritoRepository.findByUsuarioId(usuarioId);
 
         if (carritoAnonimo.isEmpty()) {
-            // Nada que fusionar: si el usuario no tiene carrito, crear uno vacío
             if (carritoUsuario.isEmpty()) {
                 Carrito nuevo = new Carrito();
                 nuevo.setSessionId(sessionId);
                 nuevo.setUsuarioId(usuarioId);
                 carritoRepository.save(nuevo);
             } else {
-                // Actualizar sessionId del carrito existente para que coincida
                 Carrito cu = carritoUsuario.get();
                 cu.setSessionId(sessionId);
                 carritoRepository.save(cu);
@@ -73,22 +63,20 @@ public class CarritoService {
         }
 
         Carrito anonimo = carritoAnonimo.get();
-
         if (carritoUsuario.isEmpty()) {
-            // El usuario no tenía carrito: asignarle el anónimo
             anonimo.setUsuarioId(usuarioId);
             carritoRepository.save(anonimo);
         } else {
-            // Fusionar: sumar items del carrito anónimo al del usuario
             Carrito usuario = carritoUsuario.get();
             for (ItemCarrito itemAnonimo : anonimo.getItems()) {
+                // Deduplica por (idProducto + talla)
                 Optional<ItemCarrito> existente = usuario.getItems().stream()
-                        .filter(i -> i.getIdProducto().equals(itemAnonimo.getIdProducto()))
+                        .filter(i -> i.getIdProducto().equals(itemAnonimo.getIdProducto())
+                                && Objects.equals(i.getTalla(), itemAnonimo.getTalla()))
                         .findFirst();
                 if (existente.isPresent()) {
                     existente.get().setCantidad(
-                            existente.get().getCantidad() + itemAnonimo.getCantidad()
-                    );
+                            existente.get().getCantidad() + itemAnonimo.getCantidad());
                 } else {
                     usuario.getItems().add(itemAnonimo);
                 }
@@ -96,13 +84,11 @@ public class CarritoService {
             usuario.setSessionId(sessionId);
             usuario.setFechaActualizacion(LocalDateTime.now());
             carritoRepository.save(usuario);
-            // Eliminar el carrito anónimo ya fusionado
             carritoRepository.delete(anonimo);
         }
     }
 
     // ─── Agregar producto ────────────────────────────────────────────────────
-
     public Carrito agregarItem(String sessionId, ItemCarrito nuevoItem) {
         return agregarItem(null, sessionId, nuevoItem);
     }
@@ -110,13 +96,35 @@ public class CarritoService {
     public Carrito agregarItem(String usuarioId, String sessionId, ItemCarrito nuevoItem) {
         Carrito carrito = obtenerCarrito(usuarioId, sessionId);
 
+        // ── Calcular stock disponible para este producto/talla ──────────────
+        final String talla = nuevoItem.getTalla();
+        int stockDisponible = productoRepository.findById(nuevoItem.getIdProducto())
+                .map(p -> {
+                    if (talla != null && !talla.isBlank() && p.getStockPorTalla() != null) {
+                        return p.getStockPorTalla().getOrDefault(talla, 0);
+                    }
+                    return p.getStock();
+                })
+                .orElse(0);
+
+        // ── Deduplicar por (idProducto + talla) ────────────────────────────
         Optional<ItemCarrito> existente = carrito.getItems().stream()
-                .filter(i -> i.getIdProducto().equals(nuevoItem.getIdProducto()))
+                .filter(i -> i.getIdProducto().equals(nuevoItem.getIdProducto())
+                        && Objects.equals(i.getTalla(), talla))
                 .findFirst();
 
+        int yaEnCarrito  = existente.map(ItemCarrito::getCantidad).orElse(0);
+        int puedoAgregar = Math.max(0, stockDisponible - yaEnCarrito);
+        int cantidadReal = Math.min(nuevoItem.getCantidad(), puedoAgregar);
+
+        if (cantidadReal <= 0) {
+            return carrito; // Sin stock adicional disponible
+        }
+
         if (existente.isPresent()) {
-            existente.get().setCantidad(existente.get().getCantidad() + nuevoItem.getCantidad());
+            existente.get().setCantidad(existente.get().getCantidad() + cantidadReal);
         } else {
+            nuevoItem.setCantidad(cantidadReal);
             carrito.getItems().add(nuevoItem);
         }
 
@@ -124,32 +132,35 @@ public class CarritoService {
         return carritoRepository.save(carrito);
     }
 
-    // ─── Eliminar producto ───────────────────────────────────────────────────
-
+    // ─── Eliminar producto (talla puede ser null para productos sin talla) ────
     public Carrito eliminarProducto(String sessionId, String idProducto) {
-        return eliminarProducto(null, sessionId, idProducto);
+        return eliminarProducto(null, sessionId, idProducto, null);
     }
 
-    public Carrito eliminarProducto(String usuarioId, String sessionId, String idProducto) {
+    public Carrito eliminarProducto(String usuarioId, String sessionId,
+                                    String idProducto, String talla) {
         Carrito carrito = obtenerCarrito(usuarioId, sessionId);
-        carrito.getItems().removeIf(i -> i.getIdProducto().equals(idProducto));
+        String tallaNorm = (talla != null && !talla.isBlank()) ? talla : null;
+        carrito.getItems().removeIf(i ->
+                i.getIdProducto().equals(idProducto)
+                        && Objects.equals(i.getTalla(), tallaNorm));
         carrito.setFechaActualizacion(LocalDateTime.now());
         return carritoRepository.save(carrito);
     }
 
-    // ─── Actualizar cantidad ─────────────────────────────────────────────────
-
+    // ─── Actualizar cantidad (solo para productos sin talla) ─────────────────
     public Carrito actualizarCantidad(String sessionId, String idProducto, int cantidad) {
         return actualizarCantidad(null, sessionId, idProducto, cantidad);
     }
 
-    public Carrito actualizarCantidad(String usuarioId, String sessionId, String idProducto, int cantidad) {
+    public Carrito actualizarCantidad(String usuarioId, String sessionId,
+                                      String idProducto, int cantidad) {
         if (cantidad <= 0) {
-            return eliminarProducto(usuarioId, sessionId, idProducto);
+            return eliminarProducto(usuarioId, sessionId, idProducto, null);
         }
         Carrito carrito = obtenerCarrito(usuarioId, sessionId);
         carrito.getItems().stream()
-                .filter(i -> i.getIdProducto().equals(idProducto))
+                .filter(i -> i.getIdProducto().equals(idProducto) && i.getTalla() == null)
                 .findFirst()
                 .ifPresent(i -> i.setCantidad(cantidad));
         carrito.setFechaActualizacion(LocalDateTime.now());
@@ -157,7 +168,6 @@ public class CarritoService {
     }
 
     // ─── Vaciar carrito ──────────────────────────────────────────────────────
-
     public Carrito vaciarCarrito(String sessionId) {
         return vaciarCarrito(null, sessionId);
     }
@@ -170,18 +180,17 @@ public class CarritoService {
     }
 
     // ─── Calcular total ──────────────────────────────────────────────────────
-
     public double calcularTotal(String sessionId) {
         return obtenerCarrito(sessionId).calcularTotal();
     }
 
     // ─── Finalizar compra ────────────────────────────────────────────────────
-
     public boolean finalizarCompra(String sessionId, List<String> idsSeleccionados) {
         return finalizarCompra(null, sessionId, idsSeleccionados);
     }
 
-    public boolean finalizarCompra(String usuarioId, String sessionId, List<String> idsSeleccionados) {
+    public boolean finalizarCompra(String usuarioId, String sessionId,
+                                   List<String> idsSeleccionados) {
         Carrito carrito = obtenerCarrito(usuarioId, sessionId);
 
         List<ItemCarrito> itemsAProcesar = (idsSeleccionados != null && !idsSeleccionados.isEmpty())
@@ -192,8 +201,19 @@ public class CarritoService {
 
         for (ItemCarrito item : itemsAProcesar) {
             productoRepository.findById(item.getIdProducto()).ifPresent(producto -> {
+                // Descontar stock total
                 int nuevoStock = Math.max(0, producto.getStock() - item.getCantidad());
                 producto.setStock(nuevoStock);
+
+                // Descontar de stockPorTalla si aplica
+                if (item.getTalla() != null && !item.getTalla().isBlank()
+                        && producto.getStockPorTalla() != null) {
+                    int tallaActual = producto.getStockPorTalla()
+                            .getOrDefault(item.getTalla(), 0);
+                    producto.getStockPorTalla().put(
+                            item.getTalla(),
+                            Math.max(0, tallaActual - item.getCantidad()));
+                }
                 productoRepository.save(producto);
             });
         }

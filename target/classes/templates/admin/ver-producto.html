@@ -161,13 +161,6 @@
         </a>
     </nav>
 
-    <nav class="nav-section">
-        <div class="nav-label">Inventario</div>
-        <a href="/admin/productos" class="nav-item active">
-            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
-            Productos
-        </a>
-    </nav>
     <div class="sidebar-bottom">
         <a href="/" class="nav-item">
             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
@@ -301,19 +294,44 @@
                 <div class="specs-grid">
                     <div class="spec-item">
                         <span class="spec-label">Categoría</span>
-                        <span class="spec-value" th:text="${producto.categoria ?: 'Figuras'}">Figuras</span>
+                        <span class="spec-value" th:text="${producto.categoria}">—</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">Colección</span>
+                        <span class="spec-value" th:text="${producto.serie ?: '—'}">—</span>
                     </div>
                     <div class="spec-item">
                         <span class="spec-label">Material</span>
-                        <span class="spec-value" th:text="${producto.material != null ? producto.material : 'PVC'}">Algodon</span>
+                        <span class="spec-value" th:text="${producto.material ?: '—'}">—</span>
                     </div>
                     <div class="spec-item">
-                        <span class="spec-label">Talla</span>
-                        <span class="spec-value" th:text="${producto.talla}">XL</span>
+                        <span class="spec-label">Stock total</span>
+                        <span class="spec-value" th:text="${producto.stock}">0</span>
                     </div>
-                    <div class="spec-item">
-                        <span class="spec-label">Serie</span>
-                        <span class="spec-value" th:text="${producto.serie ?: 'Jujutsu Kaisen'}">Jujutsu Kaisen</span>
+                </div>
+
+                <!-- Desglose de tallas (solo camisas) -->
+                <div th:if="${producto.stockPorTalla != null and !producto.stockPorTalla.isEmpty()}"
+                     style="margin-top:16px;">
+                    <h4 style="font-size:12px;letter-spacing:1px;color:var(--text-secondary);
+                               text-transform:uppercase;margin-bottom:10px;">
+                        Stock por talla
+                    </h4>
+                    <div style="display:flex;flex-wrap:wrap;gap:8px;">
+                        <div th:each="entry : ${producto.stockPorTalla}"
+                             style="display:flex;flex-direction:column;align-items:center;
+                                    padding:8px 14px;background:var(--dark-surface);
+                                    border:1px solid var(--dark-border);border-radius:var(--radius-md);
+                                    min-width:52px;">
+                            <span style="font-size:13px;font-weight:700;color:var(--text-primary);"
+                                  th:text="${entry.key}">S</span>
+                            <span th:text="${entry.value}"
+                                  th:style="${entry.value == 0} ? 'color:var(--neon-red);font-size:15px;font-weight:700;'
+                                           : (${entry.value < 3} ? 'color:var(--neon-yellow);font-size:15px;font-weight:700;'
+                                           : 'color:var(--neon-green);font-size:15px;font-weight:700;')">
+                                0
+                            </span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -334,8 +352,9 @@
                         <div class="toggle-sub">Los clientes pueden ver y comprar este producto</div>
                     </div>
                     <label class="toggle">
-                        <!-- th:checked="${producto.activo}" -->
-                        <input type="checkbox" checked onchange="toggleEstado(this)"/>
+                        <input type="checkbox"
+                               th:checked="${producto.estado == 'Activo'}"
+                               onchange="toggleEstado(this)"/>
                         <span class="toggle-slider"></span>
                     </label>
                 </div>
@@ -375,8 +394,7 @@
                     style="padding:10px 24px;border-radius:8px;background:var(--dark-surface,#21262d);border:1px solid var(--dark-border,#30363d);color:var(--text-primary,#fff);cursor:pointer;font-size:14px;font-weight:600">
                 Cancelar
             </button>
-            <!-- th:action="@{/admin/productos/{id}/eliminar(id=${producto.id})}" method="post" -->
-            <a href="/admin/productos/42/eliminar"
+            <a th:href="@{/admin/productos/eliminar/{id}(id=${producto.id})}"
                style="padding:10px 24px;border-radius:8px;background:rgba(248,113,113,.15);border:1px solid rgba(248,113,113,.4);color:#f87171;cursor:pointer;font-size:14px;font-weight:700;text-decoration:none">
                 Sí, eliminar
             </a>

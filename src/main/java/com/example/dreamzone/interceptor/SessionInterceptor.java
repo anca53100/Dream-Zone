@@ -14,8 +14,9 @@ public class SessionInterceptor implements HandlerInterceptor {
                              Object handler) throws Exception {
         String uri = req.getRequestURI();
 
-        if (uri.startsWith("/auth") || uri.startsWith("/css")
-                || uri.startsWith("/js") || uri.startsWith("/images")
+        if (uri.startsWith("/auth")    || uri.startsWith("/css")
+                || uri.startsWith("/js")     || uri.startsWith("/images")
+                || uri.startsWith("/uploads") // Imágenes de productos: acceso público
                 || uri.startsWith("/favicon")) {
             return true;
         }

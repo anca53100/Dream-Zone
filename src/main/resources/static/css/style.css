@@ -625,7 +625,9 @@ tbody td:last-child  { padding-right: 24px; }
 
 .auth-banner {
     flex: 1;
-    background-color: #07091a;
+    background-image: url('/images/login/login.png');
+    background-size: cover;
+    background-position: center;
 }
 
 .auth-card {
@@ -764,7 +766,7 @@ tbody td:last-child  { padding-right: 24px; }
 
 .auth-footer-text {
     text-align: center; color: #445566;
-    font-size: 0.82rem; margin-top: auto;
+    font-size: 0.82rem; margin-top: 28px;
 }
 
 .auth-link { color: #2288cc; text-decoration: none; font-weight: 600; }

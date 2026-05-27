@@ -28,21 +28,35 @@ public class TiendaController {
     public String verTienda(
             @RequestParam(required = false) String filter,
             @RequestParam(required = false) String buscar,
+            @RequestParam(required = false) String cat,
+            @RequestParam(required = false) String coleccion,
             Model model,
             HttpSession session) {
 
         List<Producto> productos;
 
+        // Helper: solo productos Activos (o sin estado definido)
+        java.util.function.Predicate<Producto> soloActivos =
+                p -> p.getEstado() == null || "Activo".equalsIgnoreCase(p.getEstado());
+
         if ("nuevo".equals(filter)) {
-            productos = productoService.obtenerNovedades();
+            productos = productoService.obtenerNovedades().stream()
+                    .filter(soloActivos).toList();
         } else if ("oferta".equals(filter)) {
-            productos = productoService.obtenerOfertas();
+            productos = productoService.obtenerOfertas().stream()
+                    .filter(soloActivos).toList();
         } else if (buscar != null && !buscar.isBlank()) {
-            productos = productoService.buscar(buscar);
+            productos = productoService.buscar(buscar).stream()
+                    .filter(soloActivos).toList();
+        } else if (cat != null && !cat.isBlank()) {
+            productos = productoService.obtenerPorCategoria(cat).stream()
+                    .filter(soloActivos).toList();
+        } else if (coleccion != null && !coleccion.isBlank()) {
+            productos = productoService.obtenerPorSerie(coleccion).stream()
+                    .filter(soloActivos).toList();
         } else {
             productos = productoService.obtenerTodos().stream()
-                    .filter(p -> p.getEstado() == null || "Activo".equals(p.getEstado()))
-                    .toList();
+                    .filter(soloActivos).toList();
         }
 
         int totalItems = carritoService.obtenerCarrito(session.getId()).contarItems();
@@ -50,6 +64,8 @@ public class TiendaController {
         model.addAttribute("productos",   productos);
         model.addAttribute("filter",      filter);
         model.addAttribute("buscar",      buscar);
+        model.addAttribute("cat",         cat);
+        model.addAttribute("coleccion",   coleccion);
         model.addAttribute("totalItems",  totalItems);
         return "tienda";
     }

@@ -4,6 +4,7 @@ import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
@@ -18,5 +19,6 @@ public class Usuario {
     private String rol;           // "ROLE_USER" o "ROLE_ADMIN"
     private List<String> favoritos; // IDs de productos
     private String tokenRecuperacion;
+    private LocalDateTime tokenExpiracion;
 // con su getter y setter
 }

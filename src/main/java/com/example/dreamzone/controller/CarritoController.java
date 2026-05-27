@@ -72,22 +72,26 @@ public class CarritoController {
         String idProducto = (String) body.get("idProducto");
         int cantidad = body.containsKey("cantidad")
                 ? Integer.parseInt(body.get("cantidad").toString()) : 1;
+        String talla = body.containsKey("talla") ? (String) body.get("talla") : null;
 
         ItemCarrito item = new ItemCarrito();
         item.setIdProducto(idProducto);
         item.setCantidad(cantidad);
+        item.setTalla((talla != null && !talla.isBlank()) ? talla : null);
 
         productoRepository.findById(idProducto).ifPresentOrElse(
                 producto -> {
                     item.setNombre(producto.getNombre());
                     item.setSerie(producto.getSerie()         != null ? producto.getSerie()     : "");
                     item.setCategoria(producto.getCategoria() != null ? producto.getCategoria() : "");
+                    item.setImagen(producto.getImagen()       != null ? producto.getImagen()    : "");
                     item.setPrecio(producto.getPrecio());
                 },
                 () -> {
                     item.setNombre(   body.getOrDefault("nombre",    "Producto").toString());
                     item.setSerie(    body.getOrDefault("serie",     "").toString());
                     item.setCategoria(body.getOrDefault("categoria", "").toString());
+                    item.setImagen(   body.getOrDefault("imagen",    "").toString());
                     item.setPrecio(Double.parseDouble(body.getOrDefault("precio", "0").toString()));
                 }
         );
@@ -106,10 +110,12 @@ public class CarritoController {
     @ResponseBody
     public ResponseEntity<Map<String, Object>> eliminar(
             @PathVariable String idProducto,
+            @RequestParam(required = false) String talla,
             HttpSession session) {
 
         String usuarioId = getUsuarioId(session);
-        Carrito carrito  = carritoService.eliminarProducto(usuarioId, session.getId(), idProducto);
+        Carrito carrito  = carritoService.eliminarProducto(usuarioId, session.getId(),
+                idProducto, talla);
         return ResponseEntity.ok(Map.of(
                 "ok",         true,
                 "totalItems", carrito.contarItems(),
@@ -176,18 +182,21 @@ public class CarritoController {
     public String agregarDesdeVista(@PathVariable String id,
                                     HttpSession session) {
 
+        String usuarioId = getUsuarioId(session); // Respetar usuario logueado
+
         ItemCarrito item = new ItemCarrito();
         item.setIdProducto(id);
         item.setCantidad(1);
 
         productoRepository.findById(id).ifPresent(producto -> {
             item.setNombre(producto.getNombre());
-            item.setSerie(producto.getSerie() != null ? producto.getSerie() : "");
+            item.setSerie(producto.getSerie()         != null ? producto.getSerie()     : "");
             item.setCategoria(producto.getCategoria() != null ? producto.getCategoria() : "");
+            item.setImagen(producto.getImagen()       != null ? producto.getImagen()    : "");
             item.setPrecio(producto.getPrecio());
         });
 
-        carritoService.agregarItem(session.getId(), item);
+        carritoService.agregarItem(usuarioId, session.getId(), item);
 
         return "redirect:/carrito";
     }

@@ -118,10 +118,10 @@
 
         /* ─── FILTER SIDEBAR ─── */
         .filter-sidebar {
-            width: 240px; flex-shrink: 0;
+            position: fixed; left: 220px; top: 64px; bottom: 0;
+            width: 240px; flex-shrink: 0; z-index: 50;
             background: var(--dark-card); border-right: 1px solid var(--dark-border);
-            padding: 24px 0; overflow-y: auto; position: sticky; top: 64px;
-            height: calc(100vh - 64px);
+            padding: 24px 0; overflow-y: auto;
         }
         .filter-header {
             padding: 0 20px 16px; display: flex; align-items: center; justify-content: space-between;
@@ -184,7 +184,7 @@
         }
 
         /* ─── MAIN CONTENT ─── */
-        .main-content { flex: 1; padding: 28px 32px; overflow-y: auto; }
+        .main-content { flex: 1; padding: 28px 32px; overflow-y: auto; margin-left: 240px; }
 
         /* Breadcrumb */
         .breadcrumb {
@@ -225,16 +225,6 @@
         }
         .sort-select:focus { border-color: var(--neon-blue); }
 
-        .view-toggle { display: flex; gap: 4px; }
-        .view-btn {
-            width: 36px; height: 36px; border-radius: 6px; border: 1px solid var(--dark-border);
-            background: var(--dark-surface); color: var(--text-secondary);
-            display: flex; align-items: center; justify-content: center; cursor: pointer;
-            transition: all 0.15s;
-        }
-        .view-btn.active, .view-btn:hover { border-color: var(--neon-blue); color: var(--neon-blue); background: var(--accent-glow); }
-        .view-btn svg { width: 16px; height: 16px; }
-
         .results-count { font-size: 13px; color: var(--text-secondary); white-space: nowrap; }
         .results-count strong { color: var(--text-primary); }
 
@@ -243,8 +233,6 @@
             display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;
             margin-bottom: 32px;
         }
-        .products-grid.list-view { grid-template-columns: 1fr; }
-
         .product-card {
             background: var(--dark-card); border: 1px solid var(--dark-border);
             border-radius: 12px; overflow: hidden; cursor: pointer;
@@ -304,13 +292,6 @@
         .stock-low { color: #fbbf24; }
         .stock-out { color: #f87171; }
 
-        /* LIST VIEW */
-        .products-grid.list-view .product-card { display: flex; flex-direction: row; }
-        .products-grid.list-view .product-img { width: 140px; flex-shrink: 0; aspect-ratio: auto; }
-        .products-grid.list-view .product-info { flex: 1; padding: 20px; display: flex; flex-direction: column; justify-content: center; }
-        .products-grid.list-view .product-name { font-size: 16px; }
-        .products-grid.list-view .product-actions { position: static; opacity: 1; transform: none; background: none; padding: 0; margin-top: 12px; width: fit-content; }
-
         /* ─── PAGINATION ─── */
         .pagination {
             display: flex; align-items: center; justify-content: center; gap: 6px;
@@ -349,6 +330,7 @@
             .hamburger { display: block; }
             .filter-sidebar { display: none; }
             .filter-sidebar.open { display: block; position: fixed; z-index: 98; top: 64px; left: 0; bottom: 0; }
+            .main-content { margin-left: 0; }
             .products-grid { grid-template-columns: repeat(2, 1fr); }
         }
         @media (max-width: 540px) {
@@ -401,9 +383,7 @@
     <div class="topbar-actions">
         <a href="/carrito" class="icon-btn">
             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
-            <span class="cart-count"
-                  th:text="${session.carrito != null ? #lists.size(session.carrito) : 0}">
-            </span>
+            <span class="cart-count" th:text="${totalItems != null ? totalItems : 0}"></span>
         </a>
     </div>
 </header>
@@ -433,24 +413,66 @@
                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
             </div>
             <div class="filter-options">
-                <label class="filter-option"><input type="checkbox"
-                                                    value="Figuras"
-                                                    onchange="filterProducts()"/><div class="filter-checkbox"></div><span class="filter-label">Figuras</span><span class="filter-count"></span></label>
-                <label class="filter-option"><input type="checkbox"
-                                                    value="Mangas"
-                                                    onchange="filterProducts()"/><div class="filter-checkbox"></div><span class="filter-label">Mangas</span><span class="filter-count"></span></label>
-                <label class="filter-option"><input type="checkbox"
-                                                    value="Ropa"
-                                                    onchange="filterProducts()"/><div class="filter-checkbox"></div><span class="filter-label">Ropa</span><span class="filter-count"></span></label>
-                <label class="filter-option"><input type="checkbox"
-                                                    value="Funko Pop!"
-                                                    onchange="filterProducts()"/><div class="filter-checkbox"></div><span class="filter-label">Funko Pop!</span><span class="filter-count"></span></label>
-                <label class="filter-option"><input type="checkbox"
-                                                    value="Pósters"
-                                                    onchange="filterProducts()"/><div class="filter-checkbox"></div><span class="filter-label">Pósters</span><span class="filter-count"></span></label>
-                <label class="filter-option"><input type="checkbox"
-                                                    value="Accesorios"
-                                                    onchange="filterProducts()"/><div class="filter-checkbox"></div><span class="filter-label">Accesorios</span><span class="filter-count"></span></label>
+                <label class="filter-option">
+                    <input type="checkbox" data-type="cat" value="Camisas Importadas" onchange="filterProducts()"/>
+                    <div class="filter-checkbox"></div>
+                    <span class="filter-label">👔 Camisas Importadas</span>
+                </label>
+                <label class="filter-option">
+                    <input type="checkbox" data-type="cat" value="Camisas Nacionales" onchange="filterProducts()"/>
+                    <div class="filter-checkbox"></div>
+                    <span class="filter-label">🌿 Camisas Nacionales</span>
+                </label>
+                <label class="filter-option">
+                    <input type="checkbox" data-type="cat" value="Gorras" onchange="filterProducts()"/>
+                    <div class="filter-checkbox"></div>
+                    <span class="filter-label">🧢 Gorras</span>
+                </label>
+                <label class="filter-option">
+                    <input type="checkbox" data-type="cat" value="Tulas" onchange="filterProducts()"/>
+                    <div class="filter-checkbox"></div>
+                    <span class="filter-label">🎒 Tulas</span>
+                </label>
+                <label class="filter-option">
+                    <input type="checkbox" data-type="cat" value="Medias" onchange="filterProducts()"/>
+                    <div class="filter-checkbox"></div>
+                    <span class="filter-label">🧦 Medias</span>
+                </label>
+                <label class="filter-option">
+                    <input type="checkbox" data-type="cat" value="Billeteras" onchange="filterProducts()"/>
+                    <div class="filter-checkbox"></div>
+                    <span class="filter-label">👛 Billeteras</span>
+                </label>
+            </div>
+        </div>
+
+        <!-- Colecciones -->
+        <div class="filter-group">
+            <div class="filter-group-title" onclick="toggleGroup(this)">
+                Colecciones
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+            </div>
+            <div class="filter-options">
+                <label class="filter-option">
+                    <input type="checkbox" data-type="serie" value="Death Note" onchange="filterProducts()"/>
+                    <div class="filter-checkbox"></div>
+                    <span class="filter-label">📓 Death Note</span>
+                </label>
+                <label class="filter-option">
+                    <input type="checkbox" data-type="serie" value="One Piece" onchange="filterProducts()"/>
+                    <div class="filter-checkbox"></div>
+                    <span class="filter-label">⚓ One Piece</span>
+                </label>
+                <label class="filter-option">
+                    <input type="checkbox" data-type="serie" value="Naruto" onchange="filterProducts()"/>
+                    <div class="filter-checkbox"></div>
+                    <span class="filter-label">🍃 Naruto</span>
+                </label>
+                <label class="filter-option">
+                    <input type="checkbox" data-type="serie" value="Demon Slayer" onchange="filterProducts()"/>
+                    <div class="filter-checkbox"></div>
+                    <span class="filter-label">⚔️ Demon Slayer</span>
+                </label>
             </div>
         </div>
 
@@ -472,14 +494,6 @@
                     <option value="precio-desc">Precio: mayor a menor</option>
                     <option value="nombre">Nombre A–Z</option>
                 </select>
-                <div class="view-toggle">
-                    <button class="view-btn active" id="gridBtn" onclick="setView('grid')" title="Cuadrícula">
-                        <svg fill="currentColor" viewBox="0 0 24 24"><path d="M3 3h7v7H3V3zm0 11h7v7H3v-7zm11-11h7v7h-7V3zm0 11h7v7h-7v-7z"/></svg>
-                    </button>
-                    <button class="view-btn" id="listBtn" onclick="setView('list')" title="Lista">
-                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
-                    </button>
-                </div>
             </div>
         </div>
         <!-- Products -->
@@ -490,6 +504,7 @@
                th:each="producto : ${productos}"
                th:data-name="${producto.nombre}"
                th:data-cat="${producto.categoria}"
+               th:data-serie="${producto.serie}"
                th:data-precio="${producto.precio}"
                th:data-stock="${producto.stock}">
 
@@ -506,16 +521,6 @@
                         📦
                     </div>
 
-                    <div class="product-actions">
-                        <form th:action="@{/carrito/agregar/{id}(id=${producto.id})}"
-                              method="post">
-                            <button class="add-cart-btn"
-                                    type="submit"
-                                    th:disabled="${producto.stock <= 0}">
-                                Agregar
-                            </button>
-                        </form>
-                    </div>
                 </div>
 
                 <!-- Info -->
@@ -575,33 +580,6 @@
         document.getElementById('navSidebar').classList.toggle('open');
     }
 
-    // ───────── CAMBIAR VISTA ─────────
-    function setView(mode) {
-
-        const grid = document.getElementById('productsGrid');
-
-        const gridBtn = document.getElementById('gridBtn');
-
-        const listBtn = document.getElementById('listBtn');
-
-        if (mode === 'list') {
-
-            grid.classList.add('list-view');
-
-            listBtn.classList.add('active');
-
-            gridBtn.classList.remove('active');
-
-        } else {
-
-            grid.classList.remove('list-view');
-
-            gridBtn.classList.add('active');
-
-            listBtn.classList.remove('active');
-        }
-    }
-
     // ───────── ABRIR / CERRAR FILTRO ─────────
     function toggleGroup(el) {
 
@@ -618,68 +596,46 @@
         }
     }
 
-    // ───────── FILTRO SOLO POR CATEGORÍA ─────────
+    // ───────── FILTRO POR CATEGORÍA Y COLECCIÓN ─────────
     function filterProducts() {
 
         const searchText =
             document.getElementById('searchInput')
-                .value
-                .trim()
-                .toLowerCase();
+                .value.trim().toLowerCase();
 
         const selectedCategories =
-            Array.from(
-                document.querySelectorAll('.filter-option input:checked')
-            ).map(cb => cb.value.trim().toLowerCase());
+            Array.from(document.querySelectorAll('input[data-type="cat"]:checked'))
+                .map(cb => cb.value.trim().toLowerCase());
 
-        const cards =
-            document.querySelectorAll('.product-card');
+        const selectedCollections =
+            Array.from(document.querySelectorAll('input[data-type="serie"]:checked'))
+                .map(cb => cb.value.trim().toLowerCase());
 
+        const cards = document.querySelectorAll('.product-card');
         let visibles = 0;
 
         cards.forEach(card => {
+            const category = (card.dataset.cat   || '').trim().toLowerCase();
+            const serie    = (card.dataset.serie  || '').trim().toLowerCase();
+            const name     = (card.dataset.name   || '').trim().toLowerCase();
 
-            const category =
-                (card.dataset.cat || '')
-                    .trim()
-                    .toLowerCase();
+            const matchCategory   = selectedCategories.length  === 0 || selectedCategories.includes(category);
+            const matchCollection = selectedCollections.length === 0 || selectedCollections.includes(serie);
+            const matchSearch     = name.includes(searchText);
 
-            const name =
-                (card.dataset.name || '')
-                    .trim()
-                    .toLowerCase();
-
-            const matchCategory =
-                selectedCategories.length === 0 ||
-                selectedCategories.includes(category);
-
-            const matchSearch =
-                name.includes(searchText);
-
-            const show =
-                matchCategory && matchSearch;
-
-            card.style.display =
-                show ? 'block' : 'none';
-
+            const show = matchCategory && matchCollection && matchSearch;
+            card.style.display = show ? 'block' : 'none';
             if (show) visibles++;
         });
 
         document.getElementById('emptyState').style.display =
-            visibles === 0
-                ? 'block'
-                : 'none';
+            visibles === 0 ? 'block' : 'none';
     }
 
     // ───────── LIMPIAR FILTROS ─────────
     function resetFilters() {
-
-        document
-            .querySelectorAll('.filter-option input')
-            .forEach(cb => cb.checked = false);
-
+        document.querySelectorAll('.filter-option input').forEach(cb => cb.checked = false);
         filterProducts();
-
         return false;
     }
 
@@ -720,8 +676,25 @@
         cards.forEach(card => grid.appendChild(card));
     }
 
-    // Inicializar
-    filterProducts();
+    // ───────── PRE-SELECCIONAR FILTROS DESDE URL ─────────
+    (function initFilters() {
+        const params = new URLSearchParams(window.location.search);
+        const catParam       = params.get('cat');
+        const coleccionParam = params.get('coleccion');
+
+        if (catParam) {
+            document.querySelectorAll('input[data-type="cat"]').forEach(cb => {
+                if (cb.value.toLowerCase() === catParam.toLowerCase()) cb.checked = true;
+            });
+        }
+        if (coleccionParam) {
+            document.querySelectorAll('input[data-type="serie"]').forEach(cb => {
+                if (cb.value.toLowerCase() === coleccionParam.toLowerCase()) cb.checked = true;
+            });
+        }
+
+        filterProducts();
+    })();
 
 </script>
 

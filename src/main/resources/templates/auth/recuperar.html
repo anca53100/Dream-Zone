@@ -6,13 +6,50 @@
     <title>Recuperar contraseña - Dream Zone</title>
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@400;500;600&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" th:href="@{/css/style.css}">
+    <style>
+        .email-sent-card {
+            background: rgba(0, 212, 100, 0.07);
+            border: 1px solid rgba(0, 212, 100, 0.35);
+            border-radius: 12px;
+            padding: 28px 24px;
+            text-align: center;
+            margin-top: 8px;
+        }
+        .email-sent-icon {
+            font-size: 48px;
+            margin-bottom: 12px;
+            display: block;
+        }
+        .email-sent-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #22c55e;
+            margin-bottom: 8px;
+        }
+        .email-sent-body {
+            font-size: 14px;
+            color: #9ca3af;
+            line-height: 1.6;
+        }
+        .email-sent-address {
+            color: #f9fafb;
+            font-weight: 600;
+            word-break: break-all;
+        }
+        .email-sent-note {
+            margin-top: 16px;
+            font-size: 12px;
+            color: #6b7280;
+        }
+    </style>
 </head>
 <body class="auth-body">
 
 <div class="auth-wrapper">
 
-    <!-- Panel izquierdo vacío -->
-    <div class="auth-banner"></div>
+    <div class="auth-banner">
+        <img src="/images/login/login.png" alt="Dream Zone" style="width:100%;height:100%;object-fit:cover;display:block;">
+    </div>
 
     <!-- Panel derecho: formulario -->
     <div class="auth-card">
@@ -21,38 +58,58 @@
             DREAM<br>ZONE
         </div>
 
-        <h2 class="auth-title">Recuperar contraseña</h2>
-        <p class="auth-subtitle">Te enviaremos un enlace a tu correo</p>
+        <!-- ── Estado normal: pedir email ── -->
+        <div th:if="${emailEnviado == null}">
+            <h2 class="auth-title">Recuperar contraseña</h2>
+            <p class="auth-subtitle">Ingresa tu correo y te enviaremos un enlace para restablecer tu contraseña</p>
 
-        <!-- Mensaje de error -->
-        <div th:if="${error}" class="auth-alert auth-alert-error">
-            <span th:text="${error}"></span>
-        </div>
-
-        <!-- Mensaje de éxito -->
-        <div th:if="${exito}" class="auth-alert auth-alert-success">
-            <span th:text="${exito}"></span>
-        </div>
-
-        <form th:action="@{/auth/recuperar}" method="post">
-
-            <div class="auth-field">
-                <label for="email">Correo electrónico</label>
-                <input type="email"
-                       id="email"
-                       name="email"
-                       placeholder="tu@email.com"
-                       required
-                       class="auth-input">
+            <!-- Mensaje de error -->
+            <div th:if="${error}" class="auth-alert auth-alert-error">
+                <span th:text="${error}"></span>
             </div>
 
-            <button type="submit" class="btn-auth-primary">Enviar enlace</button>
+            <form th:action="@{/auth/recuperar}" method="post">
+                <div class="auth-field">
+                    <label for="email">Correo electrónico</label>
+                    <input type="email"
+                           id="email"
+                           name="email"
+                           placeholder="tu@email.com"
+                           required
+                           class="auth-input">
+                </div>
+                <button type="submit" class="btn-auth-primary">Enviar enlace</button>
+            </form>
 
-        </form>
+            <p class="auth-footer-text" style="margin-top: 16px;">
+                <a th:href="@{/auth/login}" class="auth-link">← Volver al login</a>
+            </p>
+        </div>
 
-        <p class="auth-footer-text" style="margin-top: 16px;">
-            <a th:href="@{/auth/login}" class="auth-link">← Volver al login</a>
-        </p>
+        <!-- ── Estado confirmación: enlace enviado ── -->
+        <div th:if="${emailEnviado != null}">
+            <h2 class="auth-title">Revisa tu correo</h2>
+
+            <div class="email-sent-card">
+                <span class="email-sent-icon">📧</span>
+                <div class="email-sent-title">¡Enlace enviado!</div>
+                <div class="email-sent-body">
+                    Hemos enviado un enlace de recuperación a<br>
+                    <span class="email-sent-address" th:text="${emailEnviado}"></span>
+                </div>
+                <div class="email-sent-note">
+                    El enlace es válido durante 60 minutos.<br>
+                    Si no ves el correo, revisa tu carpeta de spam.
+                </div>
+            </div>
+
+            <p class="auth-footer-text" style="margin-top: 24px; text-align:center;">
+                <a th:href="@{/auth/recuperar}" class="auth-link">← Intentar con otro correo</a>
+            </p>
+            <p class="auth-footer-text" style="margin-top: 8px; text-align:center;">
+                <a th:href="@{/auth/login}" class="auth-link">← Volver al login</a>
+            </p>
+        </div>
 
     </div>
 </div>

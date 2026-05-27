@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Service
@@ -14,8 +15,6 @@ public class UsuarioService {
     @Autowired
     private UsuarioRepository usuarioRepository;
 
-    // BCryptPasswordEncoder es accesible porque spring-security-crypto
-    // ya está en el classpath vía thymeleaf-extras-springsecurity6.
     private final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 
     /** Busca un usuario por correo electrónico. */
@@ -23,14 +22,9 @@ public class UsuarioService {
         return usuarioRepository.findByEmail(email);
     }
 
-    /**
-     * Registra un nuevo usuario.
-     * @return false si el correo ya existe.
-     */
+    /** Registra un nuevo usuario. @return false si el correo ya existe. */
     public boolean registrar(String nombre, String email, String rawPassword) {
-        if (usuarioRepository.findByEmail(email).isPresent()) {
-            return false;
-        }
+        if (usuarioRepository.findByEmail(email).isPresent()) return false;
         Usuario u = new Usuario();
         u.setNombre(nombre);
         u.setEmail(email);
@@ -44,22 +38,38 @@ public class UsuarioService {
     public boolean validarPassword(String rawPassword, String encodedPassword) {
         return encoder.matches(rawPassword, encodedPassword);
     }
-    public boolean guardarTokenRecuperacion(String email, String token) {
-        Optional<Usuario> usuarioOpt = usuarioRepository.findByEmail(email);
-        if (usuarioOpt.isEmpty()) return false;
-        Usuario usuario = usuarioOpt.get();
-        usuario.setTokenRecuperacion(token);
-        usuarioRepository.save(usuario);
+
+    // ─── Recuperación por enlace UUID ──────────────────────────────────────
+
+    /**
+     * Cambia la contraseña usando el token UUID del enlace enviado por email.
+     */
+    public boolean cambiarPassword(String token, String nuevaPassword) {
+        Optional<Usuario> opt = usuarioRepository.findByTokenRecuperacion(token);
+        if (opt.isEmpty()) return false;
+
+        Usuario u = opt.get();
+        if (u.getTokenExpiracion() != null && u.getTokenExpiracion().isBefore(LocalDateTime.now()))
+            return false;
+
+        u.setPassword(encoder.encode(nuevaPassword));
+        u.setTokenRecuperacion(null);
+        u.setTokenExpiracion(null);
+        usuarioRepository.save(u);
         return true;
     }
 
-    public boolean cambiarPassword(String token, String nuevaPassword) {
-        Optional<Usuario> usuarioOpt = usuarioRepository.findByTokenRecuperacion(token);
-        if (usuarioOpt.isEmpty()) return false;
-        Usuario usuario = usuarioOpt.get();
-        usuario.setPassword(encoder.encode(nuevaPassword)); // BCrypt aplicado
-        usuario.setTokenRecuperacion(null);
-        usuarioRepository.save(usuario);
+    /**
+     * Guarda el token UUID de recuperación con expiración de 60 minutos.
+     * @return false si el email no existe.
+     */
+    public boolean guardarTokenRecuperacion(String email, String token) {
+        Optional<Usuario> opt = usuarioRepository.findByEmail(email);
+        if (opt.isEmpty()) return false;
+        Usuario u = opt.get();
+        u.setTokenRecuperacion(token);
+        u.setTokenExpiracion(LocalDateTime.now().plusMinutes(60));
+        usuarioRepository.save(u);
         return true;
     }
 }

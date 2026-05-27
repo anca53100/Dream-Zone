@@ -46,6 +46,10 @@ public class ProductoService {
         return productoRepository.findByNombreContainingIgnoreCase(nombre);
     }
 
+    public List<Producto> obtenerPorSerie(String serie) {
+        return productoRepository.findBySerie(serie);
+    }
+
     // ProductoService.java — agregar
     public Map<String, Long> contarPorCategoria() {
         return obtenerTodos().stream()

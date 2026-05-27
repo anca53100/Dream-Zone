@@ -12,7 +12,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @Controller
@@ -111,48 +113,72 @@ public class AdminController {
     public String nuevoProducto(Model model) {
         model.addAttribute("producto", new Producto());
         model.addAttribute("categorias",
-                List.of("Figuras","Mangas","Ropa","Funko Pop!","Pósters","Accesorios"));
+                List.of("Camisas Importadas","Camisas Nacionales","Gorras","Tulas","Medias","Billeteras"));
+        model.addAttribute("colecciones",
+                List.of("Death Note","One Piece","Naruto","Demon Slayer"));
         return "admin/formulario-producto";
     }
 
-    // ── Guardar (crear) ──
+    // ── Guardar (crear / editar) ──
     @PostMapping("/productos/guardar")
-    public String guardar(@ModelAttribute Producto producto,
-                          @RequestParam("archivo") MultipartFile archivo) throws IOException {
+    public String guardar(
+            @ModelAttribute Producto formData,
+            @RequestParam("archivo") MultipartFile archivo,
+            @RequestParam(value = "tallaXS",  required = false, defaultValue = "0") int tallaXS,
+            @RequestParam(value = "tallaS",   required = false, defaultValue = "0") int tallaS,
+            @RequestParam(value = "tallaM",   required = false, defaultValue = "0") int tallaM,
+            @RequestParam(value = "tallaL",   required = false, defaultValue = "0") int tallaL,
+            @RequestParam(value = "tallaXL",  required = false, defaultValue = "0") int tallaXL,
+            @RequestParam(value = "tallaXXL", required = false, defaultValue = "0") int tallaXXL
+    ) throws IOException {
 
-        // Mantener imagen anterior si no suben una nueva
-        if (producto.getId() != null && !producto.getId().isBlank()) {
+        boolean esEdicion = formData.getId() != null && !formData.getId().isBlank();
 
-            Producto existente = productoService.obtenerPorId(producto.getId())
-                    .orElse(null);
+        // ── Para edición: partir del producto existente en DB ──
+        // Así no se pierden campos que no están en el formulario
+        Producto producto = esEdicion
+                ? productoService.obtenerPorId(formData.getId()).orElse(new Producto())
+                : new Producto();
 
-            if (existente != null) {
-                producto.setImagen(existente.getImagen());
-            }
-        }
+        // ── Copiar campos del formulario ──
+        producto.setId(formData.getId());
+        producto.setNombre(formData.getNombre());
+        producto.setDescripcion(formData.getDescripcion());
+        producto.setCategoria(formData.getCategoria());
+        producto.setSerie(formData.getSerie());
+        producto.setPrecio(formData.getPrecio());
+        producto.setMaterial(formData.getMaterial());
+        producto.setEstado((formData.getEstado() == null || formData.getEstado().isBlank())
+                ? "Activo" : formData.getEstado());
 
-        // Guardar nueva imagen
+        // ── Imagen: guardar nueva o conservar la existente ──
         if (archivo != null && !archivo.isEmpty()) {
-
             Path dir = Paths.get("uploads/productos/");
             Files.createDirectories(dir);
-
             String filename = UUID.randomUUID() + "_" + archivo.getOriginalFilename();
-
-            Files.copy(
-                    archivo.getInputStream(),
-                    dir.resolve(filename)
-            );
-
+            Files.copy(archivo.getInputStream(), dir.resolve(filename));
             producto.setImagen("/uploads/productos/" + filename);
         }
+        // Si no hay archivo nuevo, producto ya trae la imagen del DB (en edición)
+        // o null (en creación sin imagen)
 
-        if (producto.getEstado() == null || producto.getEstado().isBlank()) {
-            producto.setEstado("Activo");
+        // ── Stock por talla (solo Camisas) ──
+        if (Producto.tieneTallas(formData.getCategoria())) {
+            Map<String, Integer> tallas = new LinkedHashMap<>();
+            tallas.put("XS",  tallaXS);
+            tallas.put("S",   tallaS);
+            tallas.put("M",   tallaM);
+            tallas.put("L",   tallaL);
+            tallas.put("XL",  tallaXL);
+            tallas.put("XXL", tallaXXL);
+            producto.setStockPorTalla(tallas);
+            producto.setStock(tallaXS + tallaS + tallaM + tallaL + tallaXL + tallaXXL);
+        } else {
+            producto.setStockPorTalla(null);
+            producto.setStock(formData.getStock());
         }
 
         productoService.guardar(producto);
-
         return "redirect:/admin/productos";
     }
     // ── Editar (GET) ──
@@ -160,7 +186,9 @@ public class AdminController {
     public String editar(@PathVariable String id, Model model) {
         productoService.obtenerPorId(id).ifPresent(p -> model.addAttribute("producto", p));
         model.addAttribute("categorias",
-                List.of("Figuras","Mangas","Ropa","Funko Pop!","Pósters","Accesorios"));
+                List.of("Camisas Importadas","Camisas Nacionales","Gorras","Tulas","Medias","Billeteras"));
+        model.addAttribute("colecciones",
+                List.of("Death Note","One Piece","Naruto","Demon Slayer"));
         return "admin/formulario-producto";   // reutiliza el mismo formulario
     }
 

@@ -10,98 +10,92 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.Optional;
-import java.util.UUID;
 
 @Controller
 @RequestMapping("/auth")
 public class AuthController {
 
-    @Autowired
-    private UsuarioService usuarioService;
+    @Autowired private UsuarioService  usuarioService;
+    @Autowired private CarritoService  carritoService;
+    @Autowired private JavaMailSender  mailSender;
 
-    @Autowired
-    private CarritoService carritoService;
-
-    @Autowired
-    private JavaMailSender mailSender;
-
+    // ─── Login ────────────────────────────────────────────────────────────
     @GetMapping("/login")
-    public String mostrarLogin(Model model) {
-        return "auth/login";
-    }
+    public String mostrarLogin() { return "auth/login"; }
 
     @PostMapping("/login")
     public String procesarLogin(@RequestParam String email,
                                 @RequestParam String password,
-                                HttpSession session,
-                                Model model) {
-
-        Optional<Usuario> usuarioOpt = usuarioService.findByEmail(email);
-
-        if (usuarioOpt.isEmpty() || !usuarioService.validarPassword(password, usuarioOpt.get().getPassword())) {
+                                HttpSession session, Model model) {
+        Optional<Usuario> opt = usuarioService.findByEmail(email);
+        if (opt.isEmpty() || !usuarioService.validarPassword(password, opt.get().getPassword())) {
             model.addAttribute("error", "Correo o contraseña incorrectos");
             return "auth/login";
         }
-
-        Usuario usuario = usuarioOpt.get();
+        Usuario usuario = opt.get();
         session.setAttribute("usuarioLogueado", usuario);
         carritoService.vincularCarritoAlUsuario(session.getId(), usuario.getId());
-
         return "ROLE_ADMIN".equals(usuario.getRol()) ? "redirect:/admin" : "redirect:/";
     }
 
+    // ─── Registro ─────────────────────────────────────────────────────────
     @GetMapping("/register")
-    public String mostrarRegistro() {
-        return "auth/register";
-    }
+    public String mostrarRegistro() { return "auth/register"; }
 
     @PostMapping("/register")
     public String procesarRegistro(@RequestParam String nombre,
                                    @RequestParam String email,
                                    @RequestParam String password,
                                    Model model) {
-        boolean registrado = usuarioService.registrar(nombre, email, password);
-        if (!registrado) {
+        if (!usuarioService.registrar(nombre, email, password)) {
             model.addAttribute("error", "Ya existe una cuenta con ese correo");
             return "auth/register";
         }
         return "redirect:/auth/login?registrado=true";
     }
 
+    // ─── Logout ───────────────────────────────────────────────────────────
     @GetMapping("/logout")
     public String logout(HttpSession session) {
         session.invalidate();
         return "redirect:/auth/login";
     }
 
+    // ─── Recuperar contraseña: solicitar enlace ───────────────────────────
     @GetMapping("/recuperar")
-    public String mostrarRecuperar() {
-        return "auth/recuperar";
-    }
+    public String mostrarRecuperar() { return "auth/recuperar"; }
 
     @PostMapping("/recuperar")
-    public String procesarRecuperar(@RequestParam String email, Model model) {
-        String token = UUID.randomUUID().toString();
-        boolean existe = usuarioService.guardarTokenRecuperacion(email, token);
-
-        if (!existe) {
-            model.addAttribute("error", "No existe una cuenta con ese correo");
+    public String procesarRecuperar(@RequestParam String email,
+                                    Model model) {
+        String token = java.util.UUID.randomUUID().toString();
+        boolean ok = usuarioService.guardarTokenRecuperacion(email, token);
+        if (!ok) {
+            model.addAttribute("error", "No existe una cuenta con ese correo.");
             return "auth/recuperar";
         }
 
+        // Enviar enlace por email
         String enlace = "http://localhost:8080/auth/nueva-contrasena?token=" + token;
-        SimpleMailMessage mensaje = new SimpleMailMessage();
-        mensaje.setTo(email);
-        mensaje.setSubject("Recuperar contraseña - Dream Zone");
-        mensaje.setText("Haz clic aquí para cambiar tu contraseña:\n\n" + enlace);
-        mailSender.send(mensaje);
+        SimpleMailMessage msg = new SimpleMailMessage();
+        msg.setTo(email);
+        msg.setSubject("Restablecer contraseña — Dream Zone");
+        msg.setText(
+            "Hola,\n\n" +
+            "Haz clic en el siguiente enlace para restablecer tu contraseña:\n\n" +
+            enlace + "\n\n" +
+            "El enlace es válido durante 60 minutos.\n" +
+            "Si no solicitaste esto, ignora este mensaje.\n\n" +
+            "— El equipo de Dream Zone"
+        );
+        mailSender.send(msg);
 
-        model.addAttribute("exito", "Te enviamos un enlace a tu correo.");
+        model.addAttribute("emailEnviado", email);
         return "auth/recuperar";
     }
 
+    // ─── Nueva contraseña (desde enlace) ─────────────────────────────────
     @GetMapping("/nueva-contrasena")
     public String mostrarNuevaContrasena(@RequestParam String token, Model model) {
         model.addAttribute("token", token);
@@ -112,8 +106,7 @@ public class AuthController {
     public String procesarNuevaContrasena(@RequestParam String token,
                                           @RequestParam String password,
                                           Model model) {
-        boolean ok = usuarioService.cambiarPassword(token, password);
-        if (!ok) {
+        if (!usuarioService.cambiarPassword(token, password)) {
             model.addAttribute("error", "El enlace no es válido o ya fue usado.");
             model.addAttribute("token", token);
             return "auth/nueva-contrasena";

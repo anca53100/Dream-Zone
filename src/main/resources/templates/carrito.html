@@ -341,11 +341,16 @@
             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
             Tienda
         </a>
-        <a href="/carrito" class="nav-item active">
-            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
-            Carrito
-        </a>
     </nav>
+    <a href="/admin" class="nav-item"
+       th:if="${session.usuarioLogueado != null and session.usuarioLogueado.rol == 'ROLE_ADMIN'}">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+        </svg>
+        Panel Admin
+    </a>
     <div class="sidebar-bottom">
         <a href="/auth/logout" class="nav-item">
             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
@@ -359,11 +364,6 @@
         <svg width="22" height="22" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
     </button>
     <span class="topbar-title">MI CARRITO</span>
-    <div class="topbar-actions">
-        <a href="/tienda" class="icon-btn" title="Seguir comprando">
-            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
-        </a>
-    </div>
 </header>
 
 <div class="page-wrapper">
@@ -403,7 +403,8 @@
                 <!-- Renderizado por Thymeleaf -->
                 <div class="cart-item"
                      th:each="item, iStat : ${carrito.items}"
-                     th:attr="data-id=${item.idProducto},data-price=${item.precio}"
+                     th:with="lineKey=${item.idProducto + (item.talla != null and !item.talla.isEmpty() ? '|' + item.talla : '')}"
+                     th:attr="data-id=${item.idProducto},data-talla=${item.talla ?: ''},data-price=${item.precio}"
                      th:style="${'animation-delay:' + (iStat.index * 0.07) + 's'}">
 
                     <label class="item-check">
@@ -411,35 +412,47 @@
                         <div class="item-cb"></div>
                     </label>
 
-                    <!-- Thumb: emoji según categoría -->
+                    <!-- Thumb: imagen del producto -->
                     <div class="item-thumb">
-                        <span th:text="${item.categoria != null and !item.categoria.isEmpty() ?
-                            (item.categoria.equalsIgnoreCase('figuras')    ? '🗿' :
-                             item.categoria.equalsIgnoreCase('mangas')     ? '📚' :
-                             item.categoria.equalsIgnoreCase('ropa')       ? '👕' :
-                             item.categoria.equalsIgnoreCase('funko')      ? '🎭' :
-                             item.categoria.equalsIgnoreCase('posters')    ? '🖼' :
-                             item.categoria.equalsIgnoreCase('accesorios') ? '🎒' : '📦')
-                            : '📦'}">📦</span>
+                        <img th:if="${item.imagen != null and !item.imagen.isEmpty()}"
+                             th:src="${item.imagen}"
+                             alt="Producto"
+                             style="width:100%; height:100%; object-fit:cover; border-radius:8px;"/>
+                        <span th:if="${item.imagen == null or item.imagen.isEmpty()}">📦</span>
                     </div>
 
                     <div class="item-info">
                         <div class="item-series" th:text="${item.serie}"></div>
                         <div class="item-name" th:text="${item.nombre}"></div>
+                        <!-- Badge de talla (solo si tiene) -->
+                        <div th:if="${item.talla != null and !item.talla.isEmpty()}"
+                             style="display:inline-block;margin-top:3px;padding:2px 8px;
+                                    background:rgba(0,212,255,0.1);border:1px solid rgba(0,212,255,0.3);
+                                    border-radius:4px;font-size:11px;font-weight:700;color:#00d4ff;letter-spacing:1px;"
+                             th:text="'TALLA ' + ${item.talla}">
+                        </div>
                         <div class="item-unit" th:text="${'$' + #numbers.formatDecimal(item.precio, 1, 'COMMA', 0, 'POINT') + ' c/u'}"></div>
                     </div>
 
                     <div class="item-right">
                         <div class="item-total"
-                             th:id="${'itotal-' + item.idProducto}"
+                             th:id="${'itotal-' + lineKey}"
                              th:text="${'$' + #numbers.formatDecimal(item.subtotal, 1, 'COMMA', 0, 'POINT')}"></div>
 
-                        <div class="qty-wrap">
+                        <!-- Controles de cantidad: solo para productos SIN talla -->
+                        <div class="qty-wrap" th:if="${item.talla == null or item.talla.isEmpty()}">
                             <button class="qty-btn" onclick="handleQtyBtn(this, -1)">−</button>
                             <div class="qty-num"
-                                 th:id="${'iqty-' + item.idProducto}"
+                                 th:id="${'iqty-' + lineKey}"
                                  th:text="${item.cantidad}">1</div>
                             <button class="qty-btn" onclick="handleQtyBtn(this, 1)">+</button>
+                        </div>
+                        <!-- Cantidad fija para productos CON talla (no editable) -->
+                        <div th:if="${item.talla != null and !item.talla.isEmpty()}"
+                             style="font-size:13px;color:var(--text-secondary);text-align:center;">
+                            Cant:&nbsp;<span th:id="${'iqty-' + lineKey}"
+                                            th:text="${item.cantidad}"
+                                            style="font-weight:700;color:var(--text-primary);">1</span>
                         </div>
 
                         <button class="remove-btn" onclick="handleRemoveBtn(this)">
@@ -509,21 +522,31 @@
         }).then(r => r.json());
     }
 
+    // ─── Clave única de línea de carrito ────────────────────────────────────────
+    function lineKey(id, talla) {
+        return id + (talla ? '|' + talla : '');
+    }
+
     // ─── Delegación de eventos en botones de ítem ──────────────────────────────
     function handleQtyBtn(btn, delta) {
-        const id = btn.closest('.cart-item').dataset.id;
+        const cartItem = btn.closest('.cart-item');
+        if (!cartItem) return;
+        const id = cartItem.dataset.id;
+        // +/- solo existe para items sin talla
         changeQty(id, delta);
     }
 
     function handleRemoveBtn(btn) {
-        const id = btn.closest('.cart-item').dataset.id;
-        removeItem(id);
+        const el = btn.closest('.cart-item');
+        if (!el) return;
+        doRemoveItem(el);
     }
 
-    // ─── Cambiar cantidad ──────────────────────────────────────────────────────
+    // ─── Cambiar cantidad (solo items sin talla) ───────────────────────────────
     function changeQty(id, delta) {
-        const qtyEl = document.getElementById('iqty-' + id);
-        const totEl = document.getElementById('itotal-' + id);
+        const lk = lineKey(id, '');
+        const qtyEl = document.getElementById('iqty-' + lk);
+        const totEl = document.getElementById('itotal-' + lk);
         if (!qtyEl) return;
 
         const currentQty = parseInt(qtyEl.textContent);
@@ -541,23 +564,36 @@
             });
     }
 
-    // ─── Eliminar ítem ─────────────────────────────────────────────────────────
-    function removeItem(id) {
-        const el = document.querySelector('.cart-item[data-id="' + id + '"]');
-        if (!el) return;
-        el.style.opacity = '0';
-        el.style.transform = 'translateX(-24px)';
-        el.style.transition = 'opacity 0.26s, transform 0.26s';
+    // ─── Eliminar ítem: recibe el elemento DOM directamente ────────────────────
+    function doRemoveItem(el) {
+        const id    = el.dataset.id;
+        const talla = el.dataset.talla || '';
 
-        api('/carrito/eliminar/' + id, {})
-            .then(data => {
-                setTimeout(() => {
-                    el.remove();
-                    updateSubtitle(data.totalItems);
-                    checkIfEmpty();
-                    recalc();
-                }, 270);
-            });
+        // Animación de salida
+        el.style.transition = 'opacity 0.26s, transform 0.26s';
+        el.style.opacity    = '0';
+        el.style.transform  = 'translateX(-24px)';
+
+        const url = '/carrito/eliminar/' + id + (talla ? '?talla=' + encodeURIComponent(talla) : '');
+        fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: '{}'
+        })
+        .then(r => r.json())
+        .then(data => {
+            setTimeout(() => {
+                el.remove();
+                updateSubtitle(data.totalItems);
+                checkIfEmpty();
+                recalc();
+            }, 270);
+        })
+        .catch(() => {
+            // Revertir animación si falla
+            el.style.opacity   = '1';
+            el.style.transform = 'none';
+        });
     }
 
     // ─── Vaciar carrito ────────────────────────────────────────────────────────
@@ -578,29 +614,15 @@
 
     // ─── Eliminar seleccionados ────────────────────────────────────────────────
     function removeSelected() {
-        const ids = [];
+        const selected = [];
         document.querySelectorAll('.cart-item').forEach(el => {
             const cb = el.querySelector('input[type="checkbox"]');
-            if (cb && cb.checked) ids.push(el.dataset.id);
+            if (cb && cb.checked) selected.push(el);
         });
-        if (ids.length === 0) return;
+        if (selected.length === 0) return;
 
-        ids.forEach(id => {
-            const el = document.querySelector('.cart-item[data-id="' + id + '"]');
-            if (el) el.remove();
-            api('/carrito/eliminar/' + id, {});
-        });
-
-        // Actualizar subtítulo y verificar vacío tras pequeña espera
-        setTimeout(() => {
-            const remaining = document.querySelectorAll('.cart-item').length;
-            updateSubtitle(
-                Array.from(document.querySelectorAll('.cart-item'))
-                    .reduce((s, el) => s + parseInt(document.getElementById('iqty-' + el.dataset.id)?.textContent || 1), 0)
-            );
-            checkIfEmpty();
-            recalc();
-        }, 100);
+        // Eliminar cada ítem seleccionado usando el elemento directamente
+        selected.forEach(el => doRemoveItem(el));
     }
 
     // ─── Toggle selección ──────────────────────────────────────────────────────
@@ -616,7 +638,8 @@
             const cb = el.querySelector('input[type="checkbox"]');
             if (!cb || !cb.checked) return;
             const price = parseFloat(el.dataset.price);
-            const qty   = parseInt(document.getElementById('iqty-' + el.dataset.id)?.textContent || 1);
+            const lk    = lineKey(el.dataset.id, el.dataset.talla || '');
+            const qty   = parseInt(document.getElementById('iqty-' + lk)?.textContent || 1);
             subtotal += price * qty;
             count++;
         });
