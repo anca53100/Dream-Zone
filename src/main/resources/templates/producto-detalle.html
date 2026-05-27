@@ -279,7 +279,8 @@
         <div class="galeria">
             <div class="img-principal">
                 <img th:if="${producto.imagen != null and !producto.imagen.isEmpty()}"
-                     th:src="${producto.imagen}" alt="Producto"/>
+                     th:src="${producto.imagen}"
+                     alt="Producto"/>
                 <div class="img-principal-inner"
                      th:if="${producto.imagen == null or producto.imagen.isEmpty()}">
                     Sin imagen

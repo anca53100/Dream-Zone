@@ -525,7 +525,8 @@
                          id="existingImgs"
                          th:if="${producto != null and producto.imagen != null}">
                         <div class="img-preview-item">
-                            <img th:src="${producto.imagen}" alt="Imagen del producto"/>
+                            <img th:src="${producto.imagen}"
+                                 alt="Imagen del producto"/>
                             <div class="img-remove"
                                  onclick="this.closest('.img-preview-item').remove()">✕</div>
                         </div>

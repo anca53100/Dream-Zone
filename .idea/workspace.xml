@@ -5,7 +5,14 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="796707c2-83dd-4d95-8574-35bd03ad96fc" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/dreamzone/config/WebConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/dreamzone/config/WebConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/dreamzone/controller/admin/AdminController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/dreamzone/controller/admin/AdminController.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/templates/admin/formulario-producto.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/templates/admin/formulario-producto.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/templates/producto-detalle.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/templates/producto-detalle.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/example/dreamzone/controller/admin/AdminController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/example/dreamzone/controller/admin/AdminController.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/templates/admin/formulario-producto.html" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/templates/admin/formulario-producto.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/templates/producto-detalle.html" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/templates/producto-detalle.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

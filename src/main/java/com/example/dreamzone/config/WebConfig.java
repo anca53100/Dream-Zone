@@ -16,7 +16,8 @@ public class WebConfig implements WebMvcConfigurer {
                         "/css/**",
                         "/js/**",
                         "/images/**",
-                        "/uploads/**",   // Imágenes de productos: acceso público
+                        "/uploads/**",   // Compatibilidad con imágenes locales antiguas
+                        "/imagenes/**",  // Imágenes servidas desde MongoDB GridFS
                         "/favicon.ico",
                         "/auth/**"
                 );
@@ -24,6 +25,7 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        // Compatibilidad con imágenes locales antiguas (si aún existen en disco)
         registry.addResourceHandler("/uploads/**")
                 .addResourceLocations("file:uploads/");
     }

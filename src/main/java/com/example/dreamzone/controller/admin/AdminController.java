@@ -1,6 +1,7 @@
 package com.example.dreamzone.controller.admin;
 
 import com.example.dreamzone.model.Producto;
+import com.example.dreamzone.service.GridFSService;
 import com.example.dreamzone.service.ProductoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -9,13 +10,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 @Controller
 @RequestMapping("/admin")
@@ -23,6 +20,9 @@ public class AdminController {
 
     @Autowired
     private ProductoService productoService;
+
+    @Autowired
+    private GridFSService gridFSService;
 
     // ── Dashboard ──
     @GetMapping
@@ -151,16 +151,19 @@ public class AdminController {
         producto.setEstado((formData.getEstado() == null || formData.getEstado().isBlank())
                 ? "Activo" : formData.getEstado());
 
-        // ── Imagen: guardar nueva o conservar la existente ──
+        // ── Imagen: guardar en GridFS (MongoDB Atlas) ──
         if (archivo != null && !archivo.isEmpty()) {
-            Path dir = Paths.get("uploads/productos/");
-            Files.createDirectories(dir);
-            String filename = UUID.randomUUID() + "_" + archivo.getOriginalFilename();
-            Files.copy(archivo.getInputStream(), dir.resolve(filename));
-            producto.setImagen("/uploads/productos/" + filename);
+            // Si ya tenía imagen en GridFS, eliminarla para no dejar archivos huérfanos
+            if (esEdicion && producto.getImagen() != null) {
+                gridFSService.eliminarPorUrl(producto.getImagen());
+            }
+            // Guardar nueva imagen en GridFS y guardar la URL completa
+            String gridFsId = gridFSService.guardar(archivo);
+            producto.setImagen("/imagenes/" + gridFsId);  // URL lista para th:src
         }
-        // Si no hay archivo nuevo, producto ya trae la imagen del DB (en edición)
-        // o null (en creación sin imagen)
+        // Si no hay archivo nuevo:
+        //  - En edición: producto ya cargó la imagen existente de la DB → se conserva
+        //  - En creación sin imagen: imagen queda null
 
         // ── Stock por talla (solo Camisas) ──
         if (Producto.tieneTallas(formData.getCategoria())) {
@@ -196,6 +199,12 @@ public class AdminController {
     // ── Eliminar ──
     @GetMapping("/productos/eliminar/{id}")
     public String eliminar(@PathVariable String id) {
+        // Antes de eliminar el producto, borrar su imagen de GridFS (si tiene)
+        productoService.obtenerPorId(id).ifPresent(p -> {
+            if (p.getImagen() != null) {
+                gridFSService.eliminarPorUrl(p.getImagen());
+            }
+        });
         productoService.eliminar(id);
         return "redirect:/admin/productos?success=eliminado";
     }
