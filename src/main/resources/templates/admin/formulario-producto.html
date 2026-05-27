@@ -681,7 +681,10 @@
         });
 
         /* Preview de stock total inicial si es camisa */
-        recalcularStock();
+        const catActual = document.querySelector('[name="categoria"]')?.value;
+        if (TALLAS_CATS.includes(catActual)) {
+            recalcularStock();
+        }
     });
 
     /* ── Vista previa de tarjeta (elementos opcionales) ── */
